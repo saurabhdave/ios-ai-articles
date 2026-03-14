@@ -1,18 +1,32 @@
 # iOS AI Articles
 
-Automated technical articles for senior iOS engineers, generated 3x/week by the [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer) pipeline and pushed here via GitHub Actions (Monday, Wednesday, Friday at 10:00 UTC).
+Automated technical articles for senior iOS engineers, generated 3x/week by the [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer) pipeline and published at **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**.
 
 Topics focus on production-grade Swift and SwiftUI: architecture decisions, migration strategies, performance, and risk-aware rollout patterns.
+
+## Blog
+
+Live at → **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**
+
+Built with Jekyll (minima theme) and deployed to GitHub Pages via GitHub Actions on every push.
+
+### Local preview
+
+```bash
+bundle install
+bundle exec jekyll serve
+```
 
 ## Structure
 
 ```
-articles/   Full long-form articles (~900–1,200 words, 5-section format)
+articles/   Full long-form articles — source of truth, pushed by the writer pipeline
 linkedin/   LinkedIn-optimized posts (~1,700 chars) for each article
 codegen/    Swift code generation metadata (compilation results, diagnostics)
+scripts/    update_readme.py — auto-updates this table; prep_jekyll.py — bridges articles/ to Jekyll _posts/
 ```
 
-All files share a date-prefixed naming convention:
+All content files share a date-prefixed naming convention:
 
 ```
 YYYY-MM-DD-<topic-slug>.md
@@ -39,6 +53,13 @@ Each article follows a consistent 5-section structure:
 5. **Validation, Testing & Rollout** — XCTest, feature flags, canary strategy
 
 Each section includes: Apple API callouts, a decision framework (Simple / Moderate / Advanced), and observability guidance.
+
+## Automation
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `update-readme.yml` | Push to `articles/**` or `linkedin/**` | Regenerates the articles table above |
+| `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages |
 
 ## Source
 

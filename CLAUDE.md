@@ -71,6 +71,21 @@ Ends with a **Closing Takeaway** and an **Implementation Checklist**.
 - Decision frameworks required (e.g., "Simple / Moderate / Advanced" classification)
 - Apple API callouts must specify UIKit vs. SwiftUI tooling explicitly
 
+## Jekyll Blog
+
+The repo publishes a blog at `https://saurabhdave.github.io/ios-ai-articles` via GitHub Pages.
+
+**How it works:**
+- `scripts/prep_jekyll.py` — called by the Jekyll workflow; copies `articles/*.md` → `_posts/` with injected YAML front matter (layout, title, date, categories). `_posts/` is gitignored — never edit files there.
+- `.github/workflows/jekyll.yml` — triggers on every push to `main`; runs `prep_jekyll.py`, builds with `bundle exec jekyll build`, deploys via `actions/deploy-pages`
+- `.github/workflows/update-readme.yml` — triggers on push to `articles/**` or `linkedin/**`; regenerates the articles table in README.md between `<!-- ARTICLES_TABLE_START -->` and `<!-- ARTICLES_TABLE_END -->` markers
+- `_config.yml` — minima theme, permalink: `/articles/:year/:month/:day/:title/`
+- `Gemfile` — `github-pages` gem + `webrick`
+
+**Local preview:** `bundle install && bundle exec jekyll serve`
+
+**Do not commit:** `_posts/`, `_site/`, `.jekyll-cache/`, `Gemfile.lock` — all gitignored.
+
 ## Git Commit Pattern
 
 ```
