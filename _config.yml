@@ -15,7 +15,13 @@ exclude:
   - articles/
   - linkedin/
   - codegen/
+  - newsletter/
   - scripts/
+
+collections:
+  newsletters:
+    output: true
+    permalink: /newsletter/:name/
 
 plugins:
   - jekyll-feed

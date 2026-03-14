@@ -49,6 +49,29 @@ layout: default
     </div>
   </section>
 
+  {% assign sorted_newsletters = site.newsletters | sort: 'date' | reverse %}
+  {% if sorted_newsletters.size > 0 %}
+  {% assign latest_newsletter = sorted_newsletters.first %}
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Latest Newsletter</span>
+        <a href="{{ '/newsletter/' | relative_url }}" class="section-count">All issues &rarr;</a>
+      </div>
+      <a href="{{ latest_newsletter.url | relative_url }}" class="featured-card">
+        <div class="featured-meta">
+          <span class="post-date">{{ latest_newsletter.date | date: "%B %-d, %Y" }}</span>
+          <span class="post-dot">&middot;</span>
+          <span class="cat-tag">Newsletter</span>
+        </div>
+        <h2 class="featured-title">{{ latest_newsletter.title }}</h2>
+        <p class="featured-excerpt">{{ latest_newsletter.excerpt | strip_html | truncate: 260 }}</p>
+        <span class="read-more">Read issue &rarr;</span>
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
   {% if site.posts.size > 1 %}
   <section class="articles-section">
     <div class="container">

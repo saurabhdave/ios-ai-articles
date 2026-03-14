@@ -1,0 +1,101 @@
+---
+layout: default
+title: iOS Dev Weekly
+permalink: /newsletter/
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Weekly Newsletter
+    </div>
+    <h1 class="hero-title">iOS Dev<br><span class="gradient-text">Weekly</span></h1>
+    <p class="hero-desc">A weekly roundup of iOS engineering trends, Swift snippets, and community picks — curated for senior engineers.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="stat-val">{{ site.newsletters | size }}</span>
+        <span class="stat-key">Issues</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="stat-val">1&times;</span>
+        <span class="stat-key">Weekly</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="stat-val">Swift 6</span>
+        <span class="stat-key">Platform</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% assign sorted_newsletters = site.newsletters | sort: 'date' | reverse %}
+
+{% if sorted_newsletters.size > 0 %}
+  {% assign latest = sorted_newsletters.first %}
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Latest Issue</span>
+      </div>
+      <a href="{{ latest.url | relative_url }}" class="featured-card">
+        <div class="featured-meta">
+          <span class="post-date">{{ latest.date | date: "%B %-d, %Y" }}</span>
+          <span class="post-dot">&middot;</span>
+          <span class="cat-tag">Newsletter</span>
+        </div>
+        <h2 class="featured-title">{{ latest.title }}</h2>
+        <p class="featured-excerpt">{{ latest.excerpt | strip_html | truncate: 260 }}</p>
+        <span class="read-more">Read issue &rarr;</span>
+      </a>
+    </div>
+  </section>
+
+  {% if sorted_newsletters.size > 1 %}
+  <section class="articles-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">All Issues</span>
+        <span class="section-count">{{ sorted_newsletters.size | minus: 1 }} more</span>
+      </div>
+      <div class="articles-grid">
+        {% for newsletter in sorted_newsletters offset: 1 %}
+        <a href="{{ newsletter.url | relative_url }}" class="article-card">
+          <div class="card-meta">
+            <span class="post-date">{{ newsletter.date | date: "%b %-d, %Y" }}</span>
+          </div>
+          <h3 class="card-title">{{ newsletter.title }}</h3>
+          <p class="card-excerpt">{{ newsletter.excerpt | strip_html | truncate: 160 }}</p>
+          <div class="card-footer">
+            <span class="cat-tag">newsletter</span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+{% else %}
+<section class="empty-section">
+  <div class="container">
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4L29.5 16.5L43 18.5L33.5 27.5L36 41L24 34.5L12 41L14.5 27.5L5 18.5L18.5 16.5L24 4Z" fill="url(#ng)" stroke="none"/>
+          <defs>
+            <linearGradient id="ng" x1="0" y1="0" x2="48" y2="48">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#60a5fa"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h2>Newsletter is coming soon</h2>
+      <p>Weekly iOS engineering roundups publish every Friday.</p>
+    </div>
+  </div>
+</section>
+{% endif %}
