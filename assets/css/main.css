@@ -4,7 +4,7 @@
    ============================================================ */
 
 /* === Light mode variables === */
-[data-theme="light"] {
+html[data-theme="light"] {
   --bg:           #f8f7ff;
   --bg-elevated:  #f0eeff;
   --bg-card:      #f4f2ff;
