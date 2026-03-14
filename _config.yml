@@ -8,10 +8,18 @@ minima:
   skin: classic
   date_format: "%B %-d, %Y"
 
-# No extra nav pages — home lists all articles
-header_pages: []
-
 permalink: /articles/:year/:month/:day/:title/
+
+# Exclude repo files that aren't part of the blog
+exclude:
+  - README.md
+  - CLAUDE.md
+  - Gemfile
+  - Gemfile.lock
+  - articles/
+  - linkedin/
+  - codegen/
+  - scripts/
 
 plugins:
   - jekyll-feed
