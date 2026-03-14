@@ -921,6 +921,21 @@ html[data-theme="light"] .feed-subheading { color: #4a3f6e; }
 }
 .feed-tab.active .tab-count { background: rgba(124,58,237,0.25); }
 
+/* Simple tab bar (no JS filter — single type feed) */
+.feed-tab-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--purple-light);
+}
+html[data-theme="light"] .feed-tab-bar { background: #f0eeff; border-color: rgba(124,58,237,0.15); color: #5b21b6; }
+
 /* Feed list */
 .feed { display: flex; flex-direction: column; gap: 14px; }
 
@@ -1091,6 +1106,74 @@ html[data-theme="light"] .feed-subheading { color: #4a3f6e; }
   color: var(--text-1);
   background: rgba(255,255,255,0.08);
 }
+
+/* === LinkedIn post detail page === */
+.lp-article {
+  padding: 48px 0 100px;
+}
+.lp-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px 24px;
+  box-shadow: var(--shadow);
+  margin-top: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.lp-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gradient);
+}
+.lp-body {
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 1.82;
+  color: var(--text-2);
+  white-space: pre-wrap;
+}
+.lp-body p { margin-bottom: 1.2em; }
+.lp-body ul, .lp-body ol { padding-left: 1.5em; margin-bottom: 1.2em; }
+.lp-body li { margin-bottom: 0.4em; }
+.lp-body strong { color: var(--text-1); font-weight: 600; }
+.lp-body code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: rgba(255,255,255,0.065);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2px 7px;
+  border-radius: 5px;
+  color: #c4b5fd;
+}
+.lp-body pre {
+  background: #080817;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  margin-bottom: 1.4em;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+.lp-body pre code { background: none; border: none; padding: 0; color: #d4cef5; }
+.lp-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+html[data-theme="light"] .lp-card { background: #f4f2ff; border-color: rgba(124,58,237,0.12); }
+html[data-theme="light"] .lp-body { color: #4a3f6e; }
+html[data-theme="light"] .lp-body strong { color: #1a1333; }
+html[data-theme="light"] .lp-body code { background: rgba(124,58,237,0.07); border-color: rgba(124,58,237,0.15); color: #5b21b6; }
+html[data-theme="light"] .lp-body pre { background: #ede9ff; border-color: rgba(124,58,237,0.14); }
+html[data-theme="light"] .lp-body pre code { color: #1e1040; }
+html[data-theme="light"] .lp-footer { border-color: rgba(124,58,237,0.12); }
 
 /* Light mode — feed */
 html[data-theme="light"] .feed-heading       { color: #1a1333; }

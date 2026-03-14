@@ -22,6 +22,9 @@ collections:
   newsletters:
     output: true
     permalink: /newsletter/:name/
+  linkedin:
+    output: true
+    permalink: /posts/:name/
 
 plugins:
   - jekyll-feed
