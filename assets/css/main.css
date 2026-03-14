@@ -865,8 +865,16 @@ img { max-width: 100%; display: block; }
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text-1);
-  margin-bottom: 14px;
+  margin-bottom: 6px;
 }
+
+.feed-subheading {
+  font-size: 15px;
+  color: var(--text-2);
+  margin-bottom: 18px;
+  font-weight: 400;
+}
+html[data-theme="light"] .feed-subheading { color: #4a3f6e; }
 
 .feed-tabs {
   display: flex;

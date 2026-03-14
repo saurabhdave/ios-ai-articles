@@ -29,114 +29,73 @@ layout: default
   </div>
 </section>
 
-{% assign all_newsletters = site.newsletters | sort: 'date' | reverse %}
-{% assign all_items = site.posts | concat: all_newsletters | sort: 'date' | reverse %}
-
-{% if all_items.size > 0 %}
-<section class="posts-section">
-  <div class="posts-container">
-
-    <div class="feed-header">
-      <h2 class="feed-heading">Posts</h2>
-      <div class="feed-tabs">
-        <button class="feed-tab active" data-filter="all">
-          All <span class="tab-count">{{ all_items | size }}</span>
-        </button>
-        <button class="feed-tab" data-filter="article">
-          Articles <span class="tab-count">{{ site.posts | size }}</span>
-        </button>
-        <button class="feed-tab" data-filter="newsletter">
-          Newsletter <span class="tab-count">{{ all_newsletters | size }}</span>
-        </button>
+{% if site.posts.size > 0 %}
+  {% assign featured = site.posts.first %}
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Latest Article</span>
       </div>
+      <a href="{{ featured.url | relative_url }}" class="featured-card">
+        <div class="featured-meta">
+          <span class="post-date">{{ featured.date | date: "%B %-d, %Y" }}</span>
+          <span class="post-dot">&middot;</span>
+          {% for cat in featured.categories %}<span class="cat-tag">{{ cat }}</span>{% endfor %}
+        </div>
+        <h2 class="featured-title">{{ featured.title }}</h2>
+        <p class="featured-excerpt">{{ featured.excerpt | strip_html | truncate: 260 }}</p>
+        <span class="read-more">Read article &rarr;</span>
+      </a>
     </div>
+  </section>
 
-    <div class="feed" id="feed">
-      {% for item in all_items %}
-        {% if item.collection == "newsletters" %}
-          {% assign item_type = "newsletter" %}
-          {% assign item_type_label = "Newsletter" %}
-          {% assign item_cta = "Read issue" %}
-        {% else %}
-          {% assign item_type = "article" %}
-          {% assign item_type_label = "Article" %}
-          {% assign item_cta = "Read article" %}
-        {% endif %}
-        {% assign words = item.content | number_of_words %}
-        {% if words < 360 %}{% assign read_time = 1 %}{% else %}{% assign read_time = words | divided_by: 180 %}{% endif %}
+  {% assign sorted_newsletters = site.newsletters | sort: 'date' | reverse %}
+  {% if sorted_newsletters.size > 0 %}
+  {% assign latest_newsletter = sorted_newsletters.first %}
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Latest Newsletter</span>
+        <a href="{{ '/newsletter/' | relative_url }}" class="section-count">All issues &rarr;</a>
+      </div>
+      <a href="{{ latest_newsletter.url | relative_url }}" class="featured-card">
+        <div class="featured-meta">
+          <span class="post-date">{{ latest_newsletter.date | date: "%B %-d, %Y" }}</span>
+          <span class="post-dot">&middot;</span>
+          <span class="cat-tag">Newsletter</span>
+        </div>
+        <h2 class="featured-title">{{ latest_newsletter.title }}</h2>
+        <p class="featured-excerpt">{{ latest_newsletter.excerpt | strip_html | truncate: 260 }}</p>
+        <span class="read-more">Read issue &rarr;</span>
+      </a>
+    </div>
+  </section>
+  {% endif %}
 
-        <a href="{{ item.url | relative_url }}" class="feed-card" data-type="{{ item_type }}">
-          <div class="feed-card-header">
-            <div class="feed-avatar">
-              <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2L13.09 8.26L20 9.27L15 14.14L16.18 21.02L10 17.77L3.82 21.02L5 14.14L0 9.27L6.91 8.26L10 2Z" fill="url(#fa{{ forloop.index }})" stroke="none"/>
-                <defs>
-                  <linearGradient id="fa{{ forloop.index }}" x1="0" y1="0" x2="20" y2="20">
-                    <stop offset="0%" stop-color="#a78bfa"/>
-                    <stop offset="100%" stop-color="#60a5fa"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div class="feed-author-info">
-              <span class="feed-author-name">iOS AI Articles</span>
-              <span class="feed-author-meta">Swift · SwiftUI · Apple Platform &nbsp;·&nbsp; {{ item.date | date: "%b %-d, %Y" }}</span>
-            </div>
-            <span class="feed-type-badge feed-type-{{ item_type }}">{{ item_type_label }}</span>
+  {% if site.posts.size > 1 %}
+  <section class="articles-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">All Articles</span>
+        <span class="section-count">{{ site.posts.size | minus: 1 }} more</span>
+      </div>
+      <div class="articles-grid">
+        {% for post in site.posts offset: 1 %}
+        <a href="{{ post.url | relative_url }}" class="article-card">
+          <div class="card-meta">
+            <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
           </div>
-
-          <div class="feed-content">
-            <h2 class="feed-title">{{ item.title }}</h2>
-            <p class="feed-excerpt">{{ item.excerpt | strip_html | truncate: 220 }}</p>
-          </div>
-
-          {% if item.categories and item.categories.size > 0 %}
-          <div class="feed-tags">
-            {% for cat in item.categories %}<span class="feed-tag">#{{ cat | downcase | replace: ' ', '' }}</span>{% endfor %}
-          </div>
-          {% endif %}
-
-          <div class="feed-footer">
-            <span class="feed-cta">
-              {{ item_cta }}
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <div class="feed-actions">
-              <span class="feed-read-time">{{ read_time }} min read</span>
-              <button class="feed-action-btn" onclick="event.preventDefault();event.stopPropagation()" aria-label="Bookmark">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                </svg>
-              </button>
-              <button class="feed-action-btn" onclick="event.preventDefault();event.stopPropagation()" aria-label="Share">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
-              </button>
-            </div>
+          <h3 class="card-title">{{ post.title }}</h3>
+          <p class="card-excerpt">{{ post.excerpt | strip_html | truncate: 160 }}</p>
+          <div class="card-footer">
+            {% for cat in post.categories %}<span class="cat-tag">{{ cat }}</span>{% endfor %}
           </div>
         </a>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
-
-  </div>
-</section>
-
-<script>
-  document.querySelectorAll('.feed-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.feed-tab').forEach(function(t) { t.classList.remove('active'); });
-      this.classList.add('active');
-      var filter = this.dataset.filter;
-      document.querySelectorAll('.feed-card').forEach(function(card) {
-        card.style.display = (filter === 'all' || card.dataset.type === filter) ? 'block' : 'none';
-      });
-    });
-  });
-</script>
+  </section>
+  {% endif %}
 
 {% else %}
 <section class="empty-section">
