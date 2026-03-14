@@ -8,7 +8,7 @@ Topics focus on production-grade Swift and SwiftUI: architecture decisions, migr
 
 Live at → **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**
 
-Built with Jekyll (minima theme) and deployed to GitHub Pages via GitHub Actions on every push.
+Built with Jekyll (custom dark theme) and deployed to GitHub Pages via GitHub Actions on every push.
 
 ### Local preview
 
@@ -34,7 +34,9 @@ YYYY-MM-DD-<topic-slug>-linkedin.md
 YYYY-MM-DD-<topic-slug>-codegen.json
 ```
 
-## Articles
+## Recent Articles
+
+Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**.
 
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |

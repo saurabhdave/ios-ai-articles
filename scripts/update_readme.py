@@ -30,12 +30,19 @@ def get_h1_title(filepath):
     return None
 
 
+RECENT_LIMIT = 10
+BLOG_URL = "https://saurabhdave.github.io/ios-ai-articles"
+
+
 def build_table():
+    all_files = sorted(
+        [f for f in os.listdir(ARTICLES_DIR) if PATTERN.match(f)],
+        reverse=True,
+    )
+    total = len(all_files)
     rows = []
-    for filename in sorted(os.listdir(ARTICLES_DIR), reverse=True):
+    for filename in all_files[:RECENT_LIMIT]:
         m = PATTERN.match(filename)
-        if not m:
-            continue
         date, slug = m.group(1), m.group(2)
         article_path = os.path.join(ARTICLES_DIR, filename)
         title = get_h1_title(article_path) or slug.replace("-", " ").title()
@@ -43,15 +50,21 @@ def build_table():
 
         linkedin_filename = f"{date}-{slug}-linkedin.md"
         linkedin_path = os.path.join(LINKEDIN_DIR, linkedin_filename)
-        if os.path.exists(linkedin_path):
-            linkedin_link = f"[Post](linkedin/{linkedin_filename})"
-        else:
-            linkedin_link = "—"
-
+        linkedin_link = (
+            f"[Post](linkedin/{linkedin_filename})"
+            if os.path.exists(linkedin_path)
+            else "—"
+        )
         rows.append(f"| {date} | {article_link} | {linkedin_link} |")
 
     header = "| Date | Article | LinkedIn |\n|------|---------|----------|"
-    return header + "\n" + "\n".join(rows)
+    table = header + "\n" + "\n".join(rows)
+
+    if total > RECENT_LIMIT:
+        remaining = total - RECENT_LIMIT
+        table += f"\n\n> Showing {RECENT_LIMIT} of {total} articles — [{remaining} more on the blog]({BLOG_URL})"
+
+    return table
 
 
 def update_readme():
