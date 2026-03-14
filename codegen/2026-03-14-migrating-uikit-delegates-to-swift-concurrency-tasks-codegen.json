@@ -1,0 +1,9 @@
+{
+  "topic": "Migrating UIKit Delegates to Swift Concurrency Tasks",
+  "generated_at_utc": "2026-03-14T15:13:28.523300+00:00",
+  "path": "omitted",
+  "repair_attempts": 2,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[validation:snippet] /tmp/tmp7mukmuea/GeneratedArticleCode.swift:81:7: error: expected '}' in struct\n75 | \n76 | // MARK: - UIViewControllerRepresentable host that triggers the async picker\n77 | struct ImagePickerPresenter: UIViewControllerRepresentable {\n   |                                                            `- note: to match this opening '{'\n78 |     // Trigger token; when toggled, the host will present the picker\n79 |     var isPresented: Bool\n80 | \n81 |     //\n   |       `- error: expected '}' in struct"
+}
