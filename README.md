@@ -22,9 +22,11 @@ YYYY-MM-DD-<topic-slug>-codegen.json
 
 ## Articles
 
-| Date | Topic |
-|------|-------|
-| 2026-03-13 | [Replace UITableView with SwiftUI LazyVStack](articles/2026-03-13-replace-uitableview-with-swiftui-lazyvstack.md) |
+<!-- ARTICLES_TABLE_START -->
+| Date | Article | LinkedIn |
+|------|---------|----------|
+| 2026-03-13 | [Replace UITableView with SwiftUI LazyVStack](articles/2026-03-13-replace-uitableview-with-swiftui-lazyvstack.md) | [Post](linkedin/2026-03-13-replace-uitableview-with-swiftui-lazyvstack-linkedin.md) |
+<!-- ARTICLES_TABLE_END -->
 
 ## Article Format
 
