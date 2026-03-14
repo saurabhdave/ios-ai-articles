@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #1</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #1</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #1</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Most mature apps carry navigation debt: push/pop calls, segues, and small hacks that made a feature ship instead of make the system resilient. Teams are quietly wrestling with deep links, state restoration, and modal coordination while debating whether SwiftUI's NavigationStack is a fit or just another refactor risk. This issue walks a practical path for migrating incrementally without detonating your release calendar.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Migrate ViewController Navigation to SwiftUI NavigationStack</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Short story: a mature app’s navigation often becomes a web of push/pop calls, segues, and ad‑hoc hacks to support deep links, state restoration, and modal coordination. Moving to a value‑typed, state‑driven NavigationStack forces a single source of truth and surfaces routing decisions that are currently buried in view controllers. The hard part isn’t the API — it’s designing an adapter and rollout plan that doesn’t break payments, auth, or user expectations.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Learning Swift and SwiftUI remains a strong community focus — people want practical, fast paths to become productive. [Source: Medium]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">SwiftUI concurrency patterns (.task, structured concurrency) are getting real‑world writeups and examples in multiple languages. [Source: dev.to]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Architectural discussions (coordinator pattern, removing navigation from view controllers) continue to surface as teams plan large refactors rather than one‑off fixes. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Observation
+
+// Simple domain model
+struct Item: Identifiable, Hashable {
+    let id: UUID
+    var title: String
+}
+
+// Observable app-level model using Swift Observation
+@Observable
+final class AppModel {
+    var items: [Item] = [
+        Item(id: .init(), title: &quot;First&quot;),
+        Item(id: .init(), title: &quot;Second&quot;),
+        Item(id: .init(), title: &quot;Third&quot;)
+    ]
+    var isFlagged: Bool = false
+}
+
+// Navigation destinations for NavigationStack
+enum Destination: Hashable {
+    case list
+    case detail(Item.ID)
+}
+// ... (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern encodes the operational decision to make routing a value‑typed, observable part of your app model so navigation becomes testable, auditable, and decoupled from fragile view controller side effects.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/@3daysofswift/want-to-learn-swift-fast-heres-the-smart-way-1bd6e5c7e4cc?source=rss------swift-5" style="color:#e05c00;text-decoration:none">Want to Learn Swift Fast? Here’s the Smart Way</a></strong> — Practical refresher on focused learning paths; handy if your team needs to get people up to speed for a SwiftUI migration.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>[[SC] Ejecutando Tasks en SwiftUI](https://dev.to/david_goyes_a488f58a17a53/sc-ejecutando-tasks-en-swiftui-dgg)</strong> — Good, concise examples of using .task and structured concurrency inside SwiftUI views — useful when you move work out of view controllers.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Read the full migration map if you’re responsible for a legacy app and have to keep users happy while changing routing primitives. Hit reply with your migration war stories, or join the LinkedIn thread to share adapter patterns that worked (or didn’t) for your team — we’ll surface the best responses in the next issue. Forward this to the engineer who’s stuck soldering UINavigationController behaviors together.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
