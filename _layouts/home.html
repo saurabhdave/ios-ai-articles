@@ -1,0 +1,97 @@
+---
+layout: default
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      iOS Engineering
+    </div>
+    <h1 class="hero-title">Swift &amp; iOS<br><span class="gradient-text">Engineering Insights</span></h1>
+    <p class="hero-desc">{{ site.description }}</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="stat-val">{{ site.posts | size }}</span>
+        <span class="stat-key">Articles</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="stat-val">3&times;</span>
+        <span class="stat-key">Weekly</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="stat-val">Swift 6</span>
+        <span class="stat-key">Platform</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if site.posts.size > 0 %}
+  {% assign featured = site.posts.first %}
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Latest Article</span>
+      </div>
+      <a href="{{ featured.url | relative_url }}" class="featured-card">
+        <div class="featured-meta">
+          <span class="post-date">{{ featured.date | date: "%B %-d, %Y" }}</span>
+          <span class="post-dot">&middot;</span>
+          {% for cat in featured.categories %}<span class="cat-tag">{{ cat }}</span>{% endfor %}
+        </div>
+        <h2 class="featured-title">{{ featured.title }}</h2>
+        <p class="featured-excerpt">{{ featured.excerpt | strip_html | truncate: 260 }}</p>
+        <span class="read-more">Read article &rarr;</span>
+      </a>
+    </div>
+  </section>
+
+  {% if site.posts.size > 1 %}
+  <section class="articles-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">All Articles</span>
+        <span class="section-count">{{ site.posts.size | minus: 1 }} more</span>
+      </div>
+      <div class="articles-grid">
+        {% for post in site.posts offset: 1 %}
+        <a href="{{ post.url | relative_url }}" class="article-card">
+          <div class="card-meta">
+            <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
+          </div>
+          <h3 class="card-title">{{ post.title }}</h3>
+          <p class="card-excerpt">{{ post.excerpt | strip_html | truncate: 160 }}</p>
+          <div class="card-footer">
+            {% for cat in post.categories %}<span class="cat-tag">{{ cat }}</span>{% endfor %}
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+{% else %}
+<section class="empty-section">
+  <div class="container">
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4L29.5 16.5L43 18.5L33.5 27.5L36 41L24 34.5L12 41L14.5 27.5L5 18.5L18.5 16.5L24 4Z" fill="url(#eg)" stroke="none"/>
+          <defs>
+            <linearGradient id="eg" x1="0" y1="0" x2="48" y2="48">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#60a5fa"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h2>Articles are on their way</h2>
+      <p>New Swift &amp; iOS engineering content publishes Monday, Wednesday, and Friday.</p>
+    </div>
+  </div>
+</section>
+{% endif %}

@@ -3,11 +3,6 @@ description: Production-grade iOS engineering articles on Swift, SwiftUI, and Ap
 url: "https://saurabhdave.github.io"
 baseurl: "/ios-ai-articles"
 
-theme: minima
-minima:
-  skin: classic
-  date_format: "%B %-d, %Y"
-
 permalink: /articles/:year/:month/:day/:title/
 
 # Exclude repo files that aren't part of the blog
