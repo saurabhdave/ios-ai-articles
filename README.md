@@ -42,6 +42,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | Date | Article | LinkedIn |
 |------|---------|----------|
 | 2026-03-14 | [Migrating UIKit Delegates to Swift Concurrency Tasks](articles/2026-03-14-migrating-uikit-delegates-to-swift-concurrency-tasks.md) | [Post](linkedin/2026-03-14-migrating-uikit-delegates-to-swift-concurrency-tasks-linkedin.md) |
+| 2026-03-14 | [Migrate ViewController Navigation to SwiftUI NavigationStack](articles/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack.md) | [Post](linkedin/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack-linkedin.md) |
 | 2026-03-13 | [Replace UITableView with SwiftUI LazyVStack](articles/2026-03-13-replace-uitableview-with-swiftui-lazyvstack.md) | [Post](linkedin/2026-03-13-replace-uitableview-with-swiftui-lazyvstack-linkedin.md) |
 <!-- ARTICLES_TABLE_END -->
 
