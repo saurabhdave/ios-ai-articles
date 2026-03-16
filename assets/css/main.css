@@ -558,7 +558,7 @@ img { max-width: 100%; display: block; }
 
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 18px;
 }
 
@@ -733,6 +733,7 @@ img { max-width: 100%; display: block; }
   border-radius: 5px;
   color: #c4b5fd;
   white-space: nowrap;
+  overflow-wrap: break-word;
 }
 
 .post-body pre {
@@ -741,6 +742,7 @@ img { max-width: 100%; display: block; }
   border-radius: 14px;
   padding: 28px 32px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-bottom: 1.75em;
   font-size: 14px;
   line-height: 1.75;
@@ -1210,12 +1212,67 @@ html[data-theme="light"] .feed-action-btn:hover { color: #1a1333; background: rg
   .feed-card { padding: 18px 18px 15px; }
   .feed-author-meta { font-size: 11px; }
   .feed-title { font-size: 16px; }
+
+  /* Reduce desktop-sized spacings */
+  .container { padding: 0 20px; }
+  .posts-container { padding: 0 20px; }
+  .featured-card { padding: 28px 24px; }
+  .featured-section { padding: 36px 0 44px; }
+  .back-link { margin-bottom: 28px; }
+  .post-header { margin-bottom: 44px; padding-bottom: 32px; }
+
+  /* Table horizontal scroll on mobile */
+  .post-body table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  /* LP card */
+  .lp-card { padding: 20px 20px 16px; }
+  .lp-article { padding: 32px 0 64px; }
+
+  /* Ensure touch-friendly nav link height */
+  .nav-link { min-height: 44px; }
 }
 
 @media (max-width: 480px) {
   .hero-title { letter-spacing: -0.025em; }
   .hero-stat-sep { display: none; }
-  .hero-stats { gap: 20px; }
+  .hero-stats { gap: 16px; }
   .feed-tabs { flex-wrap: wrap; }
   .feed-tab { flex: none; font-size: 13px; padding: 7px 12px; }
+
+  /* Tighten nav for small phones — hide redundant Articles link (logo = home) */
+  .nav-link-home { display: none; }
+  .nav-inner { padding: 0 16px; }
+  .nav-links { gap: 2px; }
+  .nav-link { padding: 5px 8px; font-size: 13px; min-height: 44px; }
+
+  /* Tighten container padding */
+  .container { padding: 0 16px; }
+  .posts-container { padding: 0 16px; }
+
+  /* Hero */
+  .hero { padding: 52px 0 48px; }
+  .hero-desc { font-size: 16px; margin-bottom: 32px; }
+  .hero-badge { margin-bottom: 24px; }
+
+  /* Featured card */
+  .featured-card { padding: 20px 16px; }
+  .featured-section { padding: 28px 0 36px; }
+
+  /* Post page */
+  .post-article { padding: 24px 0 60px; }
+  .post-header { margin-bottom: 28px; padding-bottom: 20px; }
+  .back-link { margin-bottom: 20px; }
+  .articles-section { padding: 0 0 64px; }
+
+  /* Allow inline code to wrap on tiny screens */
+  .post-body code { white-space: pre-wrap; }
+
+  /* LP card */
+  .lp-card { padding: 16px 16px 14px; }
+  .lp-article { padding: 24px 0 48px; }
 }
