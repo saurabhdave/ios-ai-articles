@@ -1,0 +1,9 @@
+{
+  "topic": "Migrate URLSession to Swift async/await",
+  "generated_at_utc": "2026-03-16T10:53:49.793919+00:00",
+  "path": "repaired",
+  "repair_attempts": 2,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[validation:snippet]"
+}
