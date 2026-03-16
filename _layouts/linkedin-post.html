@@ -36,9 +36,9 @@ layout: default
         {{ content }}
       </div>
 
-      {% if page.tags and page.tags != '""' %}
+      {% if page.hashtags and page.hashtags != "" %}
       <div class="lp-hashtags">
-        {% assign tag_list = page.tags | remove: '"' | split: " " %}
+        {% assign tag_list = page.hashtags | split: " " %}
         {% for tag in tag_list %}
           {% if tag != "" %}<span class="lp-tag">{{ tag }}</span>{% endif %}
         {% endfor %}

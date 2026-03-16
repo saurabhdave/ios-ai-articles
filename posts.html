@@ -51,9 +51,9 @@ permalink: /posts/
             <p class="feed-excerpt">{{ item.content | strip_html | truncate: 240 }}</p>
           </div>
 
-          {% if item.tags and item.tags != "" %}
+          {% if item.hashtags and item.hashtags != "" %}
           <div class="feed-tags">
-            {% assign tag_list = item.tags | split: " " %}
+            {% assign tag_list = item.hashtags | split: " " %}
             {% for tag in tag_list %}
               {% if tag contains "#" %}<span class="feed-tag">{{ tag }}</span>{% endif %}
             {% endfor %}

@@ -159,7 +159,7 @@ if os.path.isdir(LINKEDIN_DIR):
                 f'layout: linkedin-post\n'
                 f'title: "{safe_title}"\n'
                 f'date: {date}\n'
-                f'tags: "{tags}"\n'
+                f'hashtags: "{tags}"\n'
                 f'---\n\n'
             )
             out = front_matter + body
