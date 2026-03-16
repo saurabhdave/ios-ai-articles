@@ -79,7 +79,7 @@ The repo publishes a blog at `https://saurabhdave.github.io/ios-ai-articles` via
 - `scripts/prep_jekyll.py` — called by the Jekyll workflow; copies `articles/*.md` → `_posts/` with injected YAML front matter (layout, title, date, categories). `_posts/` is gitignored — never edit files there.
 - `.github/workflows/jekyll.yml` — triggers on every push to `main`; runs `prep_jekyll.py`, builds with `bundle exec jekyll build`, deploys via `actions/deploy-pages`
 - `.github/workflows/update-readme.yml` — triggers on push to `articles/**` or `linkedin/**`; regenerates the articles table in README.md between `<!-- ARTICLES_TABLE_START -->` and `<!-- ARTICLES_TABLE_END -->` markers
-- `_config.yml` — minima theme, permalink: `/articles/:year/:month/:day/:title/`
+- `_config.yml` — custom dark theme (layouts in `_layouts/`, styles in `assets/css/main.css`), permalink: `/articles/:year/:month/:day/:title/`
 - `Gemfile` — `github-pages` gem + `webrick`
 
 **Local preview:** `bundle install && bundle exec jekyll serve`
