@@ -1,0 +1,9 @@
+{
+  "topic": "Migrate Combine to Swift async/",
+  "generated_at_utc": "2026-03-16T22:07:31.048580+00:00",
+  "path": "repaired",
+  "repair_attempts": 1,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[validation:snippet]"
+}
