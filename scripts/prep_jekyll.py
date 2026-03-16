@@ -148,6 +148,12 @@ if os.path.isdir(LINKEDIN_DIR):
                     tags = line.strip()
                     break
 
+            # Strip the hashtags line from the body (already stored in tags front matter)
+            body_lines = content.rstrip().splitlines()
+            if body_lines and body_lines[-1].strip().startswith("#"):
+                body_lines = body_lines[:-1]
+            body = "\n".join(body_lines).rstrip() + "\n"
+
             front_matter = (
                 f'---\n'
                 f'layout: linkedin-post\n'
@@ -156,7 +162,7 @@ if os.path.isdir(LINKEDIN_DIR):
                 f'tags: "{tags}"\n'
                 f'---\n\n'
             )
-            out = front_matter + content
+            out = front_matter + body
 
         # Output as YYYY-MM-DD-slug.md (drop the -linkedin suffix)
         out_filename = f"{date}-{slug}.md"
