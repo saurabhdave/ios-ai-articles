@@ -675,6 +675,17 @@ img { max-width: 100%; display: block; }
   max-width: var(--max-w-post);
 }
 
+/* === Post cover image === */
+.post-cover-image {
+  display: block;
+  width: 100%;
+  max-width: var(--max-w-post);
+  height: auto;
+  border-radius: 10px;
+  margin-top: 32px;
+  object-fit: cover;
+}
+
 /* === Post body typography === */
 .post-body {
   max-width: var(--max-w-post);

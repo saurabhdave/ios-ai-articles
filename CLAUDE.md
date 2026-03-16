@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Role of This Repository
 
-This is the **output destination** for the automated pipeline at https://github.com/saurabhdave/ios-dev-ai-writer. Content is generated and pushed here via GitHub Actions 3x/week (Monday, Wednesday, Friday at 10:00 UTC). Do not manually create or edit article files — they are machine-generated and committed by the writer pipeline.
+This is the **output destination** for the automated pipeline at https://github.com/saurabhdave/ios-dev-ai-writer. Content is generated and pushed here via GitHub Actions 2x/week (Monday, Thursday at 10:00 UTC). Do not manually create or edit article files — they are machine-generated and committed by the writer pipeline.
 
 ## Upstream Pipeline (ios-dev-ai-writer)
 
@@ -20,13 +20,24 @@ Seven-phase automated pipeline:
 
 ## Output Structure
 
-Three directories, all files date-prefixed:
+Four directories, all files date-prefixed:
 
 ```
 articles/YYYY-MM-DD-<topic-slug>.md
 linkedin/YYYY-MM-DD-<topic-slug>-linkedin.md
 codegen/YYYY-MM-DD-<topic-slug>-codegen.json
+images/YYYY-MM-DD-<topic-slug>.png       ← cover image (Google Imagen 3, 16:9)
 ```
+
+Articles may include an optional YAML frontmatter block at the top when a cover image was generated:
+
+```markdown
+---
+cover_image: images/YYYY-MM-DD-<topic-slug>.png
+---
+```
+
+`scripts/prep_jekyll.py` detects this partial frontmatter and merges it with the full Jekyll frontmatter (layout, title, date, categories).
 
 ## Article Format
 
