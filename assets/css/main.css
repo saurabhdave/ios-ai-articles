@@ -1230,6 +1230,58 @@ html[data-theme="light"] .feed-read-time     { color: #9d8fba; }
 html[data-theme="light"] .feed-action-btn    { color: #9d8fba; }
 html[data-theme="light"] .feed-action-btn:hover { color: #1a1333; background: rgba(124,58,237,0.08); }
 
+/* === Share dropdown === */
+.share-dropdown {
+  position: fixed;
+  z-index: 200;
+  min-width: 188px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  border-radius: var(--radius);
+  padding: 5px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(124,58,237,0.12);
+  opacity: 0;
+  transform: scale(0.94) translateY(-6px);
+  transform-origin: top right;
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
+  pointer-events: none;
+}
+.share-dropdown.open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+.share-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background var(--dur), color var(--dur);
+  -webkit-tap-highlight-color: transparent;
+}
+.share-option:hover { background: rgba(124,58,237,0.10); color: var(--text-1); }
+.share-option svg { flex-shrink: 0; }
+.share-option-copied { color: #4ade80 !important; }
+
+html[data-theme="light"] .share-dropdown {
+  background: #f4f2ff;
+  border-color: rgba(124,58,237,0.22);
+  box-shadow: 0 8px 32px rgba(124,58,237,0.12), 0 0 0 1px rgba(124,58,237,0.10);
+}
+html[data-theme="light"] .share-option { color: #4a3f6e; }
+html[data-theme="light"] .share-option:hover { background: rgba(124,58,237,0.08); color: #1a1333; }
+
 /* === Responsive === */
 @media (max-width: 768px) {
   .hero { padding: 72px 0 64px; }
