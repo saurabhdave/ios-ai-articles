@@ -8,24 +8,27 @@ This is the **output destination** for the automated pipeline at https://github.
 
 ## Upstream Pipeline (ios-dev-ai-writer)
 
-Seven-phase automated pipeline:
+Eight-phase automated pipeline:
 
-1. **Trend Discovery** — aggregates signals from 8 sources (HackerNews, Reddit r/iOSProgramming, Apple Developer feeds, WWDC sessions, Google News RSS, social/dev.to/Medium, custom sources)
+1. **Trend Discovery** — aggregates signals from 9 sources (HackerNews, Reddit r/iOSProgramming, Apple Developer feeds, WWDC sessions, Google News RSS web search, social/dev.to/Medium, viral web/social, platforms, custom sources)
 2. **Topic Generation** — GPT-based, deduped by word-overlap (>60% = reject) and semantic similarity (threshold 0.88); falls back to curated topics on failure
 3. **Outline + Article** — quality-gated: requires ≥2 Apple signals + ≥3 practical signals + decision language ("when to", "vs"); loaded from `prompts/article_prompt.txt`
 4. **Code Generation** — Swift 6.2.4 via `swiftc` compile validation; up to 2 repair cycles; flags deprecated patterns (`@Published`, `@ObservableObject`) and enforces `@Observable`
-5. **Editorial Pass** — Medium-format polish; max 2 passes; quality score ≥8
+5. **Editorial Pass** — Medium-format polish; max 2 passes; quality score ≥8; deterministic Swift API backtick formatting applied post-generation
 6. **Review/QA** — self-review with running JSON history; optional fact-grounding (1 pass max)
 7. **LinkedIn Generation** — 3-stage pipeline (generate → constrain → fact-ground); 1,700-character limit; auto hashtag management
+8. **Newsletter Generation** — SwiftTribune-style weekly digest with 6 sections (Opening hook, Big Story, Trend Signals, Swift Snippet of the Week, Community Picks, Closing CTA); output as Markdown + email-safe HTML; issue number auto-increments
 
 ## Output Structure
 
-Three directories, all files date-prefixed:
+Four directories, all files date-prefixed:
 
 ```
 articles/YYYY-MM-DD-<topic-slug>.md
 linkedin/YYYY-MM-DD-<topic-slug>-linkedin.md
 codegen/YYYY-MM-DD-<topic-slug>-codegen.json
+newsletter/YYYY-MM-DD-issue-N.md
+newsletter/YYYY-MM-DD-issue-N.html
 ```
 
 ## Article Format
