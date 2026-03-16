@@ -33,43 +33,9 @@ for filename in sorted(os.listdir(ARTICLES_DIR)):
     with open(os.path.join(ARTICLES_DIR, filename), encoding="utf-8") as f:
         content = f.read()
 
+    # Already has front matter — copy as-is
     if content.startswith("---"):
-        fm_match = re.match(r'^---\n(.*?)\n---\n?(.*)', content, re.DOTALL)
-        if fm_match and 'layout:' in fm_match.group(1):
-            # Already full Jekyll front matter — copy as-is
-            out = content
-        elif fm_match:
-            # Partial front matter from pipeline (e.g. only cover_image) — inject Jekyll fields
-            extra_fields = fm_match.group(1).strip()
-            body = fm_match.group(2)
-
-            title = slug.replace("-", " ").title()
-            for line in body.splitlines():
-                if line.startswith("# "):
-                    title = line[2:].strip()
-                    break
-
-            safe_title = title.replace('"', '\\"')
-
-            body_lines = body.splitlines(keepends=True)
-            body_lines = [
-                l for l in body_lines
-                if not (l.startswith("# ") and l[2:].strip() == title)
-            ]
-            body = "".join(body_lines).lstrip("\n")
-
-            front_matter = (
-                f'---\n'
-                f'layout: post\n'
-                f'title: "{safe_title}"\n'
-                f'date: {date}\n'
-                f'categories: ios swift\n'
-                f'{extra_fields}\n'
-                f'---\n\n'
-            )
-            out = front_matter + body
-        else:
-            out = content
+        out = content
     else:
         # Extract H1 title; fall back to slug
         title = slug.replace("-", " ").title()

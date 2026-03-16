@@ -20,24 +20,13 @@ Seven-phase automated pipeline:
 
 ## Output Structure
 
-Four directories, all files date-prefixed:
+Three directories, all files date-prefixed:
 
 ```
 articles/YYYY-MM-DD-<topic-slug>.md
 linkedin/YYYY-MM-DD-<topic-slug>-linkedin.md
 codegen/YYYY-MM-DD-<topic-slug>-codegen.json
-images/YYYY-MM-DD-<topic-slug>.png       ← cover image (Google Imagen 3, 16:9)
 ```
-
-Articles may include an optional YAML frontmatter block at the top when a cover image was generated:
-
-```markdown
----
-cover_image: images/YYYY-MM-DD-<topic-slug>.png
----
-```
-
-`scripts/prep_jekyll.py` detects this partial frontmatter and merges it with the full Jekyll frontmatter (layout, title, date, categories).
 
 ## Article Format
 
