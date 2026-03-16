@@ -1135,7 +1135,6 @@ html[data-theme="light"] .feed-tab-bar { background: #f0eeff; border-color: rgba
   font-size: 16px;
   line-height: 1.82;
   color: var(--text-2);
-  white-space: pre-wrap;
 }
 .lp-body p { margin-bottom: 1.2em; }
 .lp-body ul, .lp-body ol { padding-left: 1.5em; margin-bottom: 1.2em; }
