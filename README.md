@@ -44,6 +44,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-03-17 | [Custom SwiftUI Layouts with the Layout Protocol](articles/2026-03-17-custom-swiftui-layouts-with-the-layout-protocol.md) | [Post](linkedin/2026-03-17-custom-swiftui-layouts-with-the-layout-protocol-linkedin.md) |
 | 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
 | 2026-03-16 | [Migrate Completion Handlers to Swift Structured Concurrency](articles/2026-03-16-migrate-completion-handlers-to-swift-structured-concurrency.md) | [Post](linkedin/2026-03-16-migrate-completion-handlers-to-swift-structured-concurrency-linkedin.md) |
 | 2026-03-16 | [Migrate Combine to Swift async/](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
