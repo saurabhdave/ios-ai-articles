@@ -11,10 +11,10 @@ This is the **output destination** for the automated pipeline at https://github.
 Eight-phase automated pipeline:
 
 1. **Trend Discovery** — aggregates signals from 9 sources (HackerNews, Reddit r/iOSProgramming, Apple Developer feeds, WWDC sessions, Google News RSS web search, social/dev.to/Medium, viral web/social, platforms, custom sources)
-2. **Topic Generation** — GPT-based, deduped by word-overlap (>60% = reject) and semantic similarity (threshold 0.88); falls back to curated topics on failure
-3. **Outline + Article** — quality-gated: requires ≥2 Apple signals + ≥3 practical signals + decision language ("when to", "vs"); loaded from `prompts/article_prompt.txt`
-4. **Code Generation** — Swift 6.2.4 via `swiftc` compile validation; up to 2 repair cycles; flags deprecated patterns (`@Published`, `@ObservableObject`) and enforces `@Observable`
-5. **Editorial Pass** — Medium-format polish; max 2 passes; quality score ≥8; deterministic Swift API backtick formatting applied post-generation
+2. **Topic Generation** — GPT-based (gpt-5-mini), deduped by word-overlap (>50% = reject) and semantic similarity (threshold 0.80); family rotation sampler de-weights recently used topic families; falls back to curated topics on failure
+3. **Outline + Article** — quality-gated: requires ≥2 Apple signals + ≥3 practical signals + decision language ("when to", "vs"); loaded from `prompts/article_prompt.txt`; optional anti-pattern sub-point per section
+4. **Code Generation** — Swift 6.2.4 via `swiftc` compile validation; minimum deployment target iOS 18 / Swift 6; up to 2 repair cycles; 35-line max per snippet; enforces `@Observable`, `OSSignposter`, and other modern APIs; no deprecated APIs (`@Published`, `@ObservableObject`, `os_signpost` are all rejected)
+5. **Editorial Pass** — Medium-format polish; max 2 passes; quality score ≥8; deterministic Swift API backtick formatting and "Operational note:" label stripping applied post-generation
 6. **Review/QA** — self-review with running JSON history; optional fact-grounding (1 pass max)
 7. **LinkedIn Generation** — 3-stage pipeline (generate → constrain → fact-ground); 1,700-character limit; auto hashtag management
 8. **Newsletter Generation** — SwiftTribune-style weekly digest with 6 sections (Opening hook, Big Story, Trend Signals, Swift Snippet of the Week, Community Picks, Closing CTA); output as Markdown + email-safe HTML; issue number auto-increments
@@ -33,10 +33,13 @@ newsletter/YYYY-MM-DD-issue-N.html
 
 ## Article Format
 
-Five sections, each with three subsections:
+Five sections, each with up to four subsections:
 - **Apple API / Tool Callout** — specific UIKit vs SwiftUI APIs at stake
-- **When to choose which** — decision guidance with named tiers (Simple / Moderate / Advanced)
-- **Operational / Observability note** — metrics, traces, lifecycle logging guidance
+- **When to choose which** — decision guidance with named tiers (Simple / Moderate / Advanced), or before/after contrast for patterns/practices topics
+- **Operational / Observability note** — metrics, traces, lifecycle logging guidance (label stripped deterministically; integrated as natural prose)
+- **Anti-pattern** (optional) — common mistake and how to avoid it
+
+Each core section includes one `swift` code block (4–10 lines). Patterns/practices topics may relax the Instruments/MetricKit observability requirement.
 
 Sections:
 1. Understanding Parity
@@ -69,10 +72,11 @@ Ends with a **Closing Takeaway** and an **Implementation Checklist**.
 
 ## Content Standards
 
-- Target audience: senior iOS engineers on production/mission-critical apps
-- Tone: risk-aware and practical; trade-offs must be explicit, not just benefits
-- Decision frameworks required (e.g., "Simple / Moderate / Advanced" classification)
+- Target audience: all iOS engineers, written from a senior perspective; previously gated to senior/production apps only
+- Tone: risk-aware and practical; trade-offs must be explicit, not just benefits; benefit-driven title framing is allowed for patterns/practices topics
+- Decision frameworks required (e.g., "Simple / Moderate / Advanced" classification), or before/after contrast structure
 - Apple API callouts must specify UIKit vs. SwiftUI tooling explicitly
+- iOS 18 / Swift 6 minimum — no pre-iOS 18 API patterns; no `os_signpost` (use `OSSignposter`); no `@Published`/`@ObservableObject`
 
 ## Jekyll Blog
 
