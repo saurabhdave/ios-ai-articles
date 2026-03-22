@@ -1,9 +1,0 @@
-{
-  "topic": "Profiling SwiftUI Rendering with Instruments",
-  "generated_at_utc": "2026-03-18T02:46:56.251258+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[snippet]  | style=Remove `@Bindable` from model properties (`model`) inside `@Observable`. Plain stored properties belong in the model; `@Bindable` belongs only in the SwiftUI View: `struct MyView: View {{ @Bindable var model: MyModel }}`."
-}
