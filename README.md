@@ -46,16 +46,14 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 |------|---------|----------|
 | 2026-03-22 | [Dependency Injection Patterns for Production SwiftUI](articles/2026-03-22-dependency-injection-patterns-for-production-swiftui.md) | [Post](linkedin/2026-03-22-dependency-injection-patterns-for-production-swiftui-linkedin.md) |
 | 2026-03-21 | [Privacy-First Telemetry with Swift Concurrency](articles/2026-03-21-privacy-first-telemetry-with-swift-concurrency.md) | [Post](linkedin/2026-03-21-privacy-first-telemetry-with-swift-concurrency-linkedin.md) |
-| 2026-03-19 | [Profile SwiftUI Rendering with Instruments](articles/2026-03-19-profile-swiftui-rendering-with-instruments.md) | [Post](linkedin/2026-03-19-profile-swiftui-rendering-with-instruments-linkedin.md) |
-| 2026-03-18 | [Profiling SwiftUI Rendering with Instruments](articles/2026-03-18-profiling-swiftui-rendering-with-instruments.md) | [Post](linkedin/2026-03-18-profiling-swiftui-rendering-with-instruments-linkedin.md) |
 | 2026-03-17 | [Swift 6.3 Macros for iOS Codebases](articles/2026-03-17-swift-63-macros-for-ios-codebases.md) | [Post](linkedin/2026-03-17-swift-63-macros-for-ios-codebases-linkedin.md) |
 | 2026-03-17 | [Custom SwiftUI Layouts with the Layout Protocol](articles/2026-03-17-custom-swiftui-layouts-with-the-layout-protocol.md) | [Post](linkedin/2026-03-17-custom-swiftui-layouts-with-the-layout-protocol-linkedin.md) |
 | 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
 | 2026-03-16 | [Migrate Completion Handlers to Swift Structured Concurrency](articles/2026-03-16-migrate-completion-handlers-to-swift-structured-concurrency.md) | [Post](linkedin/2026-03-16-migrate-completion-handlers-to-swift-structured-concurrency-linkedin.md) |
 | 2026-03-16 | [Migrate Combine to Swift async/](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
 | 2026-03-14 | [Migrating UIKit Delegates to Swift Concurrency Tasks](articles/2026-03-14-migrating-uikit-delegates-to-swift-concurrency-tasks.md) | [Post](linkedin/2026-03-14-migrating-uikit-delegates-to-swift-concurrency-tasks-linkedin.md) |
-
-> Showing 10 of 12 articles — [2 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+| 2026-03-14 | [Migrate ViewController Navigation to SwiftUI NavigationStack](articles/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack.md) | [Post](linkedin/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack-linkedin.md) |
+| 2026-03-13 | [Replace UITableView with SwiftUI LazyVStack](articles/2026-03-13-replace-uitableview-with-swiftui-lazyvstack.md) | [Post](linkedin/2026-03-13-replace-uitableview-with-swiftui-lazyvstack-linkedin.md) |
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
