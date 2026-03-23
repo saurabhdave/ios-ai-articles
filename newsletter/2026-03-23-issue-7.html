@@ -20,56 +20,57 @@
         <td style="padding:32px 40px">
 <h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #7</h2>
 <h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Ad-hoc Tasks and callback-heavy networking still show up in new codebases, and they quietly cause crashes, wasted battery, and impossible-to-repro UI bugs. Making task lifetimes explicit and owning cancellable scopes is the sort of pragmatic hygiene that pays off immediately in stability and testability.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">SwiftUI makes UI composition easier, but rendering regressions still ship and surprise teams. The hard part isn&#x27;t that SwiftUI can be slow—it&#x27;s that slow frames, CPU spikes, and creeping memory use are only useful data when you can reliably reproduce and attribute them. This issue walks through a practical, repeatable way to profile SwiftUI rendering with Instruments so your findings are actionable.</p>
 <hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
 <h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Structured Concurrency Patterns for SwiftUI Tasks</strong></p>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Conversion from floating Tasks and completion handlers to structured concurrency is about more than syntax; it&#x27;s about making lifecycle boundaries explicit so background work dies where you expect. When you own the task scope you avoid UI updates after navigation and you make cancellations testable. The patterns below target incremental, low-risk refactors that stop the common runtime footguns.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Profile SwiftUI Rendering with Instruments</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">UI regressions often show as blurred frames, CPU spikes during scrolling, or a steady memory climb after a release. Effective investigation requires profiling release builds on a device, marking meaningful boundaries in your code, and correlating traces to user actions. Do that once and you stop guessing—your next rollouts can be surgical instead of rollbacks.</p>
 <hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
 <h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
 <ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
-<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple's browser strategy and platform constraints are driving renewed attention to how apps behave in constrained or sandboxed environments — teams are re-evaluating offline, caching, and network retry strategies. [Source: HackerNews]</li>
-<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Tooling and small utility apps continue to be a vibrant corner of the community — folks are iterating on window and workspace affordances that improve developer productivity. [Source: HackerNews]</li>
-<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">There's practical interest in building backend systems with Swift at scale, which signals teams will keep investing in end-to-end Swift tooling and observability. [Source: Swift.org Blog]</li>
-<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Mobile apps that rely on ambient context (location, audio) are sharing patterns for robust background work and battery-friendly updates. [Source: Medium]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple's platform debate over web capabilities continues to attract heat—expect more discussion about platform constraints and developer experience. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">macOS tooling is getting creative; small open-source utilities like HopTab show demand for productivity tools that replace or extend OS defaults. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Teams are writing production Swift for backend and infra roles—examples like TelemetryDeck suggest Swift is maturing in server contexts and analytics. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">On-device AI is moving from experiment to practice; expect more writeups on building features with Apple foundation models in Swift. [Source: Medium]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">More teams will need to connect field metrics with local traces as on-device models and privacy-focused analytics shift how we measure UX. [Source: Medium]</li>
 </ul>
 <hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
 <h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
 <code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
 import Observation
+import OSLog
 
-// ❌ Before — ad-hoc Task spawned from the View (can leak work when view disappears)
-@Observable class LegacyVM {
-    var text: String = &quot;&quot;
-    func fetch() async {
-        let (data, _) = try! await URLSession.shared.data(from: URL(string: &quot;https://example.com&quot;)!)
-        text = String(decoding: data, as: UTF8.self)
-    }
+let profilerLogger = Logger(subsystem: &quot;com.example.app&quot;, category: &quot;rendering&quot;)
+let signposter = OSSignposter(logger: profilerLogger)
+
+@Observable class ListViewModel {
+    var items: [String] = (1...200).map { &quot;Item \($0)&quot; }
 }
-struct LegacyView: View {
-    @State private var vm = LegacyVM()
+
+struct ItemRow: View {
+    let text: String
+    // transient UI state lives here to avoid bubbling changes up the hierarchy
+    @State private var highlighted = false
+
     var body: some View {
-        Text(vm.text)
-            .task { await vm.fetch() } // ad-hoc Task lives with the view lifecycle only
-    }
-}
-
-// ✅ After — ViewModel owns a cancellable Task scope; View binds to ViewModel
-@MainActor @Observable class ModernVM {
-    var text: String = &quot;&quot;
-    private var loadingTask: Task&lt;Void, Never&gt;?
-    func load() {
-        // cancel any previous work and start a new task tied to this VM
+        Text(text)
+            .padding()
+            .background(highlighted ? .gray.opacity(0.2) : .clear)
+            .onTapGesture {
+                // mark a user-driven boundary for Instruments
+                let id = signposter.makeSignpostID()
+                signposter.beginInterval(&quot;RowTap&quot;, id: id, &quot;row&quot;, text)
+                highlighted.toggle()
 // … (truncated for newsletter)</code>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because owning the Task scope encodes a clear lifecycle contract: cancel on teardown, keep UI updates on the main actor, and make cancellations observable and testable.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because targeted signposts and localized transient state make Instruments traces mappable to user actions and reduce noisy recomputation across your view tree.</p>
 <hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
 <h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://pwa.gripe/" style="color:#e05c00;text-decoration:none">Apple&amp;#x27;s intentional crippling of Mobile Safari</a></strong> — A practical reminder that platform trade-offs ripple into app architecture and offline strategies.</p>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.royalbhati.com/hoptab" style="color:#e05c00;text-decoration:none">HopTab – Open source macOS app switcher and tiler that replaces Cmd+Tab</a></strong> — Small tooling experiments like this are useful templates for quick-iteration desktop utilities.</p>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/@canmageofficial/how-we-built-a-location-aware-audio-tour-guide-in-ios-b6cce5b9affd?source=rss------ios-5" style="color:#e05c00;text-decoration:none">How We Built a Location-Aware Audio Tour Guide in iOS</a></strong> — Good read on pragmatic background work and user-focused energy management.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://pwa.gripe/" style="color:#e05c00;text-decoration:none">Apple&amp;#x27;s intentional crippling of Mobile Safari</a></strong> — A pointed read on browser policy and platform trade-offs that ripple into how web-driven experiences are judged on iOS.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.royalbhati.com/hoptab" style="color:#e05c00;text-decoration:none">HopTab – Open source macOS app switcher and tiler that replaces Cmd+Tab</a></strong> — Small tools that reclaim productivity often reveal useful shortcuts and UX patterns you can borrow for internal tools.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/@wesleymatlock/apple-foundation-models-in-practice-building-on-device-ai-features-in-swift-b6243976af4f?source=rss------swift-5" style="color:#e05c00;text-decoration:none">Apple Foundation Models in Practice: Building On-Device AI Features in Swift</a></strong> — Practical writeup about integrating on-device models; helpful for design and measurement trade-offs.</p>
 <hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
 <h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
-<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Read the full piece for concrete refactor steps and testing tips you can apply this week, and consider moving any view-tied async into view models as a first pass. Hit reply with one painful migration or a lifecycle bug you solved — I&#x27;ll share the most useful replies next issue.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Read the full walkthrough to get step-by-step tips on which Instruments to run, how to profile release builds on device, and where to place signposts in your view hierarchy. Try the approach on one flaky screen, forward this to a teammate who owns UX performance, and join the LinkedIn thread to share how you tie MetricKit or logs back to local Instruments traces—hit reply with your patterns or gotchas.</p>
         </td>
       </tr>
       <tr>
