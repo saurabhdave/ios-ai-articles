@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #8</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #8</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #8</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Structured concurrency in Swift is maturing from a neat language feature into a real migration problem for production apps. Teams are quietly discovering that swapping callbacks for async/await can change cancellation and ownership semantics in ways that only appear under real load. This issue focuses on pragmatic patterns to migrate incrementally and detect the surprises before they hit users.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Structured Concurrency Patterns for Production Swift Apps</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Converting callback-based flows to structured-concurrency primitives can alter cancellation behavior, leaving child tasks running, sockets open, or UI state inconsistent under pressure. The article offers patterns to migrate one adapter at a time, instrument runtime behavior, and safely roll back when regressions appear. Read it for concrete tactics you can apply in an incremental rollout.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple announced a new business platform that expands its enterprise footprint and may shift priorities for teams shipping internal apps — expect new integration points and lifecycle considerations. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A long-running complaint resurfaced about Apple closing bug reports unless users explicitly verify them, which appears to be worsening trust in feedback loops for engineering teams. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Hobbyist and home-automation projects continue to push Apple Home boundaries; community builders are finding creative ways to bridge legacy hardware and modern platforms. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Swift 6.3 is out; language evolution keeps pushing async and concurrency ergonomics forward, so migrations should consider the latest runtime and compiler behaviors. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift.org blog confirms Swift 6.3’s release and reiterates the language’s reach across system and application layers, which matters when choosing migration timelines. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+import Observation
+import SwiftUI
+
+// ❌ Before — legacy callback API that returns a cancellable token (pseudo)
+// func loadResource(url: URL, completion: @escaping (Result&lt;Data,Error&gt;)-&gt;Void) -&gt; CancellableToken
+
+// ✅ After — structured-concurrency adapter that honours Task cancellation
+protocol CancellableToken { func cancel() }
+final class LegacyClient {
+    // Simulated legacy API (not used directly here)
+    func loadResource(url: URL, completion: @escaping (Result&lt;Data, Error&gt;) -&gt; Void) -&gt; CancellableToken { DummyToken() }
+    private class DummyToken: CancellableToken { func cancel() {} }
+}
+
+@Observable final class ResourceLoader {
+    var data: Data? = nil
+    var error: String? = nil
+
+    private let client = LegacyClient()
+
+    @MainActor func load(url: URL) async {
+        do {
+            let result = try await adaptLegacyLoad(url: url)
+            data = result
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it encodes ownership and cooperative cancellation for legacy callbacks so you can reason about resource lifetimes instead of guessing which sockets or tasks survive a cancellation.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Apple Business</strong> — Apple’s new all-in-one platform for businesses may change priorities for teams that integrate internal tools with Apple services. (https://www.apple.com/newsroom/2026/03/introducing-apple-business-a-new-all-in-one-platform-for-businesses-of-all-sizes/)</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Apple randomly closes bug reports unless you &quot;verify&quot; the bug remains unfixed</strong> — Useful context for teams relying on Apple’s feedback pipeline; plan for more noise in tracking regressions. (https://lapcatsoftware.com/articles/2026/3/11.html)</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Box of Secrets: Discreetly modding an apartment intercom to work with Apple Home</strong> — A practical reminder that many integration problems originate in messy legacy hardware, not just code. (https://www.jackhogan.me/blog/box-of-secrets/)</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you’re starting a concurrency migration, treat it like a deployment experiment: small, observable, and reversible. Hit reply with the odd failure mode you saw (leaked tasks, open sockets, or flaky UI) — I’ll share patterns that have worked for teams. Forward this to a teammate who’s tasked with a migration next sprint.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
