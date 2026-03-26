@@ -1,9 +1,0 @@
-{
-  "topic": "Swift 6.3 Macros for iOS Codebases",
-  "generated_at_utc": "2026-03-17T00:57:34.880356+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[validation:snippet] | observation_style=Remove `@Bindable` from model properties (`todo`) inside `@Observable` \u2014 keep them as plain stored properties. Move `@Bindable` to the SwiftUI View that holds a reference to this model: `struct MyView: View { @Bindable var model: MyModel }`."
-}

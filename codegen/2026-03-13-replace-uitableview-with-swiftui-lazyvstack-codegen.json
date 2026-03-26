@@ -1,9 +1,0 @@
-{
-  "topic": "Replace UITableView with SwiftUI LazyVStack",
-  "generated_at_utc": "2026-03-13T23:04:11.915232+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[validation:snippet] /tmp/tmp7rebbhme/GeneratedArticleCode.swift:70:33: error: expected type\n68 |     // Owned observable store\n69 |     @State private var store = ItemStore()\n70 |     @State private var editMode:\n   |                                 `- error: expected type\n\n/tmp/tmp7rebbhme/GeneratedArticleCode.swift:70:33: error: expected '}' in struct\n65 | }\n66 | \n67 | struct LazyVStackTodoListView: View {\n   |                                     `- note: to match this opening '{'\n68 |     // Owned observable store\n69 |     @State private var store = ItemStore()\n70 |     @State private var editMode:\n   |                                 `- error: expected '}' in struct | observation_style=Do not use `@Bindable` on properties inside an `@Observable` type; use plain stored properties in models."
-}
