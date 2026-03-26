@@ -44,6 +44,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-03-26 | [Structured Concurrency Patterns for Production Swift Apps](articles/2026-03-26-structured-concurrency-patterns-for-production-swift-apps.md) | [Post](linkedin/2026-03-26-structured-concurrency-patterns-for-production-swift-apps-linkedin.md) |
 | 2026-03-23 | [Structured Concurrency Patterns for SwiftUI Tasks](articles/2026-03-23-structured-concurrency-patterns-for-swiftui-tasks.md) | [Post](linkedin/2026-03-23-structured-concurrency-patterns-for-swiftui-tasks-linkedin.md) |
 | 2026-03-23 | [Profile SwiftUI Rendering with Instruments](articles/2026-03-23-profile-swiftui-rendering-with-instruments.md) | [Post](linkedin/2026-03-23-profile-swiftui-rendering-with-instruments-linkedin.md) |
 | 2026-03-22 | [Dependency Injection Patterns for Production SwiftUI](articles/2026-03-22-dependency-injection-patterns-for-production-swiftui.md) | [Post](linkedin/2026-03-22-dependency-injection-patterns-for-production-swiftui-linkedin.md) |
@@ -53,9 +54,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
 | 2026-03-16 | [Migrate Completion Handlers to Swift Structured Concurrency](articles/2026-03-16-migrate-completion-handlers-to-swift-structured-concurrency.md) | [Post](linkedin/2026-03-16-migrate-completion-handlers-to-swift-structured-concurrency-linkedin.md) |
 | 2026-03-16 | [Migrate Combine to Swift async/](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
-| 2026-03-14 | [Migrating UIKit Delegates to Swift Concurrency Tasks](articles/2026-03-14-migrating-uikit-delegates-to-swift-concurrency-tasks.md) | [Post](linkedin/2026-03-14-migrating-uikit-delegates-to-swift-concurrency-tasks-linkedin.md) |
 
-> Showing 10 of 12 articles — [2 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 13 articles — [3 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
