@@ -1,0 +1,50 @@
+name: Editorial Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "articles/**"
+      - "newsletter/**"
+      - "codegen/**"
+      - "linkedin/**"
+
+# Prevent concurrent runs from racing on the same commit
+concurrency:
+  group: editorial-gate
+  cancel-in-progress: false
+
+jobs:
+  editorial-gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run editorial gate
+        id: gate
+        run: |
+          python scripts/editorial_gate.py
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+        # exit 1 means files were removed — not a workflow failure, just triggers commit
+        continue-on-error: true
+
+      - name: Commit removals and refresh README
+        if: steps.gate.outputs.exit_code == '1'
+        run: |
+          # Regenerate articles table since [skip ci] prevents update-readme.yml from running
+          python scripts/update_readme.py
+          git config user.name "editorial-gate[bot]"
+          git config user.email "editorial-gate[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || \
+            git commit -m "editorial: remove policy-violating content [skip ci]"
+          git push
