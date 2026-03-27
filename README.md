@@ -46,7 +46,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
-| 2026-03-27 | [Structured Concurrency Patterns for Swift 6.3](articles/2026-03-27-structured-concurrency-patterns-for-swift-63.md) | [Post](linkedin/2026-03-27-structured-concurrency-patterns-for-swift-63-linkedin.md) |
+| 2026-03-27 | [Profiling SwiftUI Rendering in Instruments](articles/2026-03-27-profiling-swiftui-rendering-in-instruments.md) | [Post](linkedin/2026-03-27-profiling-swiftui-rendering-in-instruments-linkedin.md) |
 | 2026-03-26 | [Structured Concurrency Patterns for Production Swift Apps](articles/2026-03-26-structured-concurrency-patterns-for-production-swift-apps.md) | [Post](linkedin/2026-03-26-structured-concurrency-patterns-for-production-swift-apps-linkedin.md) |
 | 2026-03-23 | [Profile SwiftUI Rendering with Instruments](articles/2026-03-23-profile-swiftui-rendering-with-instruments.md) | [Post](linkedin/2026-03-23-profile-swiftui-rendering-with-instruments-linkedin.md) |
 | 2026-03-22 | [Dependency Injection Patterns for Production SwiftUI](articles/2026-03-22-dependency-injection-patterns-for-production-swiftui.md) | [Post](linkedin/2026-03-22-dependency-injection-patterns-for-production-swiftui-linkedin.md) |
