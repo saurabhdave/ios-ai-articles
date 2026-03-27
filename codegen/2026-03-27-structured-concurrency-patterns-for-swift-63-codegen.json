@@ -1,0 +1,9 @@
+{
+  "topic": "Structured Concurrency Patterns for Swift 6.3",
+  "generated_at_utc": "2026-03-27T04:37:45.342448+00:00",
+  "path": "omitted",
+  "repair_attempts": 2,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[snippet] /tmp/tmpeayxp17t/GeneratedArticleCode.swift:6:9: error: expected identifier in function declaration\n4 | \n5 | actor NetworkClient {\n6 |     func\n  |         `- error: expected identifier in function declaration\n\n/tmp/tmpeayxp17t/GeneratedArticleCode.swift:6:9: error: expected '}' in actor\n3 | import Observation\n4 | \n5 | actor NetworkClient {\n  |                     `- note: to match this opening '{'\n6 |     func\n  |         `- error: expected '}' in actor"
+}
