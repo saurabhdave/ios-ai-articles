@@ -78,6 +78,37 @@ Ends with a **Closing Takeaway** and an **Implementation Checklist**.
 - Apple API callouts must specify UIKit vs. SwiftUI tooling explicitly
 - iOS 18 / Swift 6 minimum — no pre-iOS 18 API patterns; no `os_signpost` (use `OSSignposter`); no `@Published`/`@ObservableObject`
 
+## Editorial Gate
+
+A two-layer automated quality gate prevents low-quality or policy-violating content from reaching the blog.
+
+### Layer 1 — Pre-push (ios-dev-ai-writer pipeline)
+`scripts/editorial_gate.py` in ios-dev-ai-writer runs after generation and before syncing to this repo. Failing articles are moved to `outputs/quarantine/` and never pushed.
+
+### Layer 2 — Post-push (this repo)
+`scripts/editorial_gate.py` here runs on every push via `.github/workflows/editorial-review.yml`. It removes any violations that slipped through and auto-commits the cleanup with `[skip ci]`. `update_readme.py` is also run inline (since `[skip ci]` suppresses the normal readme workflow).
+
+### Gate rules (both layers enforce the same four checks)
+
+| # | Check | Failure condition | Action |
+|---|-------|-------------------|--------|
+| 1 | Validated Swift code | `codegen.json` `path == "omitted"` | Remove article + linkedin + codegen |
+| 2 | No banned deprecated APIs | `@Published`, `@ObservableObject`, or `os_signpost(` in ` ```swift ` blocks | Same |
+| 3 | No duplicate topic | Jaccard > 0.5 on stopword-filtered H1 tokens vs all other articles | Remove weaker duplicate (prefer code-validated; prefer newer on tie) |
+| 4 | Newsletter not orphaned | Newsletter Big Story title matches an existing article H1 | Remove `.md` + `.html` pair |
+
+### Running locally
+
+```bash
+# Dry-run — report only, no deletions
+python scripts/editorial_gate.py --dry-run
+
+# Live run
+python scripts/editorial_gate.py
+```
+
+Exit 0 = all clear. Exit 1 = files removed (CI will commit the removals).
+
 ## Jekyll Blog
 
 The repo publishes a blog at `https://saurabhdave.github.io/ios-ai-articles` via GitHub Pages.

@@ -24,7 +24,9 @@ articles/     Full long-form articles — source of truth, pushed by the writer 
 linkedin/     LinkedIn-optimized posts (~1,700 chars) for each article
 codegen/      Swift code generation metadata (compilation results, diagnostics)
 newsletter/   Weekly iOS Dev Weekly newsletter — Markdown + email-safe HTML per issue
-scripts/      update_readme.py — auto-updates this table; prep_jekyll.py — bridges articles/ to Jekyll _posts/
+scripts/      editorial_gate.py — quality gate (see below)
+              update_readme.py  — auto-updates this table
+              prep_jekyll.py    — bridges articles/ to Jekyll _posts/
 ```
 
 All content files share a date-prefixed naming convention:
@@ -50,7 +52,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-03-21 | [Privacy-First Telemetry with Swift Concurrency](articles/2026-03-21-privacy-first-telemetry-with-swift-concurrency.md) | [Post](linkedin/2026-03-21-privacy-first-telemetry-with-swift-concurrency-linkedin.md) |
 | 2026-03-17 | [Custom SwiftUI Layouts with the Layout Protocol](articles/2026-03-17-custom-swiftui-layouts-with-the-layout-protocol.md) | [Post](linkedin/2026-03-17-custom-swiftui-layouts-with-the-layout-protocol-linkedin.md) |
 | 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
-| 2026-03-16 | [Migrate Combine to Swift async/](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
+| 2026-03-16 | [Migrate Combine to Swift async/await](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
 | 2026-03-14 | [Migrate ViewController Navigation to SwiftUI NavigationStack](articles/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack.md) | [Post](linkedin/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack-linkedin.md) |
 <!-- ARTICLES_TABLE_END -->
 
@@ -66,10 +68,24 @@ Each article follows a consistent 5-section structure:
 
 Each section includes: Apple API callouts, a decision framework (Simple / Moderate / Advanced), and observability guidance.
 
+## Editorial Gate
+
+Every push to this repo triggers an automated editorial review (`scripts/editorial_gate.py`) that enforces four hard rules:
+
+| # | Rule | Action |
+|---|------|--------|
+| 1 | Article must have a validated Swift code snippet (`codegen path ≠ "omitted"`) | Remove article + companions |
+| 2 | No banned deprecated APIs (`@Published`, `@ObservableObject`, `os_signpost(`) in Swift code blocks | Remove article + companions |
+| 3 | No duplicate topic — Jaccard similarity > 0.5 against other article titles | Remove the weaker duplicate |
+| 4 | Newsletter Big Story title must match an existing article H1 | Remove orphaned newsletter |
+
+Failures are committed automatically with `[skip ci]`. The same gate also runs in the upstream pipeline ([ios-dev-ai-writer#1](https://github.com/saurabhdave/ios-dev-ai-writer/pull/1)) as a pre-push quarantine step, so most issues are caught before they ever reach this repo.
+
 ## Automation
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
+| `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate; auto-removes violations and refreshes README |
 | `update-readme.yml` | Push to `articles/**` or `linkedin/**` | Regenerates the articles table above |
 | `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages |
 
