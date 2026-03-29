@@ -46,6 +46,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-03-29 | [Custom Layouts Using SwiftUI's Layout Protocol](articles/2026-03-29-custom-layouts-using-swiftuis-layout-protocol.md) | [Post](linkedin/2026-03-29-custom-layouts-using-swiftuis-layout-protocol-linkedin.md) |
 | 2026-03-27 | [Profiling SwiftUI Rendering in Instruments](articles/2026-03-27-profiling-swiftui-rendering-in-instruments.md) | [Post](linkedin/2026-03-27-profiling-swiftui-rendering-in-instruments-linkedin.md) |
 | 2026-03-26 | [Structured Concurrency Patterns for Production Swift Apps](articles/2026-03-26-structured-concurrency-patterns-for-production-swift-apps.md) | [Post](linkedin/2026-03-26-structured-concurrency-patterns-for-production-swift-apps-linkedin.md) |
 | 2026-03-23 | [Profile SwiftUI Rendering with Instruments](articles/2026-03-23-profile-swiftui-rendering-with-instruments.md) | [Post](linkedin/2026-03-23-profile-swiftui-rendering-with-instruments-linkedin.md) |
