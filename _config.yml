@@ -1,7 +1,11 @@
-title: iOS AI Articles
-description: Production-grade iOS engineering articles on Swift, SwiftUI, and Apple platform development — generated 2x/week.
+title: "iOS Dev AI Articles"
+description: "Production-grade iOS engineering articles — generated weekly from real trend signals."
 url: "https://saurabhdave.github.io"
 baseurl: "/ios-ai-articles"
+
+author:
+  name: Saurabh Dave
+  email: ""
 
 permalink: /articles/:year/:month/:day/:title/
 
@@ -29,3 +33,9 @@ collections:
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+
+feed:
+  posts_limit: 20
+  excerpt_only: false
+  collections:
+    - posts

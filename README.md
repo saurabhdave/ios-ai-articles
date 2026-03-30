@@ -10,6 +10,8 @@ Live at → **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github
 
 Built with Jekyll (custom dark theme) and deployed to GitHub Pages via GitHub Actions on every push.
 
+RSS feed available at **[saurabhdave.github.io/ios-ai-articles/feed.xml](https://saurabhdave.github.io/ios-ai-articles/feed.xml)** — works in Reeder, NetNewsWire, Feedly, and any RSS reader.
+
 ### Local preview
 
 ```bash
