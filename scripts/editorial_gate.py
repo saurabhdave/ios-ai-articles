@@ -139,6 +139,32 @@ def tokenize(title: str) -> set[str]:
     return raw - TITLE_STOPWORDS
 
 
+# Stopwords for normalise_title — grammatical filler that inflates topic distance.
+_NORMALISE_STOPWORDS: frozenset[str] = frozenset({
+    "a", "an", "the", "and", "or", "for", "in", "on", "of", "to", "with",
+    "using", "via", "how", "what", "your", "my", "our", "their",
+    "is", "are", "was", "were", "be", "been", "being", "have", "has",
+})
+
+
+def normalise_title(title: str) -> set[str]:
+    """Lowercase, remove stopwords, stem verb forms (profiling→profil), return a set.
+
+    Strips trailing 'ing' from tokens longer than 6 characters so that
+    'profiling' and 'profile' produce overlapping stems, catching near-duplicates
+    that differ only in gerund vs. base-verb phrasing.
+    """
+    tokens = re.findall(r"\w+", title.lower())
+    tokens = [t for t in tokens if t not in _NORMALISE_STOPWORDS]
+    normalised: list[str] = []
+    for t in tokens:
+        if t.endswith("ing") and len(t) > 6:
+            normalised.append(t[:-3])  # "profiling" → "profil", "rendering" → "render"
+        else:
+            normalised.append(t)
+    return set(normalised)
+
+
 def jaccard(a: set[str], b: set[str]) -> float:
     union = a | b
     if not union:
@@ -289,14 +315,15 @@ def check_duplicate_titles(
     """
     live = [s for s in slugs if os.path.exists(article_path(s))]
 
-    # Build token sets for live articles
+    # Build token sets for live articles using normalise_title so that
+    # verb-form variants ('profiling' vs 'profile') are treated as the same stem.
     tokens: dict[str, set[str]] = {}
     h1s: dict[str, str] = {}
     for slug in live:
         h1 = get_h1(article_path(slug))
         if h1:
             h1s[slug] = h1
-            tokens[slug] = tokenize(h1)
+            tokens[slug] = normalise_title(h1)
 
     processed: set[str] = set()
     for i, slug_a in enumerate(live):
