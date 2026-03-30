@@ -31,6 +31,9 @@ jobs:
 
       - name: Run editorial gate
         id: gate
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CODE_REVIEW_ENABLED: "true"
         run: |
           python scripts/editorial_gate.py
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
@@ -48,3 +51,7 @@ jobs:
           git diff --cached --quiet || \
             git commit -m "editorial: remove policy-violating content [skip ci]"
           git push
+
+      - name: Write code review summary
+        if: always()
+        run: python scripts/write_code_review_summary.py

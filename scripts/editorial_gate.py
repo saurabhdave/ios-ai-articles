@@ -12,6 +12,12 @@ Checks (run in order so later checks see the already-cleaned state):
 Removes offending files (article + linkedin + codegen companions; newsletter
 .md + .html pairs) and prints a structured summary.
 
+Advisory check (warnings only, no deletions):
+  5. Code logic review — OpenAI-powered review of Swift code blocks for issues
+     that swiftc cannot catch (data races, wrong @Bindable usage, etc.).
+     Requires OPENAI_API_KEY env var.  Controlled by CODE_REVIEW_ENABLED
+     (default "true").  Findings written to outputs/code_review_log.json.
+
 Exit codes:
   0 — gate passed, nothing removed
   1 — gate removed one or more files (caller should commit)
@@ -66,6 +72,30 @@ TITLE_STOPWORDS: frozenset[str] = frozenset({
 })
 
 BIG_STORY_SECTION = "### This Week's Big Story"
+
+OUTPUTS_DIR = os.path.join(REPO_ROOT, "outputs")
+CODE_REVIEW_LOG = os.path.join(OUTPUTS_DIR, "code_review_log.json")
+
+CODE_REVIEW_SYSTEM_PROMPT = """\
+You are a Swift 6 code reviewer. Review the following Swift code block from a technical article.
+
+Check for:
+1. Data races — mutable state accessed from multiple actors/tasks without isolation
+2. Wrong @Bindable usage — @Bindable must wrap a reference passed in from outside, never a locally-owned @Observable
+3. Misleading patterns — code that compiles but teaches incorrect idioms (e.g. Task.detached from UI code without justification)
+4. Missing actor isolation — classes with mutable dictionaries/arrays used in async context without @MainActor or actor keyword
+5. Wrong API usage — any Swift 6 API used incorrectly
+
+Respond ONLY in this JSON format:
+{
+  "has_issues": true/false,
+  "issues": [
+    {"severity": "error|warning", "description": "specific issue", "line_hint": "code fragment where issue occurs"}
+  ]
+}
+
+If no issues found: {"has_issues": false, "issues": []}
+"""
 
 
 # ---------------------------------------------------------------------------
@@ -345,6 +375,95 @@ def check_orphaned_newsletters(
 
 
 # ---------------------------------------------------------------------------
+# Check 5 — Code logic review (advisory, OpenAI-powered)
+# ---------------------------------------------------------------------------
+
+def review_code_logic(slugs: list[str], openai_client) -> None:
+    """
+    For each live article, extract Swift code blocks and send them to the
+    OpenAI API for logic review.  Findings are warnings only — no files are
+    removed.  All findings are written to outputs/code_review_log.json.
+
+    Args:
+        slugs:         List of article slugs to review (same format used
+                       throughout the gate).
+        openai_client: An initialised openai.OpenAI client instance.
+    """
+    os.makedirs(OUTPUTS_DIR, exist_ok=True)
+
+    # slug → list of issue dicts reported by the model
+    all_findings: dict[str, list[dict]] = {}
+    # slugs that have at least one "error"-severity issue
+    code_warnings: list[str] = []
+
+    for slug in slugs:
+        path = article_path(slug)
+        if not os.path.exists(path):
+            continue
+
+        try:
+            with open(path, encoding="utf-8") as fh:
+                content = fh.read()
+        except OSError:
+            continue
+
+        blocks = extract_swift_blocks(content)
+        if not blocks:
+            continue
+
+        slug_findings: list[dict] = []
+
+        for block in blocks:
+            try:
+                response = openai_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": CODE_REVIEW_SYSTEM_PROMPT},
+                        {"role": "user", "content": block},
+                    ],
+                    response_format={"type": "json_object"},
+                    temperature=0,
+                )
+                raw = response.choices[0].message.content.strip()
+                result = json.loads(raw)
+            except Exception as exc:
+                print(f"[CODE-REVIEW] {slug}: API error — {exc}")
+                continue
+
+            if not result.get("has_issues"):
+                continue
+
+            for issue in result.get("issues", []):
+                severity = issue.get("severity", "warning")
+                desc = issue.get("description", "unknown issue")
+                hint = issue.get("line_hint", "")
+                hint_part = f" | near: {hint}" if hint else ""
+                print(f"[CODE-REVIEW] {slug}: {desc}{hint_part}")
+                slug_findings.append(issue)
+                if severity == "error" and slug not in code_warnings:
+                    code_warnings.append(slug)
+
+        if slug_findings:
+            all_findings[slug] = slug_findings
+
+    with open(CODE_REVIEW_LOG, "w", encoding="utf-8") as fh:
+        json.dump(all_findings, fh, indent=2)
+
+    if code_warnings:
+        print(
+            f"\n[CODE-REVIEW] {len(code_warnings)} article(s) flagged with errors: "
+            + ", ".join(code_warnings)
+        )
+    elif all_findings:
+        print(
+            f"\n[CODE-REVIEW] {len(all_findings)} article(s) have warnings. "
+            f"See outputs/code_review_log.json"
+        )
+    else:
+        print("[CODE-REVIEW] No code logic issues found.")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -383,6 +502,15 @@ def main() -> int:
     check_banned_apis(all_slugs, blocked, removed, dry_run)
     check_duplicate_titles(all_slugs, blocked, removed, dry_run)
     check_orphaned_newsletters(blocked_newsletters, removed, dry_run)
+
+    # ---- Advisory: code logic review (OpenAI-powered) -------------------
+    if os.getenv("OPENAI_API_KEY") and os.getenv("CODE_REVIEW_ENABLED", "true") == "true":
+        try:
+            import openai as _openai  # optional dependency
+            openai_client = _openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            review_code_logic(all_slugs, openai_client)
+        except ImportError:
+            print("[CODE-REVIEW] openai package not installed — skipping code logic review")
 
     # ---- Summary --------------------------------------------------------
     if not blocked and not blocked_newsletters:
