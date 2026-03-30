@@ -83,6 +83,15 @@ Every push to this repo triggers an automated editorial review (`scripts/editori
 
 Failures are committed automatically with `[skip ci]`. The same gate also runs in the upstream pipeline ([ios-dev-ai-writer#1](https://github.com/saurabhdave/ios-dev-ai-writer/pull/1)) as a pre-push quarantine step, so most issues are caught before they ever reach this repo.
 
+### Advisory check — code logic review
+
+After the four hard rules, the gate runs an OpenAI-powered review of every Swift code block for issues `swiftc` cannot catch (data races, wrong `@Bindable` usage, misleading concurrency patterns, missing actor isolation). This check is **advisory only** — it never removes files; it prints `[CODE-REVIEW]` warnings to the log and writes all findings to `outputs/code_review_log.json`. The workflow step appends a formatted table to the GitHub Actions job summary.
+
+| Environment variable | Default | Description |
+|----------------------|---------|-------------|
+| `OPENAI_API_KEY` | _(none)_ | Repository secret. If absent the check is silently skipped. |
+| `CODE_REVIEW_ENABLED` | `true` | Set to `false` to disable the check without removing the secret. |
+
 ## Automation
 
 | Workflow | Trigger | What it does |

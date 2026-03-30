@@ -12,3 +12,6 @@ Gemfile.lock
 _posts/
 _newsletters/
 _linkedin/
+
+# Ephemeral gate outputs — not committed
+outputs/
