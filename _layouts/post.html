@@ -2,18 +2,18 @@
 layout: default
 ---
 
+{% assign words = content | number_of_words %}
+{% if words < 360 %}{% assign read_time = 1 %}{% else %}{% assign read_time = words | divided_by: 200 %}{% endif %}
+
 <article class="post-article">
   <div class="container">
-    <a href="{{ '/' | relative_url }}" class="back-link">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      All Articles
-    </a>
+    {% include back-link.html text="All Articles" %}
 
     <header class="post-header">
       <div class="post-meta">
         <span class="post-date">{{ page.date | date: "%B %-d, %Y" }}</span>
+        <span class="post-dot">&middot;</span>
+        <span class="post-read-time">{{ read_time }} min read</span>
         {% if page.categories %}
         <span class="post-dot">&middot;</span>
         {% for cat in page.categories %}<span class="cat-tag">{{ cat }}</span>{% endfor %}
@@ -27,12 +27,34 @@ layout: default
     </div>
 
     <footer class="post-footer">
-      <a href="{{ '/' | relative_url }}" class="back-link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Back to all articles
-      </a>
+      <div class="post-footer-nav">
+        {% if page.previous.url %}
+        <a href="{{ page.previous.url | relative_url }}" class="post-nav-link post-nav-prev">
+          <span class="post-nav-label">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Previous
+          </span>
+          <span class="post-nav-title">{{ page.previous.title | truncate: 60 }}</span>
+        </a>
+        {% else %}
+        <span></span>
+        {% endif %}
+        {% if page.next.url %}
+        <a href="{{ page.next.url | relative_url }}" class="post-nav-link post-nav-next">
+          <span class="post-nav-label">
+            Next
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="post-nav-title">{{ page.next.title | truncate: 60 }}</span>
+        </a>
+        {% else %}
+        <span></span>
+        {% endif %}
+      </div>
+      <div class="post-footer-actions">
+        {% include share-button.html size="16" %}
+        {% include back-link.html text="All articles" %}
+      </div>
     </footer>
   </div>
 </article>
