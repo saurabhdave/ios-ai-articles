@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #13</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #13</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #13</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Accessibility sizes keep breaking releases in predictable ways: clipped labels, truncated cells, and layout math that only shows up when someone switches to a large text size. Teams ship screens tested at the default and assume they’re fine — until bug reports and unhappy users prove otherwise.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Automating Dynamic Type Tests in Xcode</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Automating Dynamic Type checks catches many regressions that sneak past default-size QA and screenshots. Tests that exercise large UIContentSizeCategory values are deterministic and cheap compared to firefighting production bugs. If your CI doesn’t run accessibility-size checks, add them this week — the payoff is fewer regressions and faster PR feedback.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Ollama running on MLX for Apple Silicon suggests more local ML tooling will target Apple chips, which impacts on-device inference and tooling choices. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Cherri, a language that compiles to an Apple Shortcut, signals creative experiments tying small DSLs to platform automation — handy for tooling prototypes, less so for shipping app logic. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift project’s March 2026 roundup (Swift 6.3) continues incremental evolution of the language and ecosystem; keep an eye on toolchain stability for CI and test runners. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Two Medium posts this week highlight individual tooling and app stories; they’re reminders that practitioner narratives still surface practical lessons outside official docs. [Source: Medium]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">More signals next issue.</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import XCTest
+import UIKit
+
+final class DynamicTypeSnapshotTests: XCTestCase {
+    // Render a SwiftUI view under a specific content size category deterministically.
+    func render&lt;V: View&gt;(_ view: V, contentSize: UIContentSizeCategory, scale: CGFloat = 3.0) -&gt; UIImage {
+        let hosting = UIHostingController(rootView: view.environment(\.sizeCategory, ContentSizeCategory(contentSize)))
+        hosting.view.frame = CGRect(origin: .zero, size: CGSize(width: 375, height: 800))
+        // Force the trait collection to use the requested accessibility size.
+        let traits = UITraitCollection(preferredContentSizeCategory: contentSize)
+        hosting.setOverrideTraitCollection(traits, forChild: hosting)
+        hosting.view.setNeedsLayout()
+        hosting.view.layoutIfNeeded()
+        let renderer = UIGraphicsImageRenderer(size: hosting.view.bounds.size, format: UIGraphicsImageRendererFormat(for: UITraitCollection(userInterfaceIdiom: .phone)))
+        return renderer.image { _ in hosting.view.drawHierarchy(in: hosting.view.bounds, afterScreenUpdates: true) }
+    }
+
+    func testDetailCard_atAccessibilitySize_doesNotBreakLayout() {
+        let view = VStack {
+            Text(&quot;Title&quot;)
+                .font(.title)
+            Text(&quot;A longer descriptive body that should wrap gracefully for large accessibility sizes.&quot;)
+                .font(.body)
+                .fixedSize(horizontal: false, vertical: true)
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern encodes a pragmatic test strategy: render components under overridden trait collections so layout math is exercised deterministically before code ships.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you care about fewer accessibility regressions, add a small matrix of component tests and a couple of snapshot baselines at accessibility sizes to CI this sprint. Hit reply with the three screens you’d include in a minimal snapshot matrix — I’ll share a shortlist next issue and why each matters.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
