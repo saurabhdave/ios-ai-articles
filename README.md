@@ -48,6 +48,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-03-31 | [Speed Xcode Builds with Explicit Swift Modules](articles/2026-03-31-speed-xcode-builds-with-explicit-swift-modules.md) | [Post](linkedin/2026-03-31-speed-xcode-builds-with-explicit-swift-modules-linkedin.md) |
 | 2026-03-31 | [Speed Up Xcode Builds with Explicit Modules](articles/2026-03-31-speed-up-xcode-builds-with-explicit-modules.md) | [Post](linkedin/2026-03-31-speed-up-xcode-builds-with-explicit-modules-linkedin.md) |
 | 2026-03-31 | [Automating Dynamic Type Tests in Xcode](articles/2026-03-31-automating-dynamic-type-tests-in-xcode.md) | [Post](linkedin/2026-03-31-automating-dynamic-type-tests-in-xcode-linkedin.md) |
 | 2026-03-30 | [Verified SwiftUI Modifiers for Safer App UI](articles/2026-03-30-verified-swiftui-modifiers-for-safer-app-ui.md) | [Post](linkedin/2026-03-30-verified-swiftui-modifiers-for-safer-app-ui-linkedin.md) |
@@ -57,9 +58,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-03-22 | [Dependency Injection Patterns for Production SwiftUI](articles/2026-03-22-dependency-injection-patterns-for-production-swiftui.md) | [Post](linkedin/2026-03-22-dependency-injection-patterns-for-production-swiftui-linkedin.md) |
 | 2026-03-21 | [Privacy-First Telemetry with Swift Concurrency](articles/2026-03-21-privacy-first-telemetry-with-swift-concurrency.md) | [Post](linkedin/2026-03-21-privacy-first-telemetry-with-swift-concurrency-linkedin.md) |
 | 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
-| 2026-03-16 | [Migrate Combine to Swift async/await](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
 
-> Showing 10 of 11 articles — [1 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 12 articles — [2 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
