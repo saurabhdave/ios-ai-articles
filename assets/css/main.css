@@ -1180,6 +1180,7 @@ html[data-theme="light"] .feed-author-name { color: #0c0c14; }
   font-size: 11px; color: var(--text-3); font-weight: 400;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+html[data-theme="light"] .feed-author-meta { color: var(--text-2); }
 
 .feed-type-badge {
   flex-shrink: 0;
