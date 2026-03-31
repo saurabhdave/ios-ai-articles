@@ -6,14 +6,15 @@ Automated editorial gate for ios-ai-articles.
 Checks (run in order so later checks see the already-cleaned state):
   1. No validated code  — codegen path == "omitted"
   2. Banned deprecated Swift APIs in code blocks
-  3. Duplicate/near-duplicate article topics (Jaccard > 0.5 on H1 tokens)
-  4. Orphaned newsletters  — Big Story title not found in articles/
+  3. Malformed article titles — missing/truncated/dangling H1s
+  4. Duplicate/near-duplicate article topics (Jaccard > 0.5 on H1 tokens)
+  5. Orphaned newsletters  — Big Story title not found in articles/
 
 Removes offending files (article + linkedin + codegen companions; newsletter
 .md + .html pairs) and prints a structured summary.
 
 Advisory check (warnings only, no deletions):
-  5. Code logic review — OpenAI-powered review of Swift code blocks for issues
+  6. Code logic review — OpenAI-powered review of Swift code blocks for issues
      that swiftc cannot catch (data races, wrong @Bindable usage, etc.).
      Requires OPENAI_API_KEY env var.  Controlled by CODE_REVIEW_ENABLED
      (default "true").  Findings written to outputs/code_review_log.json.
@@ -33,6 +34,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 
 # ---------------------------------------------------------------------------
@@ -49,6 +51,13 @@ NEWSLETTER_DIR = os.path.join(REPO_ROOT, "newsletter")
 # ---------------------------------------------------------------------------
 ARTICLE_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})-(.+)\.md$")
 NEWSLETTER_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2}-.+)\.(md|html)$")
+LINKEDIN_ARTIFACT_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})-(.+)-linkedin\.md$")
+CODEGEN_ARTIFACT_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})-(.+)-codegen\.json$")
+
+TITLE_MIN_ALPHA_TOKENS = 3
+TRAILING_TITLE_CONNECTORS: frozenset[str] = frozenset({
+    "and", "or", "for", "with", "to", "from", "in", "on", "of",
+})
 
 # Strings that must not appear inside ```swift ... ``` blocks
 BANNED_APIS: list[str] = [
@@ -60,7 +69,7 @@ BANNED_APIS: list[str] = [
 JACCARD_THRESHOLD = 0.50
 
 # Common boilerplate words in iOS/Swift article titles that are not
-# discriminating for topic identity.  Filtered before Jaccard comparison.
+# discriminating for topic identity. Filtered before Jaccard comparison.
 TITLE_STOPWORDS: frozenset[str] = frozenset({
     "migrate", "migrating", "migration",
     "swift", "swiftui", "ios",
@@ -155,7 +164,7 @@ def normalise_title(title: str) -> set[str]:
     that differ only in gerund vs. base-verb phrasing.
     """
     tokens = re.findall(r"\w+", title.lower())
-    tokens = [t for t in tokens if t not in _NORMALISE_STOPWORDS]
+    tokens = [t for t in tokens if t not in _NORMALISE_STOPWORDS and t not in TITLE_STOPWORDS]
     normalised: list[str] = []
     for t in tokens:
         if t.endswith("ing") and len(t) > 6:
@@ -176,6 +185,50 @@ def slug_from_filename(filename: str) -> str | None:
     """'2026-03-14-some-slug.md' → '2026-03-14-some-slug'"""
     m = ARTICLE_PATTERN.match(filename)
     return f"{m.group(1)}-{m.group(2)}" if m else None
+
+
+def _git_changed_paths() -> set[str]:
+    """Return changed repo-relative paths from the push event diff, if available."""
+    before = os.getenv("GATE_DIFF_BEFORE", "").strip()
+    after = os.getenv("GATE_DIFF_AFTER", "").strip()
+    if not before or not after or re.fullmatch(r"0+", before):
+        return set()
+    try:
+        output = subprocess.check_output(
+            ["git", "diff", "--name-only", f"{before}..{after}"],
+            cwd=REPO_ROOT,
+            text=True,
+        )
+    except Exception:
+        return set()
+    return {line.strip() for line in output.splitlines() if line.strip()}
+
+
+def slug_from_changed_path(path: str) -> str | None:
+    """Map changed article/linkedin/codegen paths to the canonical article slug."""
+    filename = os.path.basename(path)
+    if path.startswith("articles/"):
+        return slug_from_filename(filename)
+
+    if path.startswith("linkedin/"):
+        match = LINKEDIN_ARTIFACT_PATTERN.match(filename)
+        if match:
+            return f"{match.group(1)}-{match.group(2)}"
+
+    if path.startswith("codegen/"):
+        match = CODEGEN_ARTIFACT_PATTERN.match(filename)
+        if match:
+            return f"{match.group(1)}-{match.group(2)}"
+
+    return None
+
+
+def newsletter_base_from_path(path: str) -> str | None:
+    """Return newsletter basename without extension for a changed newsletter artifact."""
+    if not path.startswith("newsletter/"):
+        return None
+    match = NEWSLETTER_PATTERN.match(os.path.basename(path))
+    return match.group(1) if match else None
 
 
 def codegen_path(slug: str) -> str:
@@ -246,6 +299,27 @@ def build_article_h1_set() -> set[str]:
     return titles
 
 
+def title_sanity_reason(title: str | None) -> str | None:
+    """Return a concrete reason when an article H1 is clearly malformed."""
+    if title is None:
+        return "missing H1 title"
+
+    stripped = title.strip()
+    if not stripped:
+        return "empty H1 title"
+    if stripped[-1] in {"/", ":", "-"}:
+        return f"title ends with dangling punctuation ({stripped[-1]!r})"
+
+    words = re.findall(r"[A-Za-z]+", stripped)
+    if len(words) < TITLE_MIN_ALPHA_TOKENS:
+        return f"title has fewer than {TITLE_MIN_ALPHA_TOKENS} alphabetic tokens"
+
+    if words[-1].lower() in TRAILING_TITLE_CONNECTORS:
+        return f"title ends with dangling connector ({words[-1]!r})"
+
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Check 1 — No validated code
 # ---------------------------------------------------------------------------
@@ -296,11 +370,34 @@ def check_banned_apis(
 
 
 # ---------------------------------------------------------------------------
-# Check 3 — Duplicate / near-duplicate topics
+# Check 3 — Malformed/truncated article titles
+# ---------------------------------------------------------------------------
+
+def check_title_sanity(
+    slugs: list[str],
+    blocked: dict[str, list[str]],
+    removed: list[str],
+    dry_run: bool,
+) -> None:
+    """Block changed articles whose H1 title is clearly malformed."""
+    for slug in slugs:
+        path = article_path(slug)
+        if not os.path.exists(path):
+            continue
+        reason = title_sanity_reason(get_h1(path))
+        if reason is None:
+            continue
+        blocked.setdefault(slug, []).append(reason)
+        remove_article_set(slug, removed, dry_run)
+
+
+# ---------------------------------------------------------------------------
+# Check 4 — Duplicate / near-duplicate topics
 # ---------------------------------------------------------------------------
 
 def check_duplicate_titles(
-    slugs: list[str],
+    changed_slugs: list[str],
+    all_slugs: list[str],
     blocked: dict[str, list[str]],
     removed: list[str],
     dry_run: bool,
@@ -313,10 +410,10 @@ def check_duplicate_titles(
       2. If both have code (or neither), keep the newer file (larger slug
          sorts later because filenames are YYYY-MM-DD-*).
     """
-    live = [s for s in slugs if os.path.exists(article_path(s))]
+    live = [s for s in all_slugs if os.path.exists(article_path(s))]
+    changed_live = [s for s in changed_slugs if os.path.exists(article_path(s))]
+    changed_set = set(changed_live)
 
-    # Build token sets for live articles using normalise_title so that
-    # verb-form variants ('profiling' vs 'profile') are treated as the same stem.
     tokens: dict[str, set[str]] = {}
     h1s: dict[str, str] = {}
     for slug in live:
@@ -326,10 +423,12 @@ def check_duplicate_titles(
             tokens[slug] = normalise_title(h1)
 
     processed: set[str] = set()
-    for i, slug_a in enumerate(live):
+    for slug_a in changed_live:
         if slug_a not in tokens or slug_a in processed:
             continue
-        for slug_b in live[i + 1:]:
+        for slug_b in live:
+            if slug_b == slug_a:
+                continue
             if slug_b not in tokens or slug_b in processed:
                 continue
             score = jaccard(tokens[slug_a], tokens[slug_b])
@@ -345,9 +444,11 @@ def check_duplicate_titles(
             elif has_code_b and not has_code_a:
                 loser, winner = slug_a, slug_b
             else:
-                # Both or neither — keep the newer one (lexicographically larger)
                 loser = slug_a if slug_a < slug_b else slug_b
                 winner = slug_b if loser == slug_a else slug_a
+
+            if loser not in changed_set:
+                continue
 
             reason = (
                 f"near-duplicate of '{h1s.get(winner, winner)}' "
@@ -359,10 +460,11 @@ def check_duplicate_titles(
 
 
 # ---------------------------------------------------------------------------
-# Check 4 — Orphaned newsletters
+# Check 5 — Orphaned newsletters
 # ---------------------------------------------------------------------------
 
 def check_orphaned_newsletters(
+    changed_bases: list[str],
     blocked_newsletters: dict[str, list[str]],
     removed: list[str],
     dry_run: bool,
@@ -381,7 +483,12 @@ def check_orphaned_newsletters(
             continue
         basename_map.setdefault(m.group(1), []).append(filename)
 
-    for base, files in sorted(basename_map.items()):
+    target_bases = sorted(changed_bases) if changed_bases else sorted(basename_map)
+
+    for base in target_bases:
+        files = basename_map.get(base, [])
+        if not files:
+            continue
         md_file = next((f for f in files if f.endswith(".md")), None)
         if md_file is None:
             continue
@@ -402,7 +509,7 @@ def check_orphaned_newsletters(
 
 
 # ---------------------------------------------------------------------------
-# Check 5 — Code logic review (advisory, OpenAI-powered)
+# Check 6 — Code logic review (advisory, OpenAI-powered)
 # ---------------------------------------------------------------------------
 
 def review_code_logic(slugs: list[str], openai_client) -> None:
@@ -515,27 +622,37 @@ def main() -> int:
     else:
         print("=== Editorial Gate ===\n")
 
-    # Collect article slugs sorted ascending (oldest → newest)
     all_slugs: list[str] = sorted(
         filter(None, (slug_from_filename(f) for f in os.listdir(ARTICLES_DIR)))
     )
+    changed_paths = _git_changed_paths()
+    changed_slugs = sorted(
+        filter(None, {slug_from_changed_path(path) for path in changed_paths})
+    )
+    changed_newsletter_bases = sorted(
+        filter(None, {newsletter_base_from_path(path) for path in changed_paths})
+    )
+
+    review_slugs = changed_slugs or all_slugs
+    newsletter_bases = changed_newsletter_bases
 
     blocked: dict[str, list[str]] = {}
     blocked_newsletters: dict[str, list[str]] = {}
     removed: list[str] = []
 
     # Run checks in dependency order
-    check_no_validated_code(all_slugs, blocked, removed, dry_run)
-    check_banned_apis(all_slugs, blocked, removed, dry_run)
-    check_duplicate_titles(all_slugs, blocked, removed, dry_run)
-    check_orphaned_newsletters(blocked_newsletters, removed, dry_run)
+    check_no_validated_code(review_slugs, blocked, removed, dry_run)
+    check_banned_apis(review_slugs, blocked, removed, dry_run)
+    check_title_sanity(review_slugs, blocked, removed, dry_run)
+    check_duplicate_titles(review_slugs, all_slugs, blocked, removed, dry_run)
+    check_orphaned_newsletters(newsletter_bases, blocked_newsletters, removed, dry_run)
 
     # ---- Advisory: code logic review (OpenAI-powered) -------------------
     if os.getenv("OPENAI_API_KEY") and os.getenv("CODE_REVIEW_ENABLED", "true") == "true":
         try:
             import openai as _openai  # optional dependency
             openai_client = _openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            review_code_logic(all_slugs, openai_client)
+            review_code_logic(review_slugs, openai_client)
         except ImportError:
             print("[CODE-REVIEW] openai package not installed — skipping code logic review")
 

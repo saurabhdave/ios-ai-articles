@@ -56,13 +56,13 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-03-22 | [Dependency Injection Patterns for Production SwiftUI](articles/2026-03-22-dependency-injection-patterns-for-production-swiftui.md) | [Post](linkedin/2026-03-22-dependency-injection-patterns-for-production-swiftui-linkedin.md) |
 | 2026-03-21 | [Privacy-First Telemetry with Swift Concurrency](articles/2026-03-21-privacy-first-telemetry-with-swift-concurrency.md) | [Post](linkedin/2026-03-21-privacy-first-telemetry-with-swift-concurrency-linkedin.md) |
 | 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
-| 2026-03-16 | [Migrate Combine to Swift async/](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
+| 2026-03-16 | [Migrate Combine to Swift async/await](articles/2026-03-16-migrate-combine-to-swift-async.md) | [Post](linkedin/2026-03-16-migrate-combine-to-swift-async-linkedin.md) |
 | 2026-03-14 | [Migrate ViewController Navigation to SwiftUI NavigationStack](articles/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack.md) | [Post](linkedin/2026-03-14-migrate-viewcontroller-navigation-to-swiftui-navigationstack-linkedin.md) |
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
 
-Each article follows a consistent 5-section structure:
+Each article follows a consistent long-form engineering format:
 
 1. **Understanding Parity** — API comparison, UIKit vs SwiftUI tooling
 2. **Migration Strategy** — incremental vs full rewrite, hosting techniques
@@ -70,24 +70,25 @@ Each article follows a consistent 5-section structure:
 4. **Performance, Lifecycle & Memory** — Instruments usage, pitfalls, thresholds
 5. **Validation, Testing & Rollout** — XCTest, feature flags, canary strategy
 
-Each section includes: Apple API callouts, a decision framework (Simple / Moderate / Advanced), and observability guidance.
+Recent articles typically include Apple API callouts, explicit tradeoffs, and testing or observability guidance tuned for production iOS work.
 
 ## Editorial Gate
 
-Every push to this repo triggers an automated editorial review (`scripts/editorial_gate.py`) that enforces four hard rules:
+Pushes with new or changed published artifacts trigger an automated editorial review (`scripts/editorial_gate.py`) that enforces these hard rules:
 
 | # | Rule | Action |
 |---|------|--------|
 | 1 | Article must have a validated Swift code snippet (`codegen path ≠ "omitted"`) | Remove article + companions |
 | 2 | No banned deprecated APIs (`@Published`, `@ObservableObject`, `os_signpost(`) in Swift code blocks | Remove article + companions |
-| 3 | No duplicate topic — Jaccard similarity > 0.5 against other article titles | Remove the weaker duplicate |
-| 4 | Newsletter Big Story title must match an existing article H1 | Remove orphaned newsletter |
+| 3 | Article H1 must be present and not obviously malformed/truncated | Remove article + companions |
+| 4 | No duplicate topic — Jaccard similarity > 0.5 against other article titles | Remove the weaker changed duplicate |
+| 5 | Newsletter Big Story title must match an existing article H1 | Remove orphaned newsletter |
 
-Failures are committed automatically with `[skip ci]`. The same gate also runs in the upstream pipeline ([ios-dev-ai-writer#1](https://github.com/saurabhdave/ios-dev-ai-writer/pull/1)) as a pre-push quarantine step, so most issues are caught before they ever reach this repo.
+The gate scopes strict checks to changed artifacts, while still comparing new article titles against the full archive for duplicates. Follow-up fixes are committed automatically by the editorial workflow. The same gate logic also exists upstream in the writer pipeline, so most issues are caught before they reach this repo.
 
 ### Advisory check — code logic review
 
-After the four hard rules, the gate runs an OpenAI-powered review of every Swift code block for issues `swiftc` cannot catch (data races, wrong `@Bindable` usage, misleading concurrency patterns, missing actor isolation). This check is **advisory only** — it never removes files; it prints `[CODE-REVIEW]` warnings to the log and writes all findings to `outputs/code_review_log.json`. The workflow step appends a formatted table to the GitHub Actions job summary.
+After the hard rules, the gate runs an OpenAI-powered review of Swift code blocks in changed articles for issues `swiftc` cannot catch (data races, wrong `@Bindable` usage, misleading concurrency patterns, missing actor isolation). This check is **advisory only** — it never removes files; it prints `[CODE-REVIEW]` warnings to the log and writes all findings to `outputs/code_review_log.json`. The workflow step appends a formatted table to the GitHub Actions job summary.
 
 | Environment variable | Default | Description |
 |----------------------|---------|-------------|
@@ -98,10 +99,9 @@ After the four hard rules, the gate runs an OpenAI-powered review of every Swift
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate; auto-removes violations and refreshes README |
-| `update-readme.yml` | Push to `articles/**` or `linkedin/**` | Regenerates the articles table above |
-| `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages |
+| `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate, refreshes README, and commits any follow-up removals/docs updates |
+| `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages; ignores README-only bot commits |
 
 ## Source
 
-Articles are generated by [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer) (v1.4.0). Swift code samples are validated against Swift 6.2.4 via `swiftc`; the `codegen/` JSON files record diagnostics and repair attempts for each run.
+Articles are generated by [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer). Swift code samples are validated against Swift 6.2.4 via `swiftc`; the `codegen/` JSON files record diagnostics and repair attempts for each run.

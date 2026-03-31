@@ -1,4 +1,4 @@
-# Migrate Combine to Swift async/
+# Migrate Combine to Swift async/await
 
 Replace long Combine chains with Swift async/await and your code often becomes easier to reason about. Migration is not a mechanical find-and-replace: execution timing, cancellation semantics, and backpressure differ. This guide gives a pragmatic, testable roadmap for migrating incrementally with minimal release risk.
 

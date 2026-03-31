@@ -15,3 +15,6 @@ _linkedin/
 
 # Ephemeral gate outputs — not committed
 outputs/
+
+# Content repo must not persist upstream pipeline state.
+newsletter/.issue_number
