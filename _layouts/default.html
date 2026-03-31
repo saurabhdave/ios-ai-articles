@@ -162,5 +162,51 @@
     document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
   })();
   </script>
+  <script>
+  /* ── Scroll-reveal ──────────────────────────────────────── */
+  (function(){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(!e.isIntersecting) return;
+        var el=e.target;
+        io.unobserve(el);
+        el.classList.add('visible');
+        el.addEventListener('animationend',function done(){
+          el.removeEventListener('animationend',done);
+          el.classList.remove('reveal','visible');
+        });
+      });
+    },{threshold:0.08,rootMargin:'0px 0px -32px 0px'});
+
+    document.querySelectorAll('.reveal').forEach(function(el){
+      var idx=parseInt(el.dataset.revealIdx)||0;
+      el.style.setProperty('--reveal-delay',(idx*80)+'ms');
+      io.observe(el);
+    });
+  })();
+
+  /* ── Stats counter ──────────────────────────────────────── */
+  (function(){
+    function animCount(el,target,dur){
+      var start=null;
+      function step(ts){
+        if(!start) start=ts;
+        var p=Math.min((ts-start)/dur,1);
+        var ease=1-Math.pow(1-p,3);
+        el.textContent=Math.round(ease*target);
+        if(p<1) requestAnimationFrame(step);
+        else el.textContent=target;
+      }
+      requestAnimationFrame(step);
+    }
+    setTimeout(function(){
+      document.querySelectorAll('.stat-val').forEach(function(el){
+        var raw=el.textContent.trim();
+        var num=parseInt(raw,10);
+        if(!isNaN(num)&&num>1){ el.textContent='0'; animCount(el,num,700); }
+      });
+    },500);
+  })();
+  </script>
 </body>
 </html>

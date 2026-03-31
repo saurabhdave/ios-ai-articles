@@ -1424,3 +1424,119 @@ html[data-theme="light"] .share-option:hover { background: var(--accent-soft); c
   .lp-card              { padding: 16px 16px 14px; }
   .lp-article           { padding: 24px 0 48px; }
 }
+
+/* ─── Animations & Icons ─────────────────────────────────── */
+
+/* Hero dot-grid texture */
+.hero {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Entrance keyframes */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nav-drop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Nav entrance */
+.nav { animation: nav-drop 0.42s var(--ease) both; }
+
+/* Hero content entrance — staggered */
+.hero-badge  { animation: fade-up 0.55s var(--ease) 0.05s both; }
+.hero-title  { animation: fade-up 0.60s var(--ease) 0.15s both; }
+.hero-desc   { animation: fade-up 0.55s var(--ease) 0.24s both; }
+.hero-stats  { animation: fade-up 0.55s var(--ease) 0.33s both; }
+.hero-editor { animation: fade-up 0.50s var(--ease) 0.42s both; }
+.hero-rss    { animation: fade-up 0.50s var(--ease) 0.50s both; }
+
+/* Scroll-reveal */
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal { opacity: 0; }
+
+.reveal.visible {
+  animation: reveal-in 0.55s var(--ease) var(--reveal-delay, 0ms) both;
+}
+
+/* Card lift on hover — add transform to transition */
+.article-card {
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    background var(--dur),
+    transform 0.22s var(--ease);
+}
+.article-card:hover { transform: translateY(-4px); }
+
+.featured-card {
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    background var(--dur),
+    transform 0.22s var(--ease);
+}
+.featured-card:hover { transform: translateY(-3px); }
+
+/* Stat icons */
+.stat-icon {
+  color: var(--accent);
+  opacity: 0.65;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: opacity var(--dur);
+  margin-bottom: 2px;
+}
+
+/* Section tag with inline SVG icon */
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 0;
+}
+.section-tag::before { display: none; }
+
+.section-icon {
+  color: var(--accent);
+  opacity: 0.80;
+  flex-shrink: 0;
+}
+
+/* Card meta icon (calendar) */
+.meta-icon {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  margin-right: 4px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* Read-more arrow */
+.read-arrow {
+  flex-shrink: 0;
+  transition: transform var(--dur) var(--ease);
+}
+.featured-card:hover .read-arrow { transform: translateX(5px); }
+
+/* ─── Reduced motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; }
+  .badge-dot { animation: none; }
+}
