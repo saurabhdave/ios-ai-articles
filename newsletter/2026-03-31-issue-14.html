@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #14</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #14</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #14</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Local Xcode iterations that balloon are a real productivity tax — not a headline feature, but a daily drag for teams. Header reprocessing and flaky incremental behavior show up as mysterious compile/CI regressions that waste focus and time. This week: practical fixes to make builds predictable again.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Speed Up Xcode Builds with Explicit Modules</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Missing per-target module flags and implicit umbrella headers cause repeated Objective‑C header parsing between incremental builds, slowing developer feedback loops. Making modules explicit reduces reprocessing, trims CI time under certain workloads, and cuts down on transient linker/import errors that only show up incrementally. If your team cares about fast local iteration, this is the kind of maintenance that pays compound dividends.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Ollama running MLX on Apple Silicon in preview suggests more machine‑learning tooling will target native Apple chips, increasing expectations for local, fast developer workflows. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Cherri — a language compiling to an Apple Shortcut — highlights lightweight experimentations in the ecosystem; teams should expect more small tools that integrate directly with Apple platforms. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple cracking down on "vibe coding" apps and removing ‘Anything’ from the App Store signals stricter policy enforcement that impacts novelty app developers more than traditional teams. [Source: Reddit r/iOSProgramming]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Ongoing conversations about SwiftUI and data layers show practitioners are still weighing ergonomics against control, which matters when choosing architectures that influence build boundaries. [Source: Reddit r/iOSProgramming]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+
+struct ModuleCheck {
+    let projectFile: URL
+
+    func run() throws {
+        let data = try String(contentsOf: projectFile, encoding: .utf8)
+        // Split targets by block &quot;/* Begin PBXNativeTarget section */&quot; is brittle; instead match target buildSettings blocks
+        let pattern = #&quot;([A-F0-9]{24}) /\* (.+?) \*/ = \{(?:[^}]*?buildSettings = \{([^}]*?)\};)?&quot;#
+        let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+        let ns = data as NSString
+        var missing: [String] = []
+        regex.enumerateMatches(in: data, options: [], range: NSRange(location: 0, length: ns.length)) { m, _, _ in
+            guard let m = m, m.numberOfRanges &gt;= 3 else { return }
+            let name = ns.substring(with: m.range(at: 2))
+            let buildSettingsRange = m.range(at: 3)
+            let settings = buildSettingsRange.location != NSNotFound ? ns.substring(with: buildSettingsRange) : &quot;&quot;
+            if !settings.contains(&quot;DEFINES_MODULE&quot;) || !settings.contains(&quot;DEFINES_MODULE = YES&quot;) {
+                missing.append(name.trimmingCharacters(in: .whitespacesAndNewlines))
+            }
+        }
+        if missing.isEmpty {
+            print(&quot;All targets appear to define modules (DEFINES_MODULE = YES).&quot;)
+        } else {
+            print(&quot;Targets missing DEFINES_MODULE = YES:&quot;)
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern codifies the practical check: if your project doesn’t consistently declare DEFINES_MODULE = YES, expect incremental build churn and flaky imports — fix it early.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://ollama.com/blog/mlx" style="color:#e05c00;text-decoration:none">Ollama is now powered by MLX on Apple Silicon in preview</a></strong> — Native Apple‑Silicon ML runtimes are becoming more common; consider local tooling impacts on developer machines.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/electrikmilk/cherri" style="color:#e05c00;text-decoration:none">Cherri – programming language that compiles to an Apple Shortuct</a></strong> — Small language experiments like this show the ecosystem exploring new automation and UX shortcuts for developers.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://reddit.com/r/iOSProgramming/comments/1s8gij4/apple_steps_up_crackdown_on_vibe_coding_apps/" style="color:#e05c00;text-decoration:none">Apple steps up crackdown on vibe coding apps, pulls ‘Anything’ from the App Store</a></strong> — A reminder that App Store policy changes can suddenly affect niche app categories.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you maintain frameworks, start a staged rollout: enable DEFINES_MODULE per target, add module.modulemap where headers are nonstandard, and use a controlled CI clean build during the switch. Hit reply with how your team staged a modules rollout or what CI cache strategy caught a transient incremental failure — I’ll share practical follow‑ups next issue. Forward this to an engineer who spends too much time waiting on Xcode.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
