@@ -1,0 +1,34 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="{{ '/feed.xslt' | absolute_url }}"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <generator uri="https://jekyllrb.com/" version="{{ jekyll.version }}">Jekyll</generator>
+  <link href="{{ page.url | absolute_url }}" rel="self" type="application/atom+xml"/>
+  <link href="{{ site.url }}{{ site.baseurl }}/" rel="alternate" type="text/html"/>
+  <updated>{{ site.time | date_to_xmlschema }}</updated>
+  <id>{{ page.url | absolute_url }}</id>
+  <title type="html">{{ site.title | xml_escape }}</title>
+  {% if site.description %}<subtitle>{{ site.description | xml_escape }}</subtitle>{% endif %}
+  <author>
+    <name>{{ site.author.name | xml_escape }}</name>
+    <email/>
+  </author>
+  {% for post in site.posts limit:20 %}
+  <entry>
+    <title type="html">{{ post.title | xml_escape }}</title>
+    <link href="{{ post.url | absolute_url }}" rel="alternate" type="text/html" title="{{ post.title | xml_escape }}"/>
+    <published>{{ post.date | date_to_xmlschema }}</published>
+    <updated>{{ post.date | date_to_xmlschema }}</updated>
+    <id>{{ post.url | absolute_url | remove: ".html" }}</id>
+    <content type="html" xml:base="{{ post.url | absolute_url }}">{{ post.content | xml_escape }}</content>
+    <author>
+      <name>{{ site.author.name | xml_escape }}</name>
+    </author>
+    {% for category in post.categories %}<category term="{{ category | xml_escape }}"/>
+    {% endfor %}
+    <summary type="html">{{ post.excerpt | xml_escape }}</summary>
+  </entry>
+  {% endfor %}
+</feed>
