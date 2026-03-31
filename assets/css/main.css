@@ -25,7 +25,7 @@ img { max-width: 100%; display: block; }
 
   --text-1:        #f0ece5;
   --text-2:        #7c8099;
-  --text-3:        #3e4258;
+  --text-3:        #626880;
 
   --accent:        #f0b840;
   --accent-dim:    rgba(240, 184, 64, 0.55);
@@ -1239,12 +1239,12 @@ html[data-theme="light"] .feed-footer { border-color: rgba(0,0,0,0.07); }
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px; border-radius: 50%;
   border: none; background: transparent;
-  color: var(--text-3); cursor: pointer;
+  color: var(--text-2); cursor: pointer;
   transition: color var(--dur), background var(--dur);
   font-family: var(--font);
 }
 .feed-action-btn:hover { color: var(--accent); background: var(--accent-soft); }
-html[data-theme="light"] .feed-action-btn { color: var(--text-3); }
+html[data-theme="light"] .feed-action-btn { color: var(--text-2); }
 html[data-theme="light"] .feed-action-btn:hover { color: var(--accent); background: var(--accent-soft); }
 
 /* ─── LinkedIn post detail ───────────────────────────────── */
@@ -1519,7 +1519,7 @@ html[data-theme="light"] .share-option:hover { background: var(--accent-soft); c
   position: relative;
   top: -1px;
   margin-right: 4px;
-  color: var(--text-3);
+  color: var(--text-2);
   flex-shrink: 0;
 }
 
