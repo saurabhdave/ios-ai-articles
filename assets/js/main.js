@@ -80,11 +80,14 @@ document.getElementById('theme-toggle').addEventListener('click', function () {
 
 /* ── Scroll-reveal ───────────────────────────────────────── */
 (function () {
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (!e.isIntersecting) return;
       var el = e.target;
       io.unobserve(el);
+      if (reducedMotion) { el.classList.remove('reveal'); return; }
       el.classList.add('visible');
       el.addEventListener('animationend', function done() {
         el.removeEventListener('animationend', done);
@@ -98,6 +101,24 @@ document.getElementById('theme-toggle').addEventListener('click', function () {
     el.style.setProperty('--reveal-delay', (idx * 80) + 'ms');
     io.observe(el);
   });
+
+  // Dynamically add reveal to post body headings and code blocks
+  var postBody = document.querySelector('.post-body');
+  if (postBody) {
+    postBody.querySelectorAll('h2, h3').forEach(function (h) {
+      if (reducedMotion) return;
+      h.classList.add('reveal');
+      h.dataset.reveal = 'left';
+      io.observe(h);
+    });
+    postBody.querySelectorAll('pre').forEach(function (pre, i) {
+      if (reducedMotion) return;
+      pre.classList.add('reveal');
+      pre.dataset.reveal = 'code';
+      pre.style.setProperty('--reveal-delay', (i * 60) + 'ms');
+      io.observe(pre);
+    });
+  }
 })();
 
 /* ── Stats counter ───────────────────────────────────────── */
@@ -114,13 +135,23 @@ document.getElementById('theme-toggle').addEventListener('click', function () {
     }
     requestAnimationFrame(step);
   }
-  setTimeout(function () {
-    document.querySelectorAll('.stat-val').forEach(function (el) {
-      var raw = el.textContent.trim();
-      var num = parseInt(raw, 10);
-      if (!isNaN(num) && num > 1) { el.textContent = '0'; animCount(el, num, 700); }
+  var statsContainer = document.querySelector('.hero-stats');
+  if (!statsContainer) return;
+  var statsTriggered = false;
+  var statsObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting && !statsTriggered) {
+        statsTriggered = true;
+        statsObs.unobserve(e.target);
+        e.target.querySelectorAll('.stat-val').forEach(function (el) {
+          var raw = el.textContent.trim();
+          var num = parseInt(raw, 10);
+          if (!isNaN(num) && num > 1) { el.textContent = '0'; animCount(el, num, 700); }
+        });
+      }
     });
-  }, 500);
+  }, { threshold: 0.3 });
+  statsObs.observe(statsContainer);
 })();
 
 /* ── Code block copy button ──────────────────────────────── */
@@ -145,4 +176,58 @@ document.getElementById('theme-toggle').addEventListener('click', function () {
       });
     });
   });
+})();
+
+/* ── Unified scroll handler: parallax + nav + progress ──── */
+(function () {
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nav = document.querySelector('.nav');
+  var heroImg = document.querySelector('.hero-bg-img');
+  var heroSection = document.querySelector('.hero--home');
+  var progressBar = document.querySelector('.reading-progress-bar');
+  var ticking = false;
+
+  // On non-hero pages, nav starts already scrolled (added via HTML).
+  // On hero pages, remove nav--scrolled so it starts transparent.
+  if (heroSection && nav) {
+    nav.classList.remove('nav--scrolled');
+  }
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var scrollY = window.scrollY || window.pageYOffset;
+
+      // Parallax
+      if (heroImg && heroSection && !reducedMotion) {
+        var heroH = heroSection.offsetHeight;
+        if (scrollY < heroH) {
+          heroImg.style.transform = 'translate3d(0,' + (scrollY * 0.35) + 'px,0)';
+        }
+      }
+
+      // Nav scroll state
+      if (nav) {
+        if (scrollY > 20) {
+          nav.classList.add('nav--scrolled');
+        } else {
+          // Only remove scrolled state on hero pages (transparent nav over image)
+          if (heroSection) nav.classList.remove('nav--scrolled');
+        }
+      }
+
+      // Reading progress bar
+      if (progressBar) {
+        var docH = document.documentElement.scrollHeight - window.innerHeight;
+        var progress = docH > 0 ? Math.min(scrollY / docH, 1) : 0;
+        progressBar.style.transform = 'scaleX(' + progress + ')';
+      }
+
+      ticking = false;
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // Run once on load to set initial state
 })();
