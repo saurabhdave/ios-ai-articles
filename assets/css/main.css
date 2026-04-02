@@ -377,6 +377,11 @@ html[data-theme="light"] .hero-bg-overlay {
     );
 }
 
+/* Hide galaxy bg in light mode — overlay clash looks muddy */
+html[data-theme="light"] .hero-bg {
+  display: none;
+}
+
 .hero--home .container {
   position: relative;
   z-index: 2;
