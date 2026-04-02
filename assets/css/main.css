@@ -137,7 +137,7 @@ body {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom: 1px solid transparent;
-  transition: background 0.3s var(--ease), backdrop-filter 0.3s var(--ease), -webkit-backdrop-filter 0.3s var(--ease), border-color 0.3s var(--ease);
+  transition: background 0.3s var(--ease), -webkit-backdrop-filter 0.3s var(--ease), backdrop-filter 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .nav--scrolled {
@@ -371,9 +371,9 @@ html[data-theme="light"] .nav-link-gh:hover { border-color: rgba(0,0,0,0.16); ba
 html[data-theme="light"] .hero-bg-overlay {
   background:
     linear-gradient(to bottom,
-      rgba(246, 244, 238, 0.82) 0%,
-      rgba(246, 244, 238, 0.68) 40%,
-      rgba(246, 244, 238, 0.94) 100%
+      rgba(246, 244, 238, 0.78) 0%,
+      rgba(246, 244, 238, 0.60) 40%,
+      rgba(246, 244, 238, 0.90) 100%
     );
 }
 
