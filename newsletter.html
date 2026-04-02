@@ -37,10 +37,10 @@ permalink: /newsletter/
   {% assign latest = sorted_newsletters.first %}
   <section class="featured-section">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal" data-reveal="left">
         <span class="section-tag">Latest Issue</span>
       </div>
-      <a href="{{ latest.url | relative_url }}" class="featured-card reveal">
+      <a href="{{ latest.url | relative_url }}" class="featured-card reveal" data-reveal="scale">
         <div class="featured-meta">
           <span class="post-date">{{ latest.date | date: "%B %-d, %Y" }}</span>
           <span class="post-dot">&middot;</span>
@@ -56,7 +56,7 @@ permalink: /newsletter/
   {% if sorted_newsletters.size > 1 %}
   <section class="articles-section">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal" data-reveal="left">
         <span class="section-tag">All Issues</span>
         <span class="section-count">{{ sorted_newsletters.size | minus: 1 }} more</span>
       </div>

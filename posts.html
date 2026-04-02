@@ -9,7 +9,7 @@ permalink: /posts/
 <section class="posts-section">
   <div class="posts-container">
 
-    <div class="feed-header">
+    <div class="feed-header reveal" data-reveal="left">
       <h2 class="feed-heading">Posts</h2>
       <p class="feed-subheading">iOS engineering insights — Swift, SwiftUI &amp; Apple platform</p>
       {% if linkedin_posts.size > 0 %}
@@ -26,7 +26,7 @@ permalink: /posts/
         {% assign words = item.content | number_of_words %}
         {% if words < 360 %}{% assign read_time = 1 %}{% else %}{% assign read_time = words | divided_by: 180 %}{% endif %}
 
-        <a href="{{ item.url | relative_url }}" class="feed-card">
+        <a href="{{ item.url | relative_url }}" class="feed-card reveal" data-reveal-idx="{{ forloop.index0 }}">
           <div class="feed-card-header">
             <div class="feed-avatar">
               {% include apple-logo.html size=22 %}

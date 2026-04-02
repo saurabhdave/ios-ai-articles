@@ -10,6 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600;1,9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}">
+  {% if page.layout == 'home' %}
+  <link rel="preload" as="image" href="{{ '/assets/images/hero-bg.jpg' | relative_url }}">
+  {% endif %}
   {% seo %}
   {% feed_meta %}
   <script>
@@ -21,7 +24,7 @@
   </script>
 </head>
 <body>
-  <nav class="nav">
+  <nav class="nav nav--scrolled">
     <div class="nav-inner">
       <a href="{{ '/' | relative_url }}" class="nav-brand">
         <svg class="nav-logo" width="20" height="20" viewBox="0 0 24 24" fill="none">

@@ -6,10 +6,11 @@ layout: default
 {% if words < 360 %}{% assign read_time = 1 %}{% else %}{% assign read_time = words | divided_by: 200 %}{% endif %}
 
 <article class="post-article">
+  <div class="reading-progress-bar" aria-hidden="true"></div>
   <div class="container">
     {% include back-link.html text="All Articles" %}
 
-    <header class="post-header">
+    <header class="post-header reveal" data-reveal="left">
       <div class="post-meta">
         <span class="post-date">{{ page.date | date: "%B %-d, %Y" }}</span>
         <span class="post-dot">&middot;</span>

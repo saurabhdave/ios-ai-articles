@@ -2,7 +2,11 @@
 layout: default
 ---
 
-<section class="hero">
+<section class="hero hero--home">
+  <div class="hero-bg" aria-hidden="true">
+    <img src="{{ '/assets/images/hero-bg.jpg' | relative_url }}" alt="" class="hero-bg-img" loading="eager" decoding="async" width="2560" height="1707">
+    <div class="hero-bg-overlay"></div>
+  </div>
   <div class="container">
     <div class="hero-badge">
       <span class="badge-dot"></span>
@@ -80,7 +84,7 @@ layout: default
   {% assign featured = site.posts.first %}
   <section class="featured-section">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal" data-reveal="left">
         <span class="section-tag">
           <!-- star icon -->
           <svg class="section-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -89,7 +93,7 @@ layout: default
           Latest Article
         </span>
       </div>
-      <a href="{{ featured.url | relative_url }}" class="featured-card reveal">
+      <a href="{{ featured.url | relative_url }}" class="featured-card reveal" data-reveal="scale">
         <div class="featured-meta">
           <span class="post-date">{{ featured.date | date: "%B %-d, %Y" }}</span>
           <span class="post-dot">&middot;</span>
@@ -110,7 +114,7 @@ layout: default
   {% assign latest_newsletter = sorted_newsletters.first %}
   <section class="featured-section">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal" data-reveal="left">
         <span class="section-tag">
           <!-- mail icon -->
           <svg class="section-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -121,7 +125,7 @@ layout: default
         </span>
         <a href="{{ '/newsletter/' | relative_url }}" class="section-count">All issues &rarr;</a>
       </div>
-      <a href="{{ latest_newsletter.url | relative_url }}" class="featured-card reveal">
+      <a href="{{ latest_newsletter.url | relative_url }}" class="featured-card reveal" data-reveal="scale">
         <div class="featured-meta">
           <span class="post-date">{{ latest_newsletter.date | date: "%B %-d, %Y" }}</span>
           <span class="post-dot">&middot;</span>
@@ -141,7 +145,7 @@ layout: default
   {% if site.posts.size > 1 %}
   <section class="articles-section">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal" data-reveal="left">
         <span class="section-tag">
           <!-- list icon -->
           <svg class="section-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
