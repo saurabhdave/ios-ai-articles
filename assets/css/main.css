@@ -100,7 +100,7 @@ html[data-theme="light"] {
 .feed-action-btn:focus-visible { border-radius: 50%; }
 
 /* ─── Base ───────────────────────────────────────────────── */
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--font);
@@ -133,15 +133,28 @@ body {
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: 60px;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid transparent;
+  transition: background 0.3s var(--ease), backdrop-filter 0.3s var(--ease), -webkit-backdrop-filter 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.nav--scrolled {
   background: rgba(8, 9, 13, 0.90);
   backdrop-filter: blur(22px) saturate(160%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border-bottom: 1px solid var(--border);
+  border-bottom-color: var(--border);
+}
+
+html[data-theme="light"] .nav--scrolled {
+  background: rgba(246, 244, 238, 0.92);
+  border-color: rgba(0,0,0,0.07);
 }
 
 html[data-theme="light"] .nav {
-  background: rgba(246, 244, 238, 0.92);
-  border-color: rgba(0,0,0,0.07);
+  background: transparent;
+  border-color: transparent;
 }
 
 .nav-inner {
@@ -206,6 +219,21 @@ html[data-theme="light"] .nav-link:hover { background: rgba(0,0,0,0.05); }
 }
 html[data-theme="light"] .nav-link-gh  { border-color: rgba(0,0,0,0.10); background: transparent; }
 html[data-theme="light"] .nav-link-gh:hover { border-color: rgba(0,0,0,0.16); background: rgba(0,0,0,0.04); }
+
+/* ─── Reading Progress Bar ───────────────────────────────── */
+.reading-progress-bar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient);
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 99;
+  pointer-events: none;
+  will-change: transform;
+}
 
 /* ─── Theme Toggle ───────────────────────────────────────── */
 .theme-toggle {
@@ -304,6 +332,58 @@ html[data-theme="light"] .nav-link-gh:hover { border-color: rgba(0,0,0,0.16); ba
   bottom: 0; left: 0; right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* ─── Hero Background Image (Homepage only) ─────────────── */
+.hero--home {
+  background-image: none; /* Remove dot-grid texture */
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 120%; /* Extra height for parallax travel room */
+  object-fit: cover;
+  object-position: center 30%;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  display: block;
+}
+
+.hero-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(8, 9, 13, 0.72) 0%,
+      rgba(8, 9, 13, 0.58) 40%,
+      rgba(8, 9, 13, 0.88) 100%
+    );
+  z-index: 1;
+}
+
+html[data-theme="light"] .hero-bg-overlay {
+  background:
+    linear-gradient(to bottom,
+      rgba(246, 244, 238, 0.82) 0%,
+      rgba(246, 244, 238, 0.68) 40%,
+      rgba(246, 244, 238, 0.94) 100%
+    );
+}
+
+.hero--home .container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero--home::before {
+  z-index: 2; /* Keep ambient glow above image */
 }
 
 /* Live badge — monospace terminal prompt style */
@@ -1550,11 +1630,36 @@ html[data-theme="light"] .share-option:hover { background: var(--accent-soft); c
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes reveal-from-left {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes reveal-from-right {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes reveal-scale {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes reveal-code {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 .reveal { opacity: 0; }
 
 .reveal.visible {
   animation: reveal-in 0.55s var(--ease) var(--reveal-delay, 0ms) both;
 }
+
+.reveal.visible[data-reveal="left"]  { animation-name: reveal-from-left; }
+.reveal.visible[data-reveal="right"] { animation-name: reveal-from-right; }
+.reveal.visible[data-reveal="scale"] { animation-name: reveal-scale; }
+.reveal.visible[data-reveal="code"]  { animation-name: reveal-code; }
 
 .article-card:hover { transform: translateY(-4px); }
 
@@ -1676,4 +1781,6 @@ html[data-theme="light"] .share-option:hover { background: var(--accent-soft); c
   }
   .reveal { opacity: 1; }
   .badge-dot { animation: none; }
+  .hero-bg-img { will-change: auto; }
+  .reading-progress-bar { display: none; }
 }
