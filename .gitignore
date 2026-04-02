@@ -18,3 +18,9 @@ outputs/
 
 # Content repo must not persist upstream pipeline state.
 newsletter/.issue_number
+
+# Git worktrees
+.worktrees/
+
+# Brainstorming session files
+.superpowers/
