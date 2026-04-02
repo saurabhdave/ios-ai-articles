@@ -28,23 +28,42 @@ document.getElementById('theme-toggle').addEventListener('click', function () {
       '</a>' +
       '<button class="share-option" id="sd-copy">' +
         '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>' +
-        'Copy link' +
+        'Copy post' +
       '</button>';
     document.body.appendChild(dd);
     dd.querySelector('#sd-copy').addEventListener('click', function (e) {
       e.stopPropagation();
-      var url = dd.dataset.url;
-      navigator.clipboard.writeText(url).then(function () {
-        var btn = dd.querySelector('#sd-copy');
+      var bodyEl = document.querySelector('.post-body') || document.querySelector('.lp-body');
+      var html = bodyEl ? bodyEl.innerHTML : dd.dataset.url;
+      var text = bodyEl ? bodyEl.innerText : dd.dataset.url;
+      var btn = dd.querySelector('#sd-copy');
+      function onCopied() {
         btn.classList.add('share-option-copied');
         btn.lastChild.textContent = ' Copied!';
-        setTimeout(function () { btn.classList.remove('share-option-copied'); btn.lastChild.textContent = ' Copy link'; close(); }, 1400);
-      }).catch(function () {
-        var ta = document.createElement('textarea');
-        ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-        document.body.removeChild(ta); close();
-      });
+        setTimeout(function () { btn.classList.remove('share-option-copied'); btn.lastChild.textContent = ' Copy post'; close(); }, 1400);
+      }
+      if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+        navigator.clipboard.write([
+          new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([text], { type: 'text/plain' })
+          })
+        ]).then(onCopied).catch(function () {
+          navigator.clipboard.writeText(text).then(onCopied).catch(function () {
+            var ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+            document.body.removeChild(ta); onCopied();
+          });
+        });
+      } else {
+        navigator.clipboard.writeText(text).then(onCopied).catch(function () {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+          document.body.removeChild(ta); onCopied();
+        });
+      }
     });
     return dd;
   }
