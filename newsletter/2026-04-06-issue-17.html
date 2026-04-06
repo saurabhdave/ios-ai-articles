@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #17</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #17</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #17</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Shortcuts that arrive in users&#x27; devices and &quot;do nothing&quot; are a support tax we freely choose to pay when we design systems without clear failure modes. This week I focus on concrete AppIntents patterns—design, migration, and observability—that stop those silent failures from becoming mysterious support tickets. The aim: make shortcuts diagnosable and resilient rather than fragile convenience.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>App Intents Patterns for iOS Shortcuts</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Silent shortcut failures usually trace back to three categories: resolution gaps, permission flow regressions, or background work that the system kills. Each category has practical mitigations you can implement today: typed parameters and tests, surfaced permission gating, and quick-return perform() with background handoff. If you care about shipping shortcuts that survive OS changes and real users, these are the trade-offs worth making.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">German implementation of eIDAS will require an Apple/Google account to function — signals more government-level integration work and platform-account dependency in mobile identity flows. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple approves driver that lets Nvidia eGPUs work with Arm Macs — early signs the platform constraints around hardware are loosening, which matters for tooling and local CI performance. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What's new in Swift: March 2026 Edition — Swift 6.3 is out and the language ecosystem continues to gain stability and polish, which lowers friction for adopting typed intent models. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+import AppIntents
+import Observation
+import os
+
+@MainActor @Observable final class ShortcutInvocationLog {
+    var entries: [String] = []
+    func record(_ entry: String) {
+        entries.append(&quot;\(Date()): \(entry)&quot;)
+    }
+}
+
+let SharedShortcutLogger = ShortcutInvocationLog()
+let signposter = OSSignposter()
+let logger = Logger(subsystem: &quot;com.example.shortcuts&quot;, category: &quot;AppIntent&quot;)
+
+struct SubmitReportIntent: AppIntent {
+    static var title: LocalizedStringResource = &quot;Submit Report&quot;
+
+    @Parameter(title: &quot;Report date&quot;) var date: Date
+    @Parameter(title: &quot;Summary&quot;) var summary: String
+
+    static var parameterSummary: some ParameterSummary {
+        Summary(&quot;Submit a summary for the specified date&quot;)
+    }
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern encodes two engineering decisions: instrument entry/exit with signposts and structured logs, and prefer small, testable perform() units that hand off long work to idempotent background workers.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you maintain AppIntents in production, try three quick experiments this week: add a typed-parameter round-trip unit test, instrument perform() with an OSSignposter signpost and a correlation ID, and gate any permission-prompt changes behind a flag. Hit reply with how you handled legacy shortcut identifier migrations and which signals helped you debug them — I’ll share interesting patterns next issue. Forward this to a teammate who owns shortcuts or automation tests.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
