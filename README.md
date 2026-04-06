@@ -48,6 +48,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-04-06 | [App Intents Patterns for iOS Shortcuts](articles/2026-04-06-app-intents-patterns-for-ios-shortcuts.md) | [Post](linkedin/2026-04-06-app-intents-patterns-for-ios-shortcuts-linkedin.md) |
 | 2026-04-01 | [Find Swift Memory Leaks with Xcode Memory Graph](articles/2026-04-01-find-swift-memory-leaks-with-xcode-memory-graph.md) | [Post](linkedin/2026-04-01-find-swift-memory-leaks-with-xcode-memory-graph-linkedin.md) |
 | 2026-03-31 | [Speed Xcode Builds with Explicit Swift Modules](articles/2026-03-31-speed-xcode-builds-with-explicit-swift-modules.md) | [Post](linkedin/2026-03-31-speed-xcode-builds-with-explicit-swift-modules-linkedin.md) |
 | 2026-03-31 | [Automating Dynamic Type Tests in Xcode](articles/2026-03-31-automating-dynamic-type-tests-in-xcode.md) | [Post](linkedin/2026-03-31-automating-dynamic-type-tests-in-xcode-linkedin.md) |
@@ -57,9 +58,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-03-26 | [Structured Concurrency Patterns for Production Swift Apps](articles/2026-03-26-structured-concurrency-patterns-for-production-swift-apps.md) | [Post](linkedin/2026-03-26-structured-concurrency-patterns-for-production-swift-apps-linkedin.md) |
 | 2026-03-22 | [Dependency Injection Patterns for Production SwiftUI](articles/2026-03-22-dependency-injection-patterns-for-production-swiftui.md) | [Post](linkedin/2026-03-22-dependency-injection-patterns-for-production-swiftui-linkedin.md) |
 | 2026-03-21 | [Privacy-First Telemetry with Swift Concurrency](articles/2026-03-21-privacy-first-telemetry-with-swift-concurrency.md) | [Post](linkedin/2026-03-21-privacy-first-telemetry-with-swift-concurrency-linkedin.md) |
-| 2026-03-16 | [Migrate URLSession to Swift async/await](articles/2026-03-16-migrate-urlsession-to-swift-asyncawait.md) | [Post](linkedin/2026-03-16-migrate-urlsession-to-swift-asyncawait-linkedin.md) |
 
-> Showing 10 of 12 articles — [2 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 13 articles — [3 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
