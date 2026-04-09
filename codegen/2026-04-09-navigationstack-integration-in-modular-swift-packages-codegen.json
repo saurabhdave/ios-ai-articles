@@ -1,0 +1,9 @@
+{
+  "topic": "NavigationStack Integration in Modular Swift Packages",
+  "generated_at_utc": "2026-04-09T11:04:48.099090+00:00",
+  "path": "omitted",
+  "repair_attempts": 2,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[snippet]  | style=Remove `@Bindable` from model properties (`router`) inside `@Observable`. Plain stored properties belong in the model; `@Bindable` belongs only in the SwiftUI View: `struct MyView: View {{ @Bindable var model: MyModel }}`."
+}
