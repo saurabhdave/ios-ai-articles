@@ -48,6 +48,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-04-20 | [Automating Xcode Tasks with Swift Package Plugins](articles/2026-04-20-automating-xcode-tasks-with-swift-package-plugins.md) | [Post](linkedin/2026-04-20-automating-xcode-tasks-with-swift-package-plugins-linkedin.md) |
 | 2026-04-16 | [Instrumenting iOS Apps with OSSignposter](articles/2026-04-16-instrumenting-ios-apps-with-ossignposter.md) | [Post](linkedin/2026-04-16-instrumenting-ios-apps-with-ossignposter-linkedin.md) |
 | 2026-04-13 | [Designing Custom SwiftUI EnvironmentKeys](articles/2026-04-13-designing-custom-swiftui-environmentkeys.md) | [Post](linkedin/2026-04-13-designing-custom-swiftui-environmentkeys-linkedin.md) |
 | 2026-04-06 | [App Intents Patterns for iOS Shortcuts](articles/2026-04-06-app-intents-patterns-for-ios-shortcuts.md) | [Post](linkedin/2026-04-06-app-intents-patterns-for-ios-shortcuts-linkedin.md) |
@@ -57,9 +58,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-03-30 | [Verified SwiftUI Modifiers for Safer App UI](articles/2026-03-30-verified-swiftui-modifiers-for-safer-app-ui.md) | [Post](linkedin/2026-03-30-verified-swiftui-modifiers-for-safer-app-ui-linkedin.md) |
 | 2026-03-29 | [Custom Layouts Using SwiftUI's Layout Protocol](articles/2026-03-29-custom-layouts-using-swiftuis-layout-protocol.md) | [Post](linkedin/2026-03-29-custom-layouts-using-swiftuis-layout-protocol-linkedin.md) |
 | 2026-03-27 | [Profiling SwiftUI Rendering in Instruments](articles/2026-03-27-profiling-swiftui-rendering-in-instruments.md) | [Post](linkedin/2026-03-27-profiling-swiftui-rendering-in-instruments-linkedin.md) |
-| 2026-03-26 | [Structured Concurrency Patterns for Production Swift Apps](articles/2026-03-26-structured-concurrency-patterns-for-production-swift-apps.md) | [Post](linkedin/2026-03-26-structured-concurrency-patterns-for-production-swift-apps-linkedin.md) |
 
-> Showing 10 of 15 articles — [5 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 16 articles — [6 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
