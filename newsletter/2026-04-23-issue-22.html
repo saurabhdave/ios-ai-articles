@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #22</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #22</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #22</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Converting loose intent inputs into typed AppIntents is quietly one of those migrations that looks small in a PR but surfaces production problems fast: misrouted shortcuts, unexpected background work, and support traffic. This week I want to focus on practical guardrails—typed parameters, deterministic tests, and telemetry—that make intent integration predictable and reversible.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Integrating Apple Intelligence into App Intents</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Integrating Apple Intelligence into AppIntents exposes ambiguous, loosely typed slots as real operational risk: shortsighted conversions create misclassification, spike background jobs, and generate support cases. Treat intent work as a migration with feature gates, coercion tests, and clear fallbacks to catch errors early. The guidance that follows frames engineering choices—type strictness, observable gates, and rollout strategies—so you can deploy with confidence.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple fixed a high-profile vulnerability used to extract deleted messages — security patches remain a platform reality and you should assume rapid OS updates can affect app behavior. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Swift's IDE reach is expanding beyond Xcode into a range of editors via VS Code extension compatibility — expect more contributors and tooling variety around Swift editing. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Community posts and translations are actively covering the iOS security fix and related user issues — attention to localized support and documentation matters for incident response. [Source: dev.to]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import AppIntents
+import Observation
+import os
+
+enum SearchScope: String, Codable, Sendable {
+    case all, messages, files
+    static func parse(_ raw: String) -&gt; SearchScope? {
+        let normalized = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return Self(rawValue: normalized) ?? (normalized.contains(&quot;msg&quot;) ? .messages : nil)
+    }
+}
+
+@MainActor @Observable final class IntentTelemetry {
+    var parseFailures = 0
+    var executions = 0
+}
+
+struct SearchIntent: AppIntent {
+    static var title: LocalizedStringResource { &quot;Search&quot; }
+    @Parameter(title: &quot;Scope&quot;) var scope: SearchScope?
+    static var parameterSummary: some ParameterSummary { Summary(&quot;Search in \(\.$scope)&quot;) }
+
+    private let logger = Logger(subsystem: &quot;com.example.app&quot;, category: &quot;intents&quot;)
+    static let telemetry = IntentTelemetry()
+
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because typed parameters plus lightweight telemetry turn ambiguous natural-language slots into structured signals you can test, monitor, and roll back safely.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Read the full article for a concise checklist you can run before flipping an AppIntent live: strict params, coercion tests, structured logging, and a rollout gate. Hit reply with how you validate system-driven prompts in production or forward this to a teammate wrestling with intent misclassification — I want to hear which runtime signals trigger your rollbacks.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
