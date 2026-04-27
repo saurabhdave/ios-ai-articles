@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #23</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #23</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #23</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Dark mode stopped being a design nicety years ago — it&#x27;s a runtime surface that can break accessibility, screenshots, and release confidence when tokens are poorly scoped. Teams are quietly wrestling with how to roll out palette changes safely without shipping visual regressions or forcing emergency rollbacks.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Designing Color Schemes for Dark Mode in SwiftUI</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">A single mis-scoped semantic color can cascade into unreadable banners, rejected App Store screenshots, or huge re-render storms across a feed. This piece lays down pragmatic, production-tested rules for token scoping, runtime validation, and gated rollouts. Read it if you want rollout patterns that are reversible and auditable.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Expanding Swift's IDE support appears to broaden where engineers will edit and test Swift code, which nudges teams to standardize tooling for color token checks across editors. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">iOS 26 SDK becoming mandatory means teams should validate color, contrast, and life-cycle assumptions against the newest SDK before submissions. [Source: dev.to]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple pushing scene-based life-cycle expectations signals that app start and theme initialization paths will need auditing for color token bootstrapping. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Observation
+import UIKit
+
+enum SemanticColor: String {
+    case background, primaryText, notificationBadge
+    func color(overrides: TokenOverrides) -&gt; Color {
+        if let hex = overrides.overrideHex(for: self) { return Color(hex: hex) }
+        // staging-safe defaults (dynamic-aware)
+        switch self {
+        case .background: return Color(uiColor: .systemBackground)
+        case .primaryText: return Color(uiColor: .label)
+        case .notificationBadge: return Color(red: 1, green: 0.23, blue: 0.19) // semantic red
+        }
+    }
+}
+
+actor TokenOverrides {
+    private var map: [String: String] = [:] // token -&gt; hex
+    var rolloutEnabled: Bool = false
+    func setOverride(_ hex: String, for token: SemanticColor) { map[token.rawValue] = hex }
+    func clearOverride(for token: SemanticColor) { map.removeValue(forKey: token.rawValue) }
+    func overrideHex(for token: SemanticColor) -&gt; String? { rolloutEnabled ? map[token.rawValue] : nil }
+    // simple runtime validator: ensure contrast with background &gt; min ratio (WCAG-like)
+    func validateContrast(for token: SemanticColor) -&gt; Bool {
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it separates semantic intent from concrete colors and gives you a safe, toggleable path to stage and validate visual changes before they reach production.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your team still plastered hexes through the codebase, start by centralizing semantic tokens and adding a staging override with contrast validation — the article shows how. Hit reply with how you gate color rollouts or join the LinkedIn thread to compare rollout telemetry and testing strategies; your war stories help everyone ship safer.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
