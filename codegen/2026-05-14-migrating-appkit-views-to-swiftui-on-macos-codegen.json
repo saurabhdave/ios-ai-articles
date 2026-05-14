@@ -1,0 +1,9 @@
+{
+  "topic": "Migrating AppKit Views to SwiftUI on macOS",
+  "generated_at_utc": "2026-05-14T11:57:56.965007+00:00",
+  "path": "omitted",
+  "repair_attempts": 2,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[snippet]  | style=Remove `@Bindable` from model properties (`model`) inside `@Observable`. Plain stored properties belong in the model; `@Bindable` belongs only in the SwiftUI View: `struct MyView: View {{ @Bindable var model: MyModel }}`."
+}
