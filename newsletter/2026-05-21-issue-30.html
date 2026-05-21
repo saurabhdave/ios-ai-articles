@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #30</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #30</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #30</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Hangs on real macOS devices are quietly one of the worst UX regressions — they destroy confidence faster than a visual bug. Many teams only notice these stalls during demos because the simulator masks GPU/driver and scheduler interactions. This issue focuses on a repeatable, conservative workflow to make device-only hangs actionable.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Xcode Time Profiler for macOS hang detection</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Frozen windows during a customer demo are a trust problem you can’t paper over with a later patch. Tracking down stalls that only appear on hardware forces you to change how you gather evidence: shorter captures, process-only sampling, and correlating samples with runtime tracing. The payoff is turning an intermittent demo failure into a CI-detectable regression.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Show HN: I reverse engineered Apple's video wallpapers — reverse engineering work like this highlights continued community interest in macOS internals and media pipelines you might need to reason about when debugging compositor-related stalls. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What's new in Swift: April 2026 Edition — the Swift project continues producing curated updates that matter for long-lived codebases; keep an eye on language and runtime changes that affect performance diagnostics. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">How I Ported iOS’s “Reason for Calling” to My Android Device — platform feature parity experiments show engineers are still learning by re-implementing UX; that cross-platform thinking often surfaces edge cases useful for performance design. [Source: Medium]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">NavigationStackCompat: Modern SwiftUI Navigation on iOS 14 and iOS 15 — community libraries that backport API ergonomics remind you to validate performance on older runtimes, where different scheduling can surface hangs. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Observation
+import OSLog
+
+@MainActor @Observable final class Renderer {
+    private let signposter = OSSignposter()
+    private let logger = Logger(subsystem: &quot;com.example.app&quot;, category: &quot;Renderer&quot;)
+    var busy: Bool = false
+
+    func simulateRenderFrame(durationMillis: UInt64 = 700) async {
+        let signpostState = signposter.beginInterval(&quot;RenderFrame&quot;)
+        logger.log(&quot;RenderFrame begin&quot;)
+        busy = true
+        // Simulate device-only stall: perform a CPU-bound short busy-wait to surface scheduling/driver interactions
+        let end = Task.detached { Date().addingTimeInterval(Double(durationMillis)/1000.0) }
+        while Date() &lt; (try! await end.value) {
+            // tight loop simulating work; keep body minimal to ensure measurable samples in Time Profiler
+            _ = (1...1000).reduce(0, +)
+            await Task.yield() // keep cooperative with the scheduler
+        }
+        busy = false
+        signposter.endInterval(signpostState)
+        logger.log(&quot;RenderFrame end&quot;)
+    }
+}
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because instrumenting named intervals and minimal, repeatable stalls gives you reliable anchors for mapping Time Profiler samples back to meaningful operations when diagnosing device-only hangs.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Read the full piece for a step-by-step Time Profiler workflow, including when to use system-wide vs process-only sampling and how to gate verbose tracing behind runtime flags. If you&#x27;re wrestling with demo-only hangs, hit reply with your capture strategy or a sampled stack — I&#x27;m interested in concrete cases. Forward this to a teammate who runs the device lab; these techniques are worth automating into CI.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
