@@ -48,6 +48,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-05-25 | [WidgetKit App Intents Patterns for macOS Widgets](articles/2026-05-25-widgetkit-app-intents-patterns-for-macos-widgets.md) | [Post](linkedin/2026-05-25-widgetkit-app-intents-patterns-for-macos-widgets-linkedin.md) |
 | 2026-05-21 | [Xcode Time Profiler for macOS hang detection](articles/2026-05-21-xcode-time-profiler-for-macos-hang-detection.md) | [Post](linkedin/2026-05-21-xcode-time-profiler-for-macos-hang-detection-linkedin.md) |
 | 2026-05-11 | [RealityKit Performance Tips for visionOS](articles/2026-05-11-realitykit-performance-tips-for-visionos.md) | [Post](linkedin/2026-05-11-realitykit-performance-tips-for-visionos-linkedin.md) |
 | 2026-04-23 | [Integrating Apple Intelligence into App Intents](articles/2026-04-23-integrating-apple-intelligence-into-app-intents.md) | [Post](linkedin/2026-04-23-integrating-apple-intelligence-into-app-intents-linkedin.md) |
@@ -57,9 +58,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-04-06 | [App Intents Patterns for iOS Shortcuts](articles/2026-04-06-app-intents-patterns-for-ios-shortcuts.md) | [Post](linkedin/2026-04-06-app-intents-patterns-for-ios-shortcuts-linkedin.md) |
 | 2026-04-01 | [Find Swift Memory Leaks with Xcode Memory Graph](articles/2026-04-01-find-swift-memory-leaks-with-xcode-memory-graph.md) | [Post](linkedin/2026-04-01-find-swift-memory-leaks-with-xcode-memory-graph-linkedin.md) |
 | 2026-03-31 | [Speed Xcode Builds with Explicit Swift Modules](articles/2026-03-31-speed-xcode-builds-with-explicit-swift-modules.md) | [Post](linkedin/2026-03-31-speed-xcode-builds-with-explicit-swift-modules-linkedin.md) |
-| 2026-03-31 | [Automating Dynamic Type Tests in Xcode](articles/2026-03-31-automating-dynamic-type-tests-in-xcode.md) | [Post](linkedin/2026-03-31-automating-dynamic-type-tests-in-xcode-linkedin.md) |
 
-> Showing 10 of 19 articles — [9 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 20 articles — [10 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
