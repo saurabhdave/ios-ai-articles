@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #31</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #31</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #31</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Staged rollouts are exposing subtle failure modes in WidgetKit integrations—widgets that stop updating, silent no-op intent executions, and timeline gaps when intent payloads get mangled across processes. These problems aren’t glamorous, but they’re where reliability is won or lost for real users. This issue digs into practical patterns for App Intents on macOS widgets so you can avoid rollout-induced regressions.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>WidgetKit App Intents Patterns for macOS Widgets</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Intent serialization and cross-process decoding are brittle points in widget lifecycles; malformed payloads and OS-specific decoder differences cause silent failures. Treat AppIntent parameters as a durable, versioned API and validate early to avoid no-op executions and missed timeline updates. The article outlines defensive patterns you can apply immediately to reduce rollout risk.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift project published its April 2026 roundup, signaling ongoing ecosystem work and new tooling conversations to watch. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Community posts continue to surface platform integration guides (e.g., iOS sign-in flows for React Native), reminding teams that cross-framework iOS behavior still needs careful production hardening. [Source: dev.to]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Community leaders and newsletters are reframing long-running curation projects as ecosystem cornerstones, suggesting maintenance and community stewardship remain important for Swift-oriented tooling. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import AppIntents
+import WidgetKit
+import OSLog
+
+private let logger = Logger(subsystem: &quot;com.example.widgets&quot;, category: &quot;AppIntent&quot;)
+
+struct FeatureFlags {
+    static var stagedRolloutEnabled: Bool {
+        UserDefaults.standard.bool(forKey: &quot;stagedRolloutEnabled&quot;)
+    }
+}
+
+// Durable, typed intent surface — validate early and fail-fast on malformed payloads.
+struct SafeSearchIntent: AppIntent {
+    static var title: LocalizedStringResource = &quot;Safe Search&quot;
+
+    // Typed parameter surface — treated as durable API
+    @Parameter(title: &quot;Query&quot;)
+    var query: String
+
+    // Lightweight defensive validation that guards cross-process decoding ambiguities.
+    func validate() -&gt; ValidationResult {
+        // Reject embedded NULs or control characters that may be introduced by mis-serialization.
+        if query.contains(&quot;\0&quot;) || query.rangeOfCharacter(from: .controlCharacters) != nil {
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because treating AppIntent parameters as a durable, validated API forces failures to surface at validation time instead of silently killing widget updates in production.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you’re shipping widgets, add encode/decode tests and validation cases to your CI today—those tests are the cheapest rollback insurance you’ll write. Read the full piece for the checklist and pragmatic signals to monitor during staged rollouts, then hit reply or join the LinkedIn thread to share which logs and signposts saved you during a bad rollout. Forward this to a teammate who owns widgets; they’ll thank you.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
