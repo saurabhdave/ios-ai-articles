@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #32</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #32</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #32</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Large, dynamic SwiftUI canvases on macOS are leaking accessibility failures into production more often than teams admit. Pixels looked right in my recent build, but VoiceOver behavior exposed missing semantics and runtime notifications — the two things SwiftUI doesn&#x27;t always wire up for you. This issue is practical: fix semantics and post the right AppKit notifications before shipping.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>VoiceOver for Custom SwiftUI Controls on macOS</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">I shipped a macOS build where a custom SwiftUI canvas looked correct but VoiceOver announced many interactive pieces as “group” and focus moved unpredictably during heavy UI updates. The issue was not visual — it was missing accessibility semantics and missing runtime notifications that assistive technologies rely on. This note shows pragmatic fixes to reduce these failures reaching customers.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What Apple and Google are doing to push notifications — pay attention to platform-level notification strategies; they shape how we design long-lived background UX and user consent flows. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Show HN: Open-source Workspace (mail,docs,spreadsheet,drive) web/iOS — teams continue to expect rich, cross-platform editing experiences, which raises the bar for accessibility parity across web and native. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What's new in Swift: April 2026 Edition — Swift ecosystem curation is ongoing and signals steady evolution in tooling and libraries that teams should track for compatibility and performance gains. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import AppKit
+
+struct CanvasItem: Identifiable {
+    let id = UUID()
+    let title: String
+    var value: Int
+}
+
+struct AccessibleCanvas: View {
+    @State private var items: [CanvasItem] = [
+        .init(title: &quot;Brush&quot;, value: 1),
+        .init(title: &quot;Eraser&quot;, value: 0)
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(&quot;Tools&quot;).font(.headline)
+                .accessibilityHidden(false)
+                .accessibilityLabel(&quot;Tool palette&quot;)
+                .accessibilityHint(&quot;Contains drawing tools&quot;)
+                .accessibilityAddTraits(.isHeader)
+
+            ForEach($items) { $item in
+                HStack {
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it expresses a pragmatic tradeoff: prefer clear SwiftUI accessibility attributes for maintainability, but be ready to bridge to AppKit when you need deterministic roles, hit-testing, or to post runtime accessibility notifications.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you run SwiftUI canvases on macOS, add explicit accessibility labels/roles and debounce updates so VoiceOver sees stable changes — and when you need it, bridge a tiny AppKit view to guarantee behavior. Hit reply with a surprising tradeoff your team faced adding VoiceOver support, or forward this to an engineer wrestling with dynamic UI updates; I’ll collect real strategies and share them next issue.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
