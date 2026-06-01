@@ -48,6 +48,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-06-01 | [On-device Marathon Coach Patterns for watchOS Apps](articles/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps.md) | [Post](linkedin/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps-linkedin.md) |
 | 2026-05-28 | [VoiceOver for Custom SwiftUI Controls on macOS](articles/2026-05-28-voiceover-for-custom-swiftui-controls-on-macos.md) | [Post](linkedin/2026-05-28-voiceover-for-custom-swiftui-controls-on-macos-linkedin.md) |
 | 2026-05-25 | [WidgetKit App Intents Patterns for macOS Widgets](articles/2026-05-25-widgetkit-app-intents-patterns-for-macos-widgets.md) | [Post](linkedin/2026-05-25-widgetkit-app-intents-patterns-for-macos-widgets-linkedin.md) |
 | 2026-05-21 | [Xcode Time Profiler for macOS hang detection](articles/2026-05-21-xcode-time-profiler-for-macos-hang-detection.md) | [Post](linkedin/2026-05-21-xcode-time-profiler-for-macos-hang-detection-linkedin.md) |
@@ -57,9 +58,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-04-16 | [Instrumenting iOS Apps with OSSignposter](articles/2026-04-16-instrumenting-ios-apps-with-ossignposter.md) | [Post](linkedin/2026-04-16-instrumenting-ios-apps-with-ossignposter-linkedin.md) |
 | 2026-04-13 | [Designing Custom SwiftUI EnvironmentKeys](articles/2026-04-13-designing-custom-swiftui-environmentkeys.md) | [Post](linkedin/2026-04-13-designing-custom-swiftui-environmentkeys-linkedin.md) |
 | 2026-04-06 | [App Intents Patterns for iOS Shortcuts](articles/2026-04-06-app-intents-patterns-for-ios-shortcuts.md) | [Post](linkedin/2026-04-06-app-intents-patterns-for-ios-shortcuts-linkedin.md) |
-| 2026-04-01 | [Find Swift Memory Leaks with Xcode Memory Graph](articles/2026-04-01-find-swift-memory-leaks-with-xcode-memory-graph.md) | [Post](linkedin/2026-04-01-find-swift-memory-leaks-with-xcode-memory-graph-linkedin.md) |
 
-> Showing 10 of 21 articles — [11 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 22 articles — [12 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
