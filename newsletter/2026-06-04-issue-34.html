@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #34</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #34</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #34</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Moving modules into Swift packages is more than folder reshuffling — it changes your build units, ABI surface, and the runtime coupling between app binaries. Teams quietly discover that a cosmetic visibility change can leak helper types and turn a small refactor into a cross-binary bug; this week I walk through pragmatic choices that reduce that blast radius.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Modular iOS Architecture Using Swift Packages</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Treat Swift packages as API boundaries, not just build organizers; visibility and package granularity are design decisions with operational consequences. Small targets help parallel builds and incremental compilation, but they also widen the number of ABIs you must reason about. I&#x27;ll show how to design package facades, stage rollouts, and spot regressions early so a cosmetic refactor doesn&#x27;t become a production incident.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">MacBook Neo production was increased, indicating stronger demand for Apple's hardware refresh cycle — watch for developer tooling and CI environment churn as new machines arrive. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift.org May 2026 roundup highlights ongoing language and community activity — expect steady evolution that affects package APIs and recommended practices. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">New posts on cross-platform navigation and richer SwiftUI preview tooling suggest teams are investing in shared component work and faster UI iteration flows. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+import SwiftUI
+import Observation
+
+@MainActor public protocol FeatureProviding {
+    var count: Int { get }
+    func increment() async -&gt; Int
+}
+
+@MainActor
+@Observable
+internal class InternalCounter: FeatureProviding {
+    var count: Int = 0
+    func increment() async -&gt; Int {
+        count += 1
+        return count
+    }
+}
+
+public enum Feature {
+    @MainActor public static func make() -&gt; FeatureProviding { InternalCounter() }
+}
+
+public struct CounterView: View {
+    @State private var count: Int
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it encodes a minimal public contract with an internal implementation, which reduces ABI surface and gives you freedom to change behavior behind a stable factory.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Read the full piece to get the checklists and rollout patterns I use when splitting code into packages — small changes should not require emergency rollbacks. If you have a rollout pattern, CI check, or os_signpost trick that caught a regression early, hit reply or share it on LinkedIn so the rest of us can steal and improve it. Forward this to a teammate who owns your app&#x27;s package map.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
