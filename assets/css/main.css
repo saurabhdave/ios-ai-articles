@@ -178,10 +178,10 @@ img { max-width: 100%; height: auto; }
 .ed-list { margin: 8px 0 0; }
 .ed-row { display: block; text-decoration: none; margin: 0 -16px; padding: 0 16px; border-radius: 10px; transition: background-color .18s ease; }
 .ed-row:hover { background-color: var(--row-hover); }
-.ed-grid { display: grid; grid-template-columns: 96px 1fr; gap: 4px 20px; padding: 24px 0; align-items: baseline; border-bottom: 1px solid var(--hair); }
-.ed-date { font-family: var(--font-mono); font-size: 12px; padding-top: 4px; white-space: nowrap; color: var(--muted); }
+.ed-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 22px 0; border-bottom: 1px solid var(--hair); }
+.ed-date { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; color: var(--muted); }
 .ed-main { min-width: 0; }
-.ed-title { font-family: var(--font-heading); font-size: clamp(20px, 2.6vw, 27px); line-height: 1.12; letter-spacing: -0.01em; color: var(--ink); margin: 0; }
+.ed-title { font-family: var(--font-heading); font-size: clamp(20px, 2.6vw, 27px); line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); margin: 0; overflow-wrap: break-word; }
 .ed-row:hover .ed-title { text-decoration: underline; text-underline-offset: 3px; }
 .ed-excerpt { margin: 8px 0 0; max-width: 64ch; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .ed-meta { margin-top: 12px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
@@ -190,7 +190,8 @@ img { max-width: 100%; height: auto; }
 .ed-row:hover .ed-arrow { transform: translateX(4px); color: var(--accent); }
 
 @media (min-width: 768px) {
-  .ed-grid { grid-template-columns: 130px 1fr 150px; }
+  .ed-grid { grid-template-columns: 130px minmax(0, 1fr) 150px; gap: 4px 20px; align-items: baseline; }
+  .ed-date { padding-top: 4px; }
   .ed-meta { display: none; }
   .ed-aside { display: flex; align-items: baseline; justify-content: flex-end; gap: 12px; padding-top: 4px; }
   .ed-aside .tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
@@ -209,7 +210,7 @@ img { max-width: 100%; height: auto; }
    READING VIEW  (post.html / newsletter.html / linkedin-post.html)
    =================================================================== */
 .reader { padding-top: 48px; }
-.article-grid { display: grid; grid-template-columns: 1fr; gap: 56px; }
+.article-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; }
 @media (min-width: 980px) { .article-grid { grid-template-columns: 200px minmax(0, 1fr); } }
 
 aside.toc { display: none; }
@@ -234,7 +235,7 @@ aside.toc { display: none; }
 .post-meta { font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-top: 22px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 
 /* ---- Prose ---- */
-.prose { max-width: 720px; }
+.prose { max-width: 720px; min-width: 0; }
 .prose > p:first-of-type { font-family: var(--font-reading); font-size: clamp(19px, 2.4vw, 23px); line-height: 1.55; color: var(--text-strong); margin: 30px 0 22px; max-width: 64ch; }
 .prose h2 { font-family: var(--font-heading); font-size: clamp(24px, 3.2vw, 32px); line-height: 1.12; letter-spacing: -0.015em; margin: 56px 0 18px; scroll-margin-top: 100px; color: var(--ink); }
 .prose h3 { font-family: var(--font-heading); font-size: 20px; line-height: 1.2; margin: 34px 0 12px; color: var(--ink); }
@@ -365,10 +366,17 @@ aside.toc { display: none; }
   .post-meta { gap: 10px; font-size: 12px; }
 }
 @media (max-width: 400px) {
-  .nav { padding: 14px 18px; }
-  .nav-logo { font-size: 18px; }
-  .nav-star { font-size: 21px; }
+  .nav { padding: 12px 16px; }
+  .nav-logo { font-size: 17px; }
+  .nav-star { display: none; }              /* decorative — reclaim space on small screens */
+  .nav-right { margin-left: 12px; gap: 8px; }
+  .theme-toggle, .hamburger { width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
   .wrap { padding: 0 18px; }
+}
+
+/* Safety net: no sideways scroll on mobile/tablet (sticky TOC is desktop-only ≥980px) */
+@media (max-width: 979px) {
+  html, body { overflow-x: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {

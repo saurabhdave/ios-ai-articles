@@ -229,10 +229,10 @@
 
   .row { display: block; text-decoration: none; margin: 0 -16px; padding: 0 16px; border-radius: 10px; transition: background-color .18s ease; }
   .row:hover { background-color: var(--row-hover); }
-  .row-grid { display: grid; grid-template-columns: 88px 1fr; gap: 4px 20px; padding: 24px 0; align-items: baseline; border-bottom: 1px solid var(--hair); }
-  .row-date { font-family: var(--font-mono); font-size: 12px; padding-top: 4px; white-space: nowrap; color: var(--muted); }
+  .row-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 22px 0; border-bottom: 1px solid var(--hair); }
+  .row-date { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; color: var(--muted); }
   .row-main { min-width: 0; }
-  .row-title { font-family: var(--font-heading); font-size: clamp(20px, 2.6vw, 27px); line-height: 1.12; letter-spacing: -0.01em; color: var(--ink); margin: 0; }
+  .row-title { font-family: var(--font-heading); font-size: clamp(20px, 2.6vw, 27px); line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); margin: 0; overflow-wrap: break-word; }
   .row:hover .row-title { text-decoration: underline; text-underline-offset: 3px; }
   .row-excerpt { margin: 8px 0 0; max-width: 64ch; color: var(--muted); font-size: 16px; line-height: 1.55; }
   .row-meta-mobile { margin-top: 12px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
@@ -291,16 +291,19 @@
     .index { padding-left: 40px; padding-right: 40px; }
     .newsletter { padding-left: 40px; padding-right: 40px; }
     .footer { padding-left: 40px; padding-right: 40px; }
-    .row-grid { grid-template-columns: 120px 1fr 150px; }
+    .row-grid { grid-template-columns: 120px minmax(0, 1fr) 150px; gap: 4px 20px; align-items: baseline; }
+    .row-date { padding-top: 4px; }
     .row-meta-mobile { display: none; }
     .row-aside { display: flex; align-items: baseline; justify-content: flex-end; gap: 12px; padding-top: 4px; }
     .row-aside .topic { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
     .newsletter-grid { grid-template-columns: 1.3fr 1fr; }
   }
   @media (max-width: 400px) {
-    .nav { padding: 14px 18px; }
-    .nav-logo { font-size: 18px; }
-    .nav-star { font-size: 21px; }
+    .nav { padding: 12px 16px; }
+    .nav-logo { font-size: 17px; }
+    .nav-star { display: none; }
+    .nav-right { margin-left: 12px; gap: 8px; }
+    .theme-toggle, .hamburger { width: 40px; height: 40px; min-width: 40px; min-height: 40px; }
     .hero { padding-left: 18px; padding-right: 18px; }
   }
 
@@ -324,7 +327,7 @@
 {%- capture topics_raw -%}{%- for post in site.posts -%}{{ site.data.article_topics[post.slug] | default: "iOS" }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}{%- endcapture -%}
 {%- assign topic_list = topics_raw | split: "," | uniq | sort -%}
 
-<!-- Mouse-scrub background video (decorative; loaded only on fine-pointer, motion-OK devices) -->
+<!-- Background video: mouse-scrubbed on desktop, autoplay-loop on touch devices (skipped on data-saver) -->
 <video class="bg-video" id="bgVideo" aria-hidden="true"
   src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4"
   muted playsinline preload="none"></video>
@@ -537,27 +540,41 @@
   var v = document.getElementById("bgVideo");
   var finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var saveData = navigator.connection && navigator.connection.saveData;
-  var allowVideo = v && finePointer && !reduceMotion && !saveData && window.innerWidth >= 768;
-  if (allowVideo) {
+  if (v && !saveData) {
     v.preload = "auto";
     v.load();
-    var state = { prevX: null, targetTime: 0, seeking: false };
-    var seekNext = function () {
-      if (Math.abs(v.currentTime - state.targetTime) > 0.01) v.currentTime = state.targetTime;
-      else state.seeking = false;
-    };
-    v.addEventListener("seeked", seekNext);
-    window.addEventListener("mousemove", function (e) {
-      var duration = v.duration;
-      if (!duration || isNaN(duration)) { state.prevX = e.clientX; return; }
-      if (state.prevX === null) { state.prevX = e.clientX; state.targetTime = v.currentTime || 0; return; }
-      var delta = e.clientX - state.prevX;
-      state.prevX = e.clientX;
-      var t = state.targetTime + (delta / window.innerWidth) * SENSITIVITY * duration;
-      t = Math.max(0, Math.min(duration, t));
-      state.targetTime = t;
-      if (!state.seeking) { state.seeking = true; v.currentTime = t; }
-    });
+    if (finePointer && !reduceMotion) {
+      /* Desktop with a mouse: scrub by horizontal movement (first frame shows at rest). */
+      var state = { prevX: null, targetTime: 0, seeking: false };
+      var seekNext = function () {
+        if (Math.abs(v.currentTime - state.targetTime) > 0.01) v.currentTime = state.targetTime;
+        else state.seeking = false;
+      };
+      v.addEventListener("seeked", seekNext);
+      window.addEventListener("mousemove", function (e) {
+        var duration = v.duration;
+        if (!duration || isNaN(duration)) { state.prevX = e.clientX; return; }
+        if (state.prevX === null) { state.prevX = e.clientX; state.targetTime = v.currentTime || 0; return; }
+        var delta = e.clientX - state.prevX;
+        state.prevX = e.clientX;
+        var t = state.targetTime + (delta / window.innerWidth) * SENSITIVITY * duration;
+        t = Math.max(0, Math.min(duration, t));
+        state.targetTime = t;
+        if (!state.seeking) { state.seeking = true; v.currentTime = t; }
+      });
+    } else {
+      /* Touch / no-mouse devices can't scrub and won't render a paused frame —
+         so play the footage directly. Autoplay-loop for motion; for reduced-motion
+         users render a single frame then pause (still shows the subject). */
+      v.muted = true; v.loop = !reduceMotion; v.setAttribute("playsinline", "");
+      var showFrame = function () {
+        var p = v.play();
+        if (p && p.then) p.then(function () { if (reduceMotion) v.pause(); }).catch(function () {});
+        else if (reduceMotion) v.pause();
+      };
+      if (v.readyState >= 2) showFrame();
+      else v.addEventListener("loadeddata", showFrame, { once: true });
+    }
   }
 
   /* ---- Typewriter ---- */
