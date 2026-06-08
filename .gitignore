@@ -24,3 +24,6 @@ newsletter/.issue_number
 
 # Brainstorming session files
 .superpowers/
+
+# Project context for Claude — keep local-only, not in repo
+CLAUDE.md
