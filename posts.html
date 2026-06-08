@@ -6,73 +6,45 @@ permalink: /posts/
 
 {% assign linkedin_posts = site.linkedin | sort: 'date' | reverse %}
 
-<section class="posts-section">
-  <div class="posts-container">
-
-    <div class="feed-header reveal" data-reveal="left">
-      <h2 class="feed-heading">Posts</h2>
-      <p class="feed-subheading">iOS engineering insights — Swift, SwiftUI &amp; Apple platform</p>
-      {% if linkedin_posts.size > 0 %}
-      <div class="feed-tab-bar">
-        <span class="feed-tab-label">All Posts</span>
-        <span class="tab-count">{{ linkedin_posts | size }}</span>
-      </div>
-      {% endif %}
-    </div>
-
-    {% if linkedin_posts.size > 0 %}
-    <div class="feed">
-      {% for item in linkedin_posts %}
-        {% assign words = item.content | number_of_words %}
-        {% if words < 360 %}{% assign read_time = 1 %}{% else %}{% assign read_time = words | divided_by: 180 %}{% endif %}
-
-        <a href="{{ item.url | relative_url }}" class="feed-card reveal" data-reveal-idx="{{ forloop.index0 }}">
-          <div class="feed-card-header">
-            <div class="feed-avatar">
-              {% include apple-logo.html size=22 %}
-            </div>
-            <div class="feed-author-info">
-              <span class="feed-author-name">Saurabh Dave</span>
-              <span class="feed-author-meta">Swift · SwiftUI · Apple Platform &nbsp;·&nbsp; {{ item.date | date: "%b %-d, %Y" }}</span>
-            </div>
-            <span class="feed-type-badge feed-type-article">Post</span>
-          </div>
-
-          <div class="feed-content">
-            <h2 class="feed-title">{{ item.title }}</h2>
-            <p class="feed-excerpt">{{ item.content | strip_html | truncate: 240 }}</p>
-          </div>
-
-          {% if item.hashtags and item.hashtags != "" %}
-          <div class="feed-tags">
-            {% assign tag_list = item.hashtags | split: " " %}
-            {% for tag in tag_list %}
-              {% if tag contains "#" %}<span class="feed-tag">{{ tag }}</span>{% endif %}
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <div class="feed-footer">
-            <span class="feed-cta">
-              Read post
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <div class="feed-actions">
-              <span class="feed-read-time">{{ read_time }} min read</span>
-              {% include share-button.html url=item.url title=item.title %}
-            </div>
-          </div>
-        </a>
-      {% endfor %}
-    </div>
-
-    {% else %}
-    <div class="empty-state" style="padding: 80px 0; text-align:center;">
-      <p style="color:var(--text-3); font-size:16px;">No posts yet — check back soon.</p>
-    </div>
-    {% endif %}
-
+<div class="wrap">
+  <div class="page-head">
+    <div class="page-kicker">Field Notes</div>
+    <h1 class="page-title">Posts</h1>
+    <p class="page-desc">Short-form iOS engineering insights &mdash; Swift, SwiftUI &amp; the Apple platform, written from a senior perspective.</p>
   </div>
-</section>
+
+  {% if linkedin_posts.size > 0 %}
+  <div class="section-head">
+    <div class="left">
+      <h2>All posts</h2>
+      <span class="count">{{ linkedin_posts | size }}</span>
+    </div>
+  </div>
+
+  <div class="ed-list">
+    {% for item in linkedin_posts %}
+      {% assign words = item.content | number_of_words %}
+      {% assign read_time = words | divided_by: 180 %}{% if read_time < 1 %}{% assign read_time = 1 %}{% endif %}
+      <a href="{{ item.url | relative_url }}" class="ed-row">
+        <div class="ed-grid">
+          <div class="ed-date">{{ item.date | date: "%b %-d, %Y" }}</div>
+          <div class="ed-main">
+            <h3 class="ed-title">{{ item.title }}</h3>
+            <p class="ed-excerpt">{{ item.content | strip_html | truncate: 170 }}</p>
+            <div class="ed-meta">Post &middot; {{ read_time }} min</div>
+          </div>
+          <div class="ed-aside">
+            <span class="tag">Post</span>
+            <span class="ed-arrow">&rarr;</span>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h2>No posts yet</h2>
+    <p>Check back soon &mdash; new posts publish alongside each article.</p>
+  </div>
+  {% endif %}
+</div>

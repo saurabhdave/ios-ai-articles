@@ -1,0 +1,27 @@
+# Curated topic labels for the homepage article index + filter chips.
+# Keyed by post slug (filename without the date prefix / .md).
+# Posts not listed here fall back to "iOS" in the home layout.
+# Seeded from the original design data; extend as new articles land.
+modular-ios-architecture-using-swift-packages: Architecture
+on-device-marathon-coach-patterns-for-watchos-apps: watchOS
+voiceover-for-custom-swiftui-controls-on-macos: Accessibility
+widgetkit-app-intents-patterns-for-macos-widgets: WidgetKit
+xcode-time-profiler-for-macos-hang-detection: Performance
+realitykit-performance-tips-for-visionos: visionOS
+integrating-apple-intelligence-into-app-intents: Apple Intelligence
+automating-xcode-tasks-with-swift-package-plugins: Tooling
+instrumenting-ios-apps-with-ossignposter: Observability
+designing-custom-swiftui-environmentkeys: SwiftUI
+app-intents-patterns-for-ios-shortcuts: App Intents
+find-swift-memory-leaks-with-xcode-memory-graph: Debugging
+speed-xcode-builds-with-explicit-swift-modules: Build Systems
+automating-dynamic-type-tests-in-xcode: Testing
+verified-swiftui-modifiers-for-safer-app-ui: SwiftUI
+custom-layouts-using-swiftuis-layout-protocol: SwiftUI
+profiling-swiftui-rendering-in-instruments: Performance
+structured-concurrency-patterns-for-production-swift-apps: Concurrency
+dependency-injection-patterns-for-production-swiftui: Architecture
+privacy-first-telemetry-with-swift-concurrency: Privacy
+migrate-urlsession-to-swift-asyncawait: Concurrency
+migrate-combine-to-swift-async: Concurrency
+migrate-viewcontroller-navigation-to-swiftui-navigationstack: Navigation
