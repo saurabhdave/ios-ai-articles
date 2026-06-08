@@ -2,26 +2,44 @@
 layout: default
 ---
 
-<article class="post-article">
-  <div class="reading-progress-bar" aria-hidden="true"></div>
-  <div class="container">
-    {% include back-link.html url="/newsletter/" text="All Issues" %}
+<div class="progress" id="progress" aria-hidden="true"></div>
 
-    <header class="post-header reveal" data-reveal="left">
-      <div class="post-meta">
-        <span class="post-date">{{ page.date | date: "%B %-d, %Y" }}</span>
-        <span class="post-dot">&middot;</span>
-        <span class="cat-tag">Newsletter</span>
-      </div>
-      <h1 class="post-title">{{ page.title }}</h1>
-    </header>
-
-    <div class="post-body">
-      {{ content }}
+<div class="wrap reader">
+  <article class="prose" style="margin: 0 auto;">
+    <div class="kicker">
+      <a class="back" href="{{ '/newsletter/' | relative_url }}">&larr; All issues</a>
+      <span class="post-topic">Newsletter</span>
+    </div>
+    <h1 class="post-title">{{ page.title }}</h1>
+    <div class="post-meta">
+      <span>{{ page.date | date: "%b %-d, %Y" }}</span>
+      <span>&middot;</span>
+      <span>iOS Dev Weekly</span>
+      {% include share-button.html size="15" %}
     </div>
 
-    <footer class="post-footer">
-      {% include back-link.html url="/newsletter/" text="Back to all issues" %}
-    </footer>
-  </div>
-</article>
+    {{ content }}
+
+    <div class="article-foot">
+      {% if page.previous.url %}
+      <a class="foot-link prev" href="{{ page.previous.url | relative_url }}">
+        <span class="lbl">&larr; Older issue</span>
+        <span class="ttl">{{ page.previous.title }}</span>
+      </a>
+      {% else %}
+      <span class="foot-link prev disabled"><span class="lbl">&larr; Older issue</span><span class="ttl">&mdash;</span></span>
+      {% endif %}
+      {% if page.next.url %}
+      <a class="foot-link next" href="{{ page.next.url | relative_url }}">
+        <span class="lbl">Newer issue &rarr;</span>
+        <span class="ttl">{{ page.next.title }}</span>
+      </a>
+      {% else %}
+      <a class="foot-link next" href="{{ '/newsletter/' | relative_url }}">
+        <span class="lbl">Index</span>
+        <span class="ttl">All issues &rarr;</span>
+      </a>
+      {% endif %}
+    </div>
+  </article>
+</div>

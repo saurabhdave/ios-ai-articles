@@ -2,42 +2,32 @@
 layout: default
 ---
 
-<article class="lp-article">
-  <div class="posts-container">
+<div class="wrap reader">
+  {% include back-link.html url="/posts/" text="All posts" %}
 
-    {% include back-link.html url="/posts/" text="All Posts" %}
-
-    <div class="lp-card">
-      <div class="feed-card-header">
-        <div class="feed-avatar">
-          {% include apple-logo.html size=22 %}
-        </div>
-        <div class="feed-author-info">
-          <span class="feed-author-name">Saurabh Dave</span>
-          <span class="feed-author-meta">Swift · SwiftUI · Apple Platform &nbsp;·&nbsp; {{ page.date | date: "%B %-d, %Y" }}</span>
-        </div>
-        <span class="feed-type-badge feed-type-article">Post</span>
+  <div class="lp-card">
+    <div class="lp-head">
+      <div class="lp-avatar">{% include apple-logo.html size=22 %}</div>
+      <div>
+        <div class="lp-author">Saurabh Dave</div>
+        <div class="lp-author-meta">Swift &middot; SwiftUI &middot; Apple Platform &middot; {{ page.date | date: "%b %-d, %Y" }}</div>
       </div>
-
-      <div class="lp-body">
-        {{ content }}
-      </div>
-
-      {% if page.hashtags and page.hashtags != "" %}
-      <div class="lp-hashtags">
-        {% assign tag_list = page.hashtags | split: " " %}
-        {% for tag in tag_list %}
-          {% if tag != "" %}<span class="lp-tag">{{ tag }}</span>{% endif %}
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <div class="lp-footer">
-        <div class="feed-actions">
-          {% include share-button.html %}
-        </div>
-      </div>
+      <span class="lp-badge">Post</span>
     </div>
 
+    <div class="lp-body">
+      {{ content }}
+    </div>
+
+    {% if page.hashtags and page.hashtags != "" %}
+    <div class="lp-hashtags">
+      {% assign tag_list = page.hashtags | split: " " %}
+      {% for tag in tag_list %}{% if tag != "" %}<span class="lp-tag">{{ tag }}</span>{% endif %}{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="lp-footer">
+      {% include share-button.html %}
+    </div>
   </div>
-</article>
+</div>

@@ -2,60 +2,95 @@
 layout: default
 ---
 
-{% assign words = content | number_of_words %}
-{% if words < 360 %}{% assign read_time = 1 %}{% else %}{% assign read_time = words | divided_by: 200 %}{% endif %}
+{%- assign topic = site.data.article_topics[page.slug] | default: "iOS" -%}
+{%- assign words = content | number_of_words -%}
+{%- assign read_time = words | divided_by: 200 -%}{%- if read_time < 1 -%}{%- assign read_time = 1 -%}{%- endif -%}
 
-<article class="post-article">
-  <div class="reading-progress-bar" aria-hidden="true"></div>
-  <div class="container">
-    {% include back-link.html text="All Articles" %}
+<div class="progress" id="progress" aria-hidden="true"></div>
 
-    <header class="post-header reveal" data-reveal="left">
-      <div class="post-meta">
-        <span class="post-date">{{ page.date | date: "%B %-d, %Y" }}</span>
-        <span class="post-dot">&middot;</span>
-        <span class="post-read-time">{{ read_time }} min read</span>
-        {% if page.categories %}
-        <span class="post-dot">&middot;</span>
-        {% for cat in page.categories %}<span class="cat-tag">{{ cat }}</span>{% endfor %}
-        {% endif %}
+<div class="wrap reader">
+  <div class="article-grid">
+    <aside class="toc">
+      <div class="toc-inner">
+        <div class="toc-label">On this page</div>
+        <nav id="toc"></nav>
+      </div>
+    </aside>
+
+    <article class="prose" id="article">
+      <div class="kicker">
+        <a class="back" href="{{ '/#articles' | relative_url }}">&larr; All articles</a>
+        <span class="post-topic">{{ topic }}</span>
       </div>
       <h1 class="post-title">{{ page.title }}</h1>
-    </header>
+      <div class="post-meta">
+        <span>{{ page.date | date: "%b %-d, %Y" }}</span>
+        <span>&middot;</span>
+        <span>{{ read_time }} min read</span>
+        <span>&middot;</span>
+        <span>Saurabh Dave</span>
+        {% include share-button.html size="15" %}
+      </div>
 
-    <div class="post-body">
       {{ content }}
-    </div>
 
-    <footer class="post-footer">
-      <div class="post-footer-nav">
+      <div class="article-foot">
         {% if page.previous.url %}
-        <a href="{{ page.previous.url | relative_url }}" class="post-nav-link post-nav-prev">
-          <span class="post-nav-label">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Previous
-          </span>
-          <span class="post-nav-title">{{ page.previous.title | truncate: 60 }}</span>
+        <a class="foot-link prev" href="{{ page.previous.url | relative_url }}">
+          <span class="lbl">&larr; Older</span>
+          <span class="ttl">{{ page.previous.title }}</span>
         </a>
         {% else %}
-        <span></span>
+        <span class="foot-link prev disabled"><span class="lbl">&larr; Older</span><span class="ttl">&mdash;</span></span>
         {% endif %}
         {% if page.next.url %}
-        <a href="{{ page.next.url | relative_url }}" class="post-nav-link post-nav-next">
-          <span class="post-nav-label">
-            Next
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="post-nav-title">{{ page.next.title | truncate: 60 }}</span>
+        <a class="foot-link next" href="{{ page.next.url | relative_url }}">
+          <span class="lbl">Newer &rarr;</span>
+          <span class="ttl">{{ page.next.title }}</span>
         </a>
         {% else %}
-        <span></span>
+        <a class="foot-link next" href="{{ '/#articles' | relative_url }}">
+          <span class="lbl">Index</span>
+          <span class="ttl">All articles &rarr;</span>
+        </a>
         {% endif %}
       </div>
-      <div class="post-footer-actions">
-        {% include share-button.html size="16" %}
-        {% include back-link.html text="All articles" %}
+
+      {%- comment -%} Related: same topic first, then top up with the most recent others (deduped) {%- endcomment -%}
+      {%- assign used = page.url -%}
+      {%- assign shown = 0 -%}
+      <div class="related">
+        <h2>Keep reading</h2>
+        <div class="rel-list">
+          {% for p in site.posts %}
+            {% assign ptopic = site.data.article_topics[p.slug] | default: "iOS" %}
+            {% if shown < 3 and p.url != page.url and ptopic == topic %}
+            <a class="rel-row" href="{{ p.url | relative_url }}">
+              <span class="d">{{ p.date | date: "%b %-d, %Y" }}</span>
+              <span class="t">{{ p.title }}</span>
+              <span class="ar">&rarr;</span>
+            </a>
+            {% assign used = used | append: "|" | append: p.url %}
+            {% assign shown = shown | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          {% if shown < 3 %}
+            {% for p in site.posts %}
+              {% unless used contains p.url %}
+              {% if shown < 3 and p.url != page.url %}
+              <a class="rel-row" href="{{ p.url | relative_url }}">
+                <span class="d">{{ p.date | date: "%b %-d, %Y" }}</span>
+                <span class="t">{{ p.title }}</span>
+                <span class="ar">&rarr;</span>
+              </a>
+              {% assign used = used | append: "|" | append: p.url %}
+              {% assign shown = shown | plus: 1 %}
+              {% endif %}
+              {% endunless %}
+            {% endfor %}
+          {% endif %}
+        </div>
       </div>
-    </footer>
+    </article>
   </div>
-</article>
+</div>
