@@ -25,3 +25,4 @@ privacy-first-telemetry-with-swift-concurrency: Privacy
 migrate-urlsession-to-swift-asyncawait: Concurrency
 migrate-combine-to-swift-async: Concurrency
 migrate-viewcontroller-navigation-to-swiftui-navigationstack: Navigation
+structured-concurrency-patterns-for-ios-networking: Concurrency
