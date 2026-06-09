@@ -101,6 +101,14 @@
     transition: filter .3s ease;
   }
 
+  /* ----- Layered parallax hero (touch) ----- */
+  .hero-parallax { position: fixed; inset: 0; z-index: 0; overflow: hidden; display: none;
+    background: var(--paper); filter: var(--video-filter, none); transition: filter .3s ease; }
+  .hero-parallax.active { display: block; }
+  .hp-layer { position: absolute; inset: -9%;
+    background-repeat: no-repeat; background-size: cover; background-position: 68% center;
+    will-change: transform; }
+
   /* ----- Navbar ----- */
   .nav {
     position: fixed; top: 0; left: 0; width: 100%;
@@ -349,10 +357,17 @@
 {%- capture topics_raw -%}{%- for post in site.posts -%}{{ site.data.article_topics[post.slug] | default: post.topic | default: "iOS" }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}{%- endcapture -%}
 {%- assign topic_list = topics_raw | split: "," | uniq | sort -%}
 
-<!-- Background video: mouse-scrubbed on desktop, autoplay-loop on touch devices (skipped on data-saver) -->
+<!-- Hero background. Desktop (mouse): scrubbed video. Touch: layered parallax
+     (subject cut out on-device with Vision, background inpainted) driven by tilt + scroll. -->
 <video class="bg-video" id="bgVideo" aria-hidden="true"
   src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4"
   muted playsinline preload="none"></video>
+<div class="hero-parallax" id="heroParallax" aria-hidden="true"
+     data-bg="{{ '/assets/images/hero-bg.jpg' | relative_url }}"
+     data-fg="{{ '/assets/images/hero-fg.png' | relative_url }}">
+  <div class="hp-layer hp-bg"></div>
+  <div class="hp-layer hp-fg"></div>
+</div>
 
 <!-- Navbar -->
 <header class="nav" id="nav">
@@ -556,47 +571,80 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- Background video: scrub by horizontal mouse movement ----
-     Decorative + driven only by mousemove, so load it only on fine-pointer,
-     motion-OK, wider, non-data-saver devices. Elsewhere the paper background shows. */
+  /* ---- Hero background ----
+     Desktop (mouse): scrub the video by horizontal movement.
+     Touch: layered parallax still (lighter than video) driven by tilt + scroll. */
   var SENSITIVITY = 0.8;
   var v = document.getElementById("bgVideo");
+  var heroParallax = document.getElementById("heroParallax");
   var finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var saveData = navigator.connection && navigator.connection.saveData;
-  if (v && !saveData) {
-    v.preload = "auto";
-    v.load();
-    if (finePointer && !reduceMotion) {
-      /* Desktop with a mouse: scrub by horizontal movement (first frame shows at rest). */
-      var state = { prevX: null, targetTime: 0, seeking: false };
-      var seekNext = function () {
-        if (Math.abs(v.currentTime - state.targetTime) > 0.01) v.currentTime = state.targetTime;
-        else state.seeking = false;
+
+  if (finePointer && !reduceMotion && v && !saveData) {
+    /* Desktop with a mouse: scrub the video (first frame shows at rest). */
+    v.preload = "auto"; v.load();
+    var state = { prevX: null, targetTime: 0, seeking: false };
+    var seekNext = function () {
+      if (Math.abs(v.currentTime - state.targetTime) > 0.01) v.currentTime = state.targetTime;
+      else state.seeking = false;
+    };
+    v.addEventListener("seeked", seekNext);
+    window.addEventListener("mousemove", function (e) {
+      var duration = v.duration;
+      if (!duration || isNaN(duration)) { state.prevX = e.clientX; return; }
+      if (state.prevX === null) { state.prevX = e.clientX; state.targetTime = v.currentTime || 0; return; }
+      var delta = e.clientX - state.prevX;
+      state.prevX = e.clientX;
+      var t = state.targetTime + (delta / window.innerWidth) * SENSITIVITY * duration;
+      t = Math.max(0, Math.min(duration, t));
+      state.targetTime = t;
+      if (!state.seeking) { state.seeking = true; v.currentTime = t; }
+    });
+  } else if (heroParallax) {
+    /* Touch / no-mouse / reduced-motion: layered depth parallax (no video download). */
+    if (v && v.parentNode) v.parentNode.removeChild(v);
+    var bgEl = heroParallax.querySelector(".hp-bg");
+    var fgEl = heroParallax.querySelector(".hp-fg");
+    bgEl.style.backgroundImage = "url('" + heroParallax.getAttribute("data-bg") + "')";
+    fgEl.style.backgroundImage = "url('" + heroParallax.getAttribute("data-fg") + "')";
+    heroParallax.classList.add("active");
+
+    if (!reduceMotion) {
+      var tX = 0, tY = 0, cX = 0, cY = 0, raf = null;   // targets + eased current (-1..1)
+      var render = function () {
+        cX += (tX - cX) * 0.12; cY += (tY - cY) * 0.12;
+        bgEl.style.transform = "translate3d(" + (cX * -10).toFixed(2) + "px," + (cY * -8).toFixed(2) + "px,0) scale(1.04)";
+        fgEl.style.transform = "translate3d(" + (cX * 22).toFixed(2) + "px," + (cY * 18).toFixed(2) + "px,0) scale(1.07)";
+        raf = (Math.abs(tX - cX) > 0.0008 || Math.abs(tY - cY) > 0.0008) ? requestAnimationFrame(render) : null;
       };
-      v.addEventListener("seeked", seekNext);
-      window.addEventListener("mousemove", function (e) {
-        var duration = v.duration;
-        if (!duration || isNaN(duration)) { state.prevX = e.clientX; return; }
-        if (state.prevX === null) { state.prevX = e.clientX; state.targetTime = v.currentTime || 0; return; }
-        var delta = e.clientX - state.prevX;
-        state.prevX = e.clientX;
-        var t = state.targetTime + (delta / window.innerWidth) * SENSITIVITY * duration;
-        t = Math.max(0, Math.min(duration, t));
-        state.targetTime = t;
-        if (!state.seeking) { state.seeking = true; v.currentTime = t; }
-      });
-    } else {
-      /* Touch / no-mouse devices can't scrub and won't render a paused frame —
-         so play the footage directly. Autoplay-loop for motion; for reduced-motion
-         users render a single frame then pause (still shows the subject). */
-      v.muted = true; v.loop = !reduceMotion; v.setAttribute("playsinline", "");
-      var showFrame = function () {
-        var p = v.play();
-        if (p && p.then) p.then(function () { if (reduceMotion) v.pause(); }).catch(function () {});
-        else if (reduceMotion) v.pause();
+      var kick = function () { if (!raf) raf = requestAnimationFrame(render); };
+      var clamp = function (n) { return Math.max(-1, Math.min(1, n)); };
+
+      /* Scroll → vertical depth (always available, no permission). */
+      window.addEventListener("scroll", function () {
+        tY = clamp((window.scrollY / Math.max(1, window.innerHeight)) * 1.4 - 0.2);
+        kick();
+      }, { passive: true });
+
+      /* Tilt → horizontal depth. Android fires directly; iOS 13+ needs a one-time
+         permission grant, requested on the first touch so there's no surprise dialog on load. */
+      var onTilt = function (e) {
+        if (e.gamma == null && e.beta == null) return;
+        tX = clamp((e.gamma || 0) / 26);
+        tY = clamp(((e.beta || 0) - 40) / 30);
+        kick();
       };
-      if (v.readyState >= 2) showFrame();
-      else v.addEventListener("loadeddata", showFrame, { once: true });
+      var DOE = window.DeviceOrientationEvent;
+      if (DOE && typeof DOE.requestPermission === "function") {
+        window.addEventListener("touchend", function once() {
+          window.removeEventListener("touchend", once);
+          DOE.requestPermission().then(function (s) {
+            if (s === "granted") window.addEventListener("deviceorientation", onTilt);
+          }).catch(function () {});
+        }, { once: true });
+      } else if (DOE) {
+        window.addEventListener("deviceorientation", onTilt);
+      }
     }
   }
 
