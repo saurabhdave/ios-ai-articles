@@ -335,29 +335,7 @@ aside.toc { display: none; }
 .share-option:hover { background: var(--paper-2); }
 .share-option-copied { color: var(--accent); }
 
-/* ===================================================================
-   Subscribe modal
-   =================================================================== */
-.sub-modal { position: fixed; inset: 0; z-index: 90; display: none; align-items: center; justify-content: center; padding: 24px; }
-.sub-modal.open { display: flex; }
-.sub-overlay { position: absolute; inset: 0; background: rgba(8,8,10,0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity .2s ease; }
-.sub-modal.open .sub-overlay { opacity: 1; }
-.sub-card { position: relative; width: 100%; max-width: 460px; background: var(--paper); border: 1px solid var(--hair); border-radius: 16px; padding: 30px 28px 26px; box-shadow: 0 24px 80px rgba(0,0,0,0.35); transform: translateY(8px) scale(.98); opacity: 0; transition: transform .22s cubic-bezier(.3,.7,.4,1), opacity .22s ease; }
-.sub-modal.open .sub-card { transform: none; opacity: 1; }
-.sub-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; border-radius: 8px; cursor: pointer; transition: background .15s, color .15s; }
-.sub-close:hover { background: var(--paper-2); color: var(--ink); }
-.sub-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
-.sub-title { font-family: var(--font-heading); font-size: 28px; letter-spacing: -0.02em; margin: 8px 0 0; color: var(--ink); }
-.sub-desc { margin: 12px 0 18px; color: var(--muted); font-size: 15px; line-height: 1.5; }
-.sub-url-row { display: flex; gap: 10px; align-items: center; }
-.sub-url { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); background: var(--paper-2); border: 1px solid var(--hair); border-radius: 8px; padding: 10px 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.sub-copy { flex-shrink: 0; font-family: var(--font-heading); font-size: 14px; color: var(--paper); background: var(--ink); border: 0; border-radius: 999px; padding: 10px 20px; cursor: pointer; transition: opacity .15s, background .15s; }
-.sub-copy:hover { opacity: .88; }
-.sub-copy.copied { background: var(--accent); }
-.sub-readers { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 18px; font-size: 14px; }
-.sub-readers-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.sub-readers a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-.sub-readers a:hover { color: var(--accent); }
+/* Subscribe modal styles live in assets/css/subscribe.css (shared with the homepage). */
 
 /* ===================================================================
    404

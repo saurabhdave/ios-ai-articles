@@ -9,6 +9,7 @@
 <!-- Signature display type (self-hosted, no third-party request) -->
 <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/geist.woff2' | relative_url }}" crossorigin>
 <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}" />
+<link rel="stylesheet" href="{{ '/assets/css/subscribe.css' | relative_url }}" />
 
 <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}" />
 {% seo %}
@@ -187,6 +188,8 @@
     transition: background-color .2s ease, color .2s ease, transform .2s ease;
   }
   .pill:hover { transform: translateY(-1px); }
+  .tilt-chip { display: inline-block; margin-top: 14px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--fg); background: transparent; border: 1px solid var(--fg); border-radius: 999px; padding: 7px 14px; cursor: pointer; opacity: .8; transition: opacity .2s ease; }
+  .tilt-chip:hover { opacity: 1; }
   .pill-solid { background: #fff; color: #000; border: 1px solid rgba(0, 0, 0, 0.1); }
   .pill-solid:hover { background: #000; color: #fff; }
   .pill-outline { background: transparent; color: var(--fg); border: 1px solid var(--fg); gap: 8px; }
@@ -323,27 +326,7 @@
     .cursor { display: none; }
   }
 
-  /* ----- Subscribe modal ----- */
-  .sub-modal { position: fixed; inset: 0; z-index: 90; display: none; align-items: center; justify-content: center; padding: 24px; }
-  .sub-modal.open { display: flex; }
-  .sub-overlay { position: absolute; inset: 0; background: rgba(8,8,10,0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity .2s ease; }
-  .sub-modal.open .sub-overlay { opacity: 1; }
-  .sub-card { position: relative; width: 100%; max-width: 460px; background: var(--paper); border: 1px solid var(--hair); border-radius: 16px; padding: 30px 28px 26px; box-shadow: 0 24px 80px rgba(0,0,0,0.35); transform: translateY(8px) scale(.98); opacity: 0; transition: transform .22s cubic-bezier(.3,.7,.4,1), opacity .22s ease; }
-  .sub-modal.open .sub-card { transform: none; opacity: 1; }
-  .sub-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; border-radius: 8px; cursor: pointer; transition: background .15s, color .15s; }
-  .sub-close:hover { background: var(--paper-2); color: var(--ink); }
-  .sub-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
-  .sub-title { font-family: var(--font-heading); font-size: 28px; letter-spacing: -0.02em; margin: 8px 0 0; color: var(--ink); }
-  .sub-desc { margin: 12px 0 18px; color: var(--muted); font-size: 15px; line-height: 1.5; }
-  .sub-url-row { display: flex; gap: 10px; align-items: center; }
-  .sub-url { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); background: var(--paper-2); border: 1px solid var(--hair); border-radius: 8px; padding: 10px 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .sub-copy { flex-shrink: 0; font-family: var(--font-heading); font-size: 14px; color: var(--paper); background: var(--ink); border: 0; border-radius: 999px; padding: 10px 20px; cursor: pointer; transition: opacity .15s, background .15s; }
-  .sub-copy:hover { opacity: .88; }
-  .sub-copy.copied { background: var(--accent); }
-  .sub-readers { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 18px; font-size: 14px; }
-  .sub-readers-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  .sub-readers a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-  .sub-readers a:hover { color: var(--accent); }
+  /* Subscribe modal styles: assets/css/subscribe.css (loaded in head). */
 </style>
 </head>
 <body>
@@ -625,22 +608,29 @@
         kick();
       }, { passive: true });
 
-      /* Tilt → horizontal depth. Android fires directly; iOS 13+ needs a one-time
-         permission grant, requested on the first touch so there's no surprise dialog on load. */
+      /* Tilt → horizontal depth only (scroll owns vertical, so they never fight). */
       var onTilt = function (e) {
-        if (e.gamma == null && e.beta == null) return;
+        if (e.gamma == null) return;
         tX = clamp((e.gamma || 0) / 26);
-        tY = clamp(((e.beta || 0) - 40) / 30);
         kick();
       };
       var DOE = window.DeviceOrientationEvent;
       if (DOE && typeof DOE.requestPermission === "function") {
-        window.addEventListener("touchend", function once() {
-          window.removeEventListener("touchend", once);
-          DOE.requestPermission().then(function (s) {
-            if (s === "granted") window.addEventListener("deviceorientation", onTilt);
-          }).catch(function () {});
-        }, { once: true });
+        /* iOS 13+: gyroscope needs explicit consent. Offer a dismissible opt-in
+           chip instead of a surprise permission dialog. Scroll depth works regardless. */
+        var hc = document.querySelector(".hero-content");
+        if (hc) {
+          var chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "tilt-chip";
+          chip.textContent = "Enable 3D tilt";
+          hc.appendChild(chip);
+          chip.addEventListener("click", function () {
+            DOE.requestPermission().then(function (s) {
+              if (s === "granted") window.addEventListener("deviceorientation", onTilt);
+            }).catch(function () {}).finally(function () { chip.remove(); });
+          });
+        }
       } else if (DOE) {
         window.addEventListener("deviceorientation", onTilt);
       }
@@ -708,42 +698,7 @@
     });
   }
 
-  /* ---- Subscribe modal (links fall back to /feed.xml without JS) ---- */
-  var subModal = document.getElementById("subscribeModal");
-  if (subModal) {
-    var subLastFocus = null;
-    var openSub = function () {
-      subLastFocus = document.activeElement;
-      subModal.classList.add("open");
-      subModal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      var c = document.getElementById("subCopy");
-      if (c) c.focus();
-    };
-    var closeSub = function () {
-      subModal.classList.remove("open");
-      subModal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      if (subLastFocus && subLastFocus.focus) subLastFocus.focus();
-    };
-    document.addEventListener("click", function (e) {
-      var trigger = e.target.closest("[data-subscribe]");
-      if (trigger) { e.preventDefault(); openSub(); return; }
-      if (e.target.closest("[data-sub-close]")) closeSub();
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && subModal.classList.contains("open")) closeSub();
-    });
-    var subCopy = document.getElementById("subCopy");
-    if (subCopy) subCopy.addEventListener("click", function () {
-      var url = (document.getElementById("subUrl").textContent || "").trim();
-      navigator.clipboard.writeText(url).then(function () {
-        subCopy.textContent = "Copied!";
-        subCopy.classList.add("copied");
-        setTimeout(function () { subCopy.textContent = "Copy"; subCopy.classList.remove("copied"); }, 1600);
-      }).catch(function () {});
-    });
-  }
+  /* Subscribe modal wiring: assets/js/subscribe.js (loaded before </body>). */
 
   /* ---- Topic filter + search ---- */
   var rows = Array.prototype.slice.call(document.querySelectorAll("#rows .row"));
@@ -776,5 +731,6 @@
   if (search) search.addEventListener("input", applyFilter);
 })();
 </script>
+<script src="{{ '/assets/js/subscribe.js' | relative_url }}" defer></script>
 </body>
 </html>

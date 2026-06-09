@@ -34,7 +34,7 @@ TOPIC_RULES = [
     (("navigationstack", "navigation"), "Navigation"),
     (("privacy", "telemetry"), "Privacy"),
     (("signpost", "ossignposter", "observability", "logging", "metrickit"), "Observability"),
-    (("xctest", "testing", " test"), "Testing"),
+    (("xctest", "testing", "unit test", "ui test"), "Testing"),
     (("swift package plugin", "explicit module", "build", "compilation", "linker"), "Build Systems"),
     (("memory", "leak", "debug"), "Debugging"),
     (("instrument", "profil", "hang", "rendering", "performance", "speed up"), "Performance"),
@@ -47,8 +47,9 @@ TOPIC_RULES = [
 def derive_topic(title, slug):
     text = (title + " " + slug.replace("-", " ")).lower()
     for keywords, topic in TOPIC_RULES:
-        if any(k in text for k in keywords):
-            return topic
+        for k in keywords:
+            if re.search(r"\b" + re.escape(k) + r"\b", text):
+                return topic
     return "iOS"
 
 
