@@ -12,8 +12,8 @@
     </div>
     <div class="sub-readers">
       <span class="sub-readers-label">One-click</span>
-      <a href="https://feedly.com/i/subscription/feed/{{ feed_abs | uri_escape }}" target="_blank" rel="noopener">Feedly</a>
-      <a href="https://www.inoreader.com/?add_feed={{ feed_abs | uri_escape }}" target="_blank" rel="noopener">Inoreader</a>
+      <a href="https://feedly.com/i/subscription/feed/{{ feed_abs | cgi_escape }}" target="_blank" rel="noopener">Feedly</a>
+      <a href="https://www.inoreader.com/?add_feed={{ feed_abs | cgi_escape }}" target="_blank" rel="noopener">Inoreader</a>
       <a href="{{ '/feed.xml' | relative_url }}" target="_blank" rel="noopener">View raw feed</a>
     </div>
   </div>

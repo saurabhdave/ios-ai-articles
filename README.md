@@ -8,7 +8,7 @@ Topics focus on senior-level Swift and SwiftUI: architecture decisions, migratio
 
 Live at → **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**
 
-Built with Jekyll (custom "Mainframe" editorial theme — warm-paper palette with full light/dark mode, self-hosted HelveticaNowDisplay + Source Serif 4 type, and a mouse-scrubbed video hero on the homepage) and deployed to GitHub Pages via GitHub Actions on every push.
+Built with Jekyll (custom "Mainframe" editorial theme — warm-paper palette with full light/dark mode, self-hosted Geist + Source Serif 4 type (both OFL), and a mouse-scrubbed video hero on the homepage) and deployed to GitHub Pages via GitHub Actions on every push.
 
 RSS feed available at **[saurabhdave.github.io/ios-ai-articles/feed.xml](https://saurabhdave.github.io/ios-ai-articles/feed.xml)** — works in Reeder, NetNewsWire, Feedly, and any RSS reader.
 

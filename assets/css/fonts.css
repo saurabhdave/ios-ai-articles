@@ -1,15 +1,10 @@
 /* Self-hosted faces (woff2, font-display: swap) — no third-party request.
-   Helvetica Now → display/UI; Source Serif 4 → long-form reading body. */
+   Geist (OFL) → display/UI; Source Serif 4 (OFL) → long-form reading body. */
 
 @font-face {
-  font-family: 'HelveticaNowDisplay-Medium';
-  src: url('../fonts/helvnow-medium.woff2') format('woff2');
-  font-weight: 500; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'HelveticaNowDisplayW01-Rg';
-  src: url('../fonts/helvnow-regular.woff2') format('woff2');
-  font-weight: 400; font-style: normal; font-display: swap;
+  font-family: 'Geist';
+  src: url('../fonts/geist.woff2') format('woff2');
+  font-weight: 400 600; font-style: normal; font-display: swap;
 }
 @font-face {
   font-family: 'Source Serif 4';

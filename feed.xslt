@@ -24,8 +24,8 @@ a { color: inherit; text-decoration: none; }
   --hair:     rgba(22,19,13,0.14);
   --accent:   #f05138;
   --row-hover:rgba(22,19,13,0.035);
-  --font:     'HelveticaNowDisplayW01-Rg', 'Helvetica Neue', Arial, sans-serif;
-  --font-d:   'HelveticaNowDisplay-Medium', 'Helvetica Neue', Arial, sans-serif;
+  --font:     'Geist', 'Helvetica Neue', Arial, sans-serif;
+  --font-d:   'Geist', 'Helvetica Neue', Arial, sans-serif;
   --font-read:'Source Serif 4', Georgia, 'Times New Roman', serif;
   --mono:     ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
   --radius:   12px;
