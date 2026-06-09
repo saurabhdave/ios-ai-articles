@@ -80,6 +80,26 @@
         sib.classList.add("checklist");
       }
     });
+
+    /* ---- Make GFM task-list checkboxes interactive + remember progress per article ---- */
+    var tasks = prose.querySelectorAll("input.task-list-item-checkbox");
+    if (tasks.length) {
+      var key = "tasks:" + location.pathname;
+      var saved = {};
+      try { saved = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) {}
+      tasks.forEach(function (box, i) {
+        box.disabled = false;
+        box.removeAttribute("disabled");
+        var li = box.closest(".task-list-item");
+        var setDone = function (on) { if (li) li.classList.toggle("done", on); };
+        if (saved[i]) { box.checked = true; setDone(true); }
+        box.addEventListener("change", function () {
+          saved[i] = box.checked;
+          try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) {}
+          setDone(box.checked);
+        });
+      });
+    }
   }
 
   /* ---- Table of contents + scrollspy ---- */
