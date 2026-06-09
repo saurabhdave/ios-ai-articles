@@ -48,7 +48,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
-| 2026-06-09 | [Getting Your iOS App Ready for iOS 27 Betas](articles/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas.md) | — |
+| 2026-06-09 | [Getting Your iOS App Ready for iOS 27 Betas](articles/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas.md) | [Post](linkedin/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas-linkedin.md) |
 | 2026-06-08 | [Structured Concurrency Patterns for iOS Networking](articles/2026-06-08-structured-concurrency-patterns-for-ios-networking.md) | [Post](linkedin/2026-06-08-structured-concurrency-patterns-for-ios-networking-linkedin.md) |
 | 2026-06-04 | [Modular iOS Architecture Using Swift Packages](articles/2026-06-04-modular-ios-architecture-using-swift-packages.md) | [Post](linkedin/2026-06-04-modular-ios-architecture-using-swift-packages-linkedin.md) |
 | 2026-06-01 | [On-device Marathon Coach Patterns for watchOS Apps](articles/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps.md) | [Post](linkedin/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps-linkedin.md) |
