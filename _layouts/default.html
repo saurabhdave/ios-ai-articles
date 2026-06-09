@@ -31,7 +31,7 @@
       <a href="{{ '/#articles' | relative_url }}">Articles</a>
       <a href="{{ '/posts/' | relative_url }}">Posts</a>
       <a href="{{ '/newsletter/' | relative_url }}">Newsletter</a>
-      <a class="subscribe" href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
+      <a class="subscribe" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
     </nav>
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light/dark mode">
@@ -48,7 +48,7 @@
     <a href="{{ '/#articles' | relative_url }}">Articles</a>
     <a href="{{ '/posts/' | relative_url }}">Posts</a>
     <a href="{{ '/newsletter/' | relative_url }}">Newsletter</a>
-    <a class="subscribe" href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
+    <a class="subscribe" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
   </div>
 
   <main class="main">
@@ -61,6 +61,8 @@
       <p class="footer-text">Swift &amp; SwiftUI engineering, twice a week.</p>
     </div>
   </footer>
+
+  {% include subscribe-modal.html %}
 
   <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
 </body>

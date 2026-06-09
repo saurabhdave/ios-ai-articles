@@ -35,6 +35,43 @@
     });
   }
 
+  /* ---- Subscribe modal (progressive enhancement; [data-subscribe] links fall back to /feed.xml) ---- */
+  var subModal = document.getElementById("subscribeModal");
+  if (subModal) {
+    var subLastFocus = null;
+    var openSub = function () {
+      subLastFocus = document.activeElement;
+      subModal.classList.add("open");
+      subModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      var c = document.getElementById("subCopy");
+      if (c) c.focus();
+    };
+    var closeSub = function () {
+      subModal.classList.remove("open");
+      subModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (subLastFocus && subLastFocus.focus) subLastFocus.focus();
+    };
+    document.addEventListener("click", function (e) {
+      var trigger = e.target.closest("[data-subscribe]");
+      if (trigger) { e.preventDefault(); openSub(); return; }
+      if (e.target.closest("[data-sub-close]")) closeSub();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && subModal.classList.contains("open")) closeSub();
+    });
+    var subCopy = document.getElementById("subCopy");
+    if (subCopy) subCopy.addEventListener("click", function () {
+      var url = (document.getElementById("subUrl").textContent || "").trim();
+      navigator.clipboard.writeText(url).then(function () {
+        subCopy.textContent = "Copied!";
+        subCopy.classList.add("copied");
+        setTimeout(function () { subCopy.textContent = "Copy"; subCopy.classList.remove("copied"); }, 1600);
+      }).catch(function () {});
+    });
+  }
+
   var prose = document.querySelector(".prose");
 
   /* ---- Enhance code blocks: language bar + copy button ---- */

@@ -1,0 +1,20 @@
+{%- assign feed_abs = '/feed.xml' | absolute_url -%}
+<div class="sub-modal" id="subscribeModal" aria-hidden="true">
+  <div class="sub-overlay" data-sub-close="1"></div>
+  <div class="sub-card" role="dialog" aria-modal="true" aria-labelledby="sub-title">
+    <button class="sub-close" type="button" data-sub-close="1" aria-label="Close">&#215;</button>
+    <div class="sub-kicker">RSS Feed</div>
+    <h2 class="sub-title" id="sub-title">Subscribe</h2>
+    <p class="sub-desc">Get new articles in your reader the moment they publish. Paste this URL into any RSS app:</p>
+    <div class="sub-url-row">
+      <code class="sub-url" id="subUrl">{{ feed_abs }}</code>
+      <button class="sub-copy" id="subCopy" type="button">Copy</button>
+    </div>
+    <div class="sub-readers">
+      <span class="sub-readers-label">One-click</span>
+      <a href="https://feedly.com/i/subscription/feed/{{ feed_abs | uri_escape }}" target="_blank" rel="noopener">Feedly</a>
+      <a href="https://www.inoreader.com/?add_feed={{ feed_abs | uri_escape }}" target="_blank" rel="noopener">Inoreader</a>
+      <a href="{{ '/feed.xml' | relative_url }}" target="_blank" rel="noopener">View raw feed</a>
+    </div>
+  </div>
+</div>

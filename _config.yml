@@ -7,6 +7,16 @@ author:
   name: Saurabh Dave
   email: ""
 
+# Social share card (Open Graph / Twitter) — used by jekyll-seo-tag
+image: /assets/images/og-card.png
+twitter:
+  card: summary_large_image
+social:
+  name: Saurabh Dave
+  links:
+    - https://github.com/saurabhdave
+    - https://www.linkedin.com/in/sdsaurabhdave
+
 permalink: /articles/:year/:month/:day/:title/
 
 # Exclude repo files that aren't part of the blog
@@ -40,3 +50,10 @@ feed:
   excerpt_only: false
   collections:
     - posts
+
+# Default the social share image on every page (jekyll-seo-tag reads page.image)
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/images/og-card.png
