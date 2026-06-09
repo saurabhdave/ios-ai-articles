@@ -11,49 +11,56 @@
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <title><xsl:value-of select="atom:feed/atom:title"/> — RSS Feed</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&amp;display=swap" rel="stylesheet"/>
+        <link rel="stylesheet" href="assets/css/fonts.css"/>
         <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 a { color: inherit; text-decoration: none; }
 
 :root {
-  --bg:           #08090d;
-  --bg-card:      #0e1019;
-  --bg-card-h:    #131621;
-  --border:       rgba(255,255,255,0.055);
-  --border-mid:   rgba(255,255,255,0.10);
-  --border-h:     rgba(240,184,64,0.36);
-  --text-1:       #f0ece5;
-  --text-2:       #7c8099;
-  --accent:       #f0b840;
-  --accent-soft:  rgba(240,184,64,0.08);
-  --accent-dim:   rgba(240,184,64,0.55);
-  --accent-glow:  rgba(240,184,64,0.16);
-  --font:         'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-d:       'Fraunces', Georgia, serif;
-  --mono:         'JetBrains Mono', 'SF Mono', monospace;
-  --radius:       10px;
-  --max-w:        720px;
+  --paper:    #ece9e2;
+  --paper-2:  #e4e0d7;
+  --ink:      #16130d;
+  --muted:    #6c6557;
+  --hair:     rgba(22,19,13,0.14);
+  --accent:   #f05138;
+  --row-hover:rgba(22,19,13,0.035);
+  --font:     'HelveticaNowDisplayW01-Rg', 'Helvetica Neue', Arial, sans-serif;
+  --font-d:   'HelveticaNowDisplay-Medium', 'Helvetica Neue', Arial, sans-serif;
+  --font-read:'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono:     ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+  --radius:   12px;
+  --max-w:    760px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper:    #15130e;
+    --paper-2:  #211d16;
+    --ink:      #ece7db;
+    --muted:    #9d9582;
+    --hair:     rgba(236,231,219,0.14);
+    --accent:   #ff6a4d;
+    --row-hover:rgba(236,231,219,0.05);
+  }
 }
 
 body {
-  background: var(--bg);
-  color: var(--text-1);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font);
   font-size: 15px;
   line-height: 1.6;
   min-height: 100vh;
-  padding: 0 16px 80px;
+  padding: 0 20px 80px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .wrap { max-width: var(--max-w); margin: 0 auto; }
 
 /* ── Header ── */
 .feed-header {
-  padding: 56px 0 48px;
-  border-bottom: 1px solid var(--border-mid);
+  padding: 64px 0 44px;
+  border-bottom: 1px solid var(--hair);
   margin-bottom: 40px;
 }
 
@@ -61,69 +68,68 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: var(--accent-soft);
-  border: 1px solid rgba(240,184,64,0.22);
   color: var(--accent);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 4px 12px 4px 9px;
-  border-radius: 100px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .feed-badge svg { flex-shrink: 0; }
 
 .feed-title {
   font-family: var(--font-d);
-  font-size: clamp(26px, 5vw, 36px);
-  font-weight: 400;
-  line-height: 1.2;
-  margin-bottom: 10px;
-  color: var(--text-1);
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-bottom: 14px;
+  color: var(--ink);
 }
 
 .feed-desc {
-  color: var(--text-2);
-  font-size: 15px;
-  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.5;
+  margin-bottom: 30px;
   max-width: 560px;
 }
 
 /* ── Subscribe box ── */
 .subscribe-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border-mid);
+  background: var(--paper-2);
+  border: 1px solid var(--hair);
   border-radius: var(--radius);
-  padding: 20px 22px;
+  padding: 22px 24px;
 }
 
 .subscribe-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-2);
-  margin-bottom: 10px;
+  color: var(--muted);
+  margin-bottom: 12px;
 }
 
 .feed-url-row {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .feed-url {
   flex: 1;
+  min-width: 0;
   font-family: var(--mono);
   font-size: 12.5px;
   color: var(--accent);
-  background: rgba(240,184,64,0.05);
-  border: 1px solid rgba(240,184,64,0.15);
-  border-radius: 6px;
-  padding: 7px 12px;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  padding: 9px 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -131,101 +137,95 @@ body {
 }
 
 .copy-btn {
-  background: var(--accent);
-  color: #08090d;
+  background: var(--ink);
+  color: var(--paper);
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-family: var(--font);
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 18px;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.15s, background 0.15s;
+  transition: opacity 0.15s;
   flex-shrink: 0;
 }
 
 .copy-btn:hover { opacity: 0.88; }
-.copy-btn.copied { background: #38c2b8; }
+.copy-btn.copied { background: var(--accent); }
 
 .reader-links {
-  font-size: 13px;
-  color: var(--text-2);
+  font-size: 13.5px;
+  color: var(--muted);
 }
 
 .reader-links a {
-  color: var(--accent-dim);
-  border-bottom: 1px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
 }
 
-.reader-links a:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent-dim);
-}
+.reader-links a:hover { color: var(--accent); }
 
 /* ── Entries ── */
-.entries { display: flex; flex-direction: column; gap: 2px; }
+.entries { display: flex; flex-direction: column; }
 
 .entry {
-  padding: 24px 22px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+  display: block;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--hair);
+  transition: background 0.18s;
 }
 
-.entry:hover {
-  background: var(--bg-card-h);
-  border-color: var(--border-h);
-  box-shadow: 0 0 0 1px rgba(240,184,64,0.06), 0 8px 32px rgba(0,0,0,0.4);
-}
+.entry:hover { background: var(--row-hover); }
 
 .entry-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 9px;
   flex-wrap: wrap;
 }
 
 .entry-date {
+  font-family: var(--mono);
   font-size: 12px;
-  color: var(--text-2);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .tag {
+  font-family: var(--mono);
   font-size: 11px;
-  font-weight: 500;
-  color: var(--accent-dim);
-  background: var(--accent-soft);
-  border: 1px solid rgba(240,184,64,0.14);
-  padding: 2px 8px;
-  border-radius: 100px;
-  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
 }
 
 .entry-title {
   font-family: var(--font-d);
-  font-size: 19px;
-  font-weight: 400;
-  line-height: 1.35;
-  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 10px;
 }
 
 .entry-title a {
-  color: var(--text-1);
+  color: var(--ink);
   transition: color 0.15s;
 }
 
 .entry-title a:hover { color: var(--accent); }
 
 .entry-summary {
-  font-size: 13.5px;
-  color: var(--text-2);
-  line-height: 1.65;
+  font-family: var(--font-read);
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.55;
   margin-bottom: 14px;
+  max-width: 64ch;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -233,26 +233,21 @@ body {
 }
 
 .read-more {
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--accent);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.15s, gap 0.15s;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
 }
 
-.read-more:hover {
-  border-bottom-color: var(--accent-dim);
-  gap: 7px;
-}
+.read-more:hover { color: var(--accent); }
 
 /* ── Footer ── */
 .feed-footer {
-  margin-top: 56px;
+  margin-top: 48px;
   padding-top: 24px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--hair);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -261,22 +256,21 @@ body {
 }
 
 .feed-footer p {
-  font-size: 12.5px;
-  color: var(--text-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .back-link {
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--accent-dim);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border-bottom: 1px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
 }
 
-.back-link:hover { color: var(--accent); border-bottom-color: var(--accent-dim); }
+.back-link:hover { color: var(--accent); }
         </style>
       </head>
       <body>
@@ -338,7 +332,9 @@ body {
                   </a>
                 </h2>
                 <p class="entry-summary">
-                  <xsl:value-of select="atom:summary"/>
+                  <xsl:call-template name="strip-tags">
+                    <xsl:with-param name="text" select="atom:summary"/>
+                  </xsl:call-template>
                 </p>
                 <a class="read-more" href="{atom:link[@rel='alternate']/@href}">
                   Read article &#x2192;
@@ -376,6 +372,23 @@ function copyFeedUrl() {
         </script>
       </body>
     </html>
+  </xsl:template>
+
+  <!-- Strip HTML tags from a string (Atom summaries carry escaped markup).
+       Pure XSLT 1.0 string ops so it works in every browser's XSLT engine. -->
+  <xsl:template name="strip-tags">
+    <xsl:param name="text"/>
+    <xsl:choose>
+      <xsl:when test="contains($text, '&lt;')">
+        <xsl:value-of select="substring-before($text, '&lt;')"/>
+        <xsl:call-template name="strip-tags">
+          <xsl:with-param name="text" select="substring-after($text, '&gt;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
