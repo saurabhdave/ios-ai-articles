@@ -2,7 +2,7 @@
 layout: default
 ---
 
-{%- assign topic = site.data.article_topics[page.slug] | default: "iOS" -%}
+{%- assign topic = site.data.article_topics[page.slug] | default: page.topic | default: "iOS" -%}
 {%- assign words = content | number_of_words -%}
 {%- assign read_time = words | divided_by: 200 -%}{%- if read_time < 1 -%}{%- assign read_time = 1 -%}{%- endif -%}
 
@@ -63,7 +63,7 @@ layout: default
         <h2>Keep reading</h2>
         <div class="rel-list">
           {% for p in site.posts %}
-            {% assign ptopic = site.data.article_topics[p.slug] | default: "iOS" %}
+            {% assign ptopic = site.data.article_topics[p.slug] | default: p.topic | default: "iOS" %}
             {% if shown < 3 and p.url != page.url and ptopic == topic %}
             <a class="rel-row" href="{{ p.url | relative_url }}">
               <span class="d">{{ p.date | date: "%b %-d, %Y" }}</span>

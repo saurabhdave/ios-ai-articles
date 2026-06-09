@@ -20,6 +20,38 @@ LINKEDIN_DEST_DIR = os.path.join(REPO_ROOT, "_linkedin")
 PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})-(.+)\.md$")
 LINKEDIN_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})-(.+)-linkedin\.md$")
 
+# Topic label derivation for the homepage filter + per-article chip.
+# Curated overrides live in _data/article_topics.yml (keyed by slug) and take
+# precedence in the layouts; this heuristic gives new auto-published articles a
+# sensible topic instead of the generic "iOS" fallback. First match wins.
+TOPIC_RULES = [
+    (("apple intelligence", "foundation model"), "Apple Intelligence"),
+    (("voiceover", "accessibility", "dynamic type"), "Accessibility"),
+    (("widgetkit", "widget", "live activity"), "WidgetKit"),
+    (("watchos",), "watchOS"),
+    (("visionos", "realitykit"), "visionOS"),
+    (("app intent", "shortcuts", "siri"), "App Intents"),
+    (("navigationstack", "navigation"), "Navigation"),
+    (("privacy", "telemetry"), "Privacy"),
+    (("signpost", "ossignposter", "observability", "logging", "metrickit"), "Observability"),
+    (("xctest", "testing", " test"), "Testing"),
+    (("swift package plugin", "explicit module", "build", "compilation", "linker"), "Build Systems"),
+    (("memory", "leak", "debug"), "Debugging"),
+    (("instrument", "profil", "hang", "rendering", "performance", "speed up"), "Performance"),
+    (("async", "await", "concurrency", "actor", "sendable", "task group", "combine", "urlsession"), "Concurrency"),
+    (("dependency injection", "modular", "swift package", "architecture"), "Architecture"),
+    (("environmentkey", "layout protocol", "viewmodifier", "modifier", "swiftui", "view"), "SwiftUI"),
+]
+
+
+def derive_topic(title, slug):
+    text = (title + " " + slug.replace("-", " ")).lower()
+    for keywords, topic in TOPIC_RULES:
+        if any(k in text for k in keywords):
+            return topic
+    return "iOS"
+
+
 os.makedirs(POSTS_DIR, exist_ok=True)
 os.makedirs(NEWSLETTERS_DIR, exist_ok=True)
 os.makedirs(LINKEDIN_DEST_DIR, exist_ok=True)
@@ -55,12 +87,14 @@ for filename in sorted(os.listdir(ARTICLES_DIR)):
         ]
         body = "".join(body_lines).lstrip("\n")
 
+        topic = derive_topic(title, slug)
         front_matter = (
             f'---\n'
             f'layout: post\n'
             f'title: "{safe_title}"\n'
             f'date: {date}\n'
             f'categories: ios swift\n'
+            f'topic: "{topic}"\n'
             f'---\n\n'
         )
         out = front_matter + body
