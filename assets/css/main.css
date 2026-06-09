@@ -258,7 +258,15 @@ aside.toc { display: none; }
 }
 .prose blockquote p { font-size: inherit; line-height: inherit; color: inherit; margin: 0; }
 
-/* Checklist (decorated via JS on the list after a "Checklist" heading) */
+/* GFM task lists (markdown "- [ ] ..."): kramdown renders native checkboxes. */
+.prose ul.task-list { list-style: none; padding: 0; margin: 0 0 22px; }
+.prose li.task-list-item { position: relative; padding-left: 32px; font-size: 17px; line-height: 1.55; margin-bottom: 12px; color: var(--text); }
+.prose li.task-list-item input.task-list-item-checkbox {
+  position: absolute; left: 0; top: 3px; width: 18px; height: 18px; margin: 0;
+  accent-color: var(--accent); opacity: 1; cursor: default;
+}
+
+/* Plain "Checklist" lists with no native checkboxes (decorated via JS) */
 .prose ul.checklist { list-style: none; padding: 0; margin: 0 0 22px; }
 .prose ul.checklist li { position: relative; padding-left: 34px; font-size: 17px; line-height: 1.55; margin-bottom: 12px; color: var(--text); }
 .prose ul.checklist li::before { content: ""; position: absolute; left: 0; top: 2px; width: 19px; height: 19px; border: 1.5px solid var(--muted); border-radius: 5px; }

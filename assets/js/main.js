@@ -70,12 +70,15 @@
       });
     });
 
-    /* ---- Decorate a "Checklist" list as a checklist ---- */
+    /* ---- Decorate a plain "Checklist" list (skip GFM task-lists, which already
+           render native checkboxes — decorating those double-stacks the marker). ---- */
     prose.querySelectorAll("h2, h3").forEach(function (h) {
       if (!/checklist/i.test(h.textContent)) return;
       var sib = h.nextElementSibling;
       while (sib && sib.tagName !== "UL" && sib.tagName !== "H2") sib = sib.nextElementSibling;
-      if (sib && sib.tagName === "UL") sib.classList.add("checklist");
+      if (sib && sib.tagName === "UL" && !sib.querySelector('input[type="checkbox"]')) {
+        sib.classList.add("checklist");
+      }
     });
   }
 
