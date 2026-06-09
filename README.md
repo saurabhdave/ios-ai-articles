@@ -2,7 +2,7 @@
 
 Automated technical articles for senior iOS engineers, generated 2x/week (Monday & Thursday) by the [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer) pipeline and published at **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**.
 
-Topics focus on production-grade Swift and SwiftUI: architecture decisions, migration strategies, performance, and risk-aware rollout patterns.
+Topics focus on senior-level Swift and SwiftUI: architecture decisions, migration strategies, performance, and risk-aware rollout patterns.
 
 ## Blog
 

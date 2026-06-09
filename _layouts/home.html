@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="{{ site.description | strip_html | strip_newlines | truncate: 160 }}" />
-<title>{{ site.title }} — Production-grade Swift engineering</title>
+<title>{{ site.title }} — Swift &amp; SwiftUI engineering</title>
 
 <!-- Signature display type (self-hosted, no third-party request) -->
 <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/helvnow-medium.woff2' | relative_url }}" crossorigin>
@@ -364,19 +364,19 @@
 
 <!-- Hero -->
 <section class="hero" id="top">
-  <h1 class="sr-only">{{ site.title | default: "iOS AI Articles" }} — production-grade Swift &amp; SwiftUI engineering</h1>
+  <h1 class="sr-only">{{ site.title | default: "iOS AI Articles" }} — Swift &amp; SwiftUI engineering for senior iOS developers</h1>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="hero-content">
     <div class="hero-intro">
       Hey there &mdash; welcome to the iOS Dev AI desk.<br />
-      Production-grade Swift &amp; SwiftUI engineering, generated 2&times; a week.
+      Deep Swift &amp; SwiftUI engineering, published twice a week.
     </div>
     <p class="hero-type"><span id="typed"></span><span class="cursor" id="cursor"></span></p>
     <div class="pills" id="pills">
       <a class="pill pill-solid" href="{{ featured.url | relative_url }}">Read the latest article</a>
       <a class="pill pill-solid" href="#articles">Browse all {{ site.posts | size }} articles</a>
       <a class="pill pill-solid" href="{{ '/newsletter/' | relative_url }}">Read the newsletter</a>
-      <a class="pill pill-solid" href="https://github.com/saurabhdave/ios-ai-articles" target="_blank" rel="noopener">Follow on GitHub</a>
+      <a class="pill pill-solid" href="https://github.com/saurabhdave" target="_blank" rel="noopener">Follow on GitHub</a>
       <button class="pill pill-outline" id="rssPill" data-feed="{{ '/feed.xml' | absolute_url }}">
         <span>Subscribe via <u>RSS</u></span>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -478,7 +478,7 @@
         <div>
           <h2 class="newsletter-title">iOS Dev Weekly, in your reader.</h2>
           <p class="newsletter-desc">
-            Every issue distills the week&rsquo;s production-grade Swift &amp; SwiftUI engineering into one focused read.
+            Every issue distills the week&rsquo;s Swift &amp; SwiftUI engineering into one focused read.
             Subscribe via any RSS reader &mdash; Reeder, NetNewsWire, Feedly.
           </p>
         </div>
@@ -504,7 +504,7 @@
             <span class="footer-logo">{{ site.title | default: "iOS AI Articles" }}</span>
             <span class="footer-star">&#10035;&#65038;</span>
           </div>
-          <p class="footer-desc">Production-grade iOS engineering articles &mdash; generated weekly from real trend signals.</p>
+          <p class="footer-desc">Real-world iOS engineering articles &mdash; generated from live trend signals.</p>
         </div>
         <div class="footer-col">
           <span class="label">Browse</span>
@@ -515,7 +515,7 @@
         <div class="footer-col">
           <span class="label">Follow</span>
           <a href="{{ '/feed.xml' | relative_url }}" class="u-link">RSS feed</a>
-          <a href="https://github.com/saurabhdave/ios-ai-articles" target="_blank" rel="noopener" class="u-link">GitHub</a>
+          <a href="https://github.com/saurabhdave" target="_blank" rel="noopener" class="u-link">GitHub</a>
           <a href="https://www.linkedin.com/in/sdsaurabhdave" target="_blank" rel="noopener" class="u-link">Saurabh Dave</a>
         </div>
       </div>
@@ -578,7 +578,7 @@
   }
 
   /* ---- Typewriter ---- */
-  var HEADLINE = "Glad you stopped in. Real trend signals in, production-grade iOS engineering out. So — what are we shipping?";
+  var HEADLINE = "Glad you stopped in. Real trend signals in, real iOS engineering out. So — what are we shipping?";
   var SPEED = 38, START_DELAY = 600;
   var typed = document.getElementById("typed");
   var cursor = document.getElementById("cursor");
