@@ -6,10 +6,11 @@
 <meta name="description" content="{{ site.description | strip_html | strip_newlines | truncate: 160 }}" />
 <title>{{ site.title }} — Swift &amp; SwiftUI engineering</title>
 
+{%- assign asset_v = site.github.build_revision | default: site.time | date: '%s' -%}
 <!-- Signature display type (self-hosted, no third-party request) -->
 <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/geist.woff2' | relative_url }}" crossorigin>
-<link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}" />
-<link rel="stylesheet" href="{{ '/assets/css/subscribe.css' | relative_url }}" />
+<link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}?v={{ asset_v }}" />
+<link rel="stylesheet" href="{{ '/assets/css/subscribe.css' | relative_url }}?v={{ asset_v }}" />
 
 <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}" />
 {% seo %}
@@ -731,6 +732,6 @@
   if (search) search.addEventListener("input", applyFilter);
 })();
 </script>
-<script src="{{ '/assets/js/subscribe.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/subscribe.js' | relative_url }}?v={{ asset_v }}" defer></script>
 </body>
 </html>

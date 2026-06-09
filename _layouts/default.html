@@ -11,12 +11,13 @@
     (function(){var s=localStorage.getItem('theme');var d=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.setAttribute('data-theme',s||d);})();
   </script>
 
+  {%- assign asset_v = site.github.build_revision | default: site.time | date: '%s' -%}
   <!-- Self-hosted signature faces (no third-party request) -->
   <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/geist.woff2' | relative_url }}" crossorigin>
-  <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}?v={{ asset_v }}">
 
-  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/css/subscribe.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ '/assets/css/subscribe.css' | relative_url }}?v={{ asset_v }}">
   <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}">
   {% seo %}
   {% feed_meta %}
@@ -64,7 +65,7 @@
 
   {% include subscribe-modal.html %}
 
-  <script src="{{ '/assets/js/subscribe.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/subscribe.js' | relative_url }}?v={{ asset_v }}" defer></script>
+  <script src="{{ '/assets/js/main.js' | relative_url }}?v={{ asset_v }}" defer></script>
 </body>
 </html>
