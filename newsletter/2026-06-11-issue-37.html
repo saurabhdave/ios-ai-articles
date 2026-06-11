@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #37</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #37</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #37</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Dynamic Type frequently reveals itself as an architectural smell in SwiftUI — a single shared observable or global scale object can cascade invalidation across dozens of views. Teams are quietly battling re-renders, layout thrash, and accessibility regressions while trying not to throw away months of layout work. This issue brings concrete practices for reducing invalidation fan‑out and rolling out Dynamic Type safely.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Scalable Dynamic Type in SwiftUI</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">I shipped a feed view that re-rendered multiple times per scroll tick because a single `@Observable` model instance was captured by many ancestor views. The runtime symptoms were stuttery scrolling, unexpected layout shifts, and poor responsiveness on constrained devices. The patterns below show how I reduced unnecessary invalidation, rolled out Dynamic Type changes safely, and kept typography predictable during migration.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">macOS now documents container machines, which continues the trend of platform tooling maturing for reproducible builds and CI. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">macOS 27 Golden Gate appears to remove icons from menu items, a small UX shift that suggests Apple is still trimming chrome and noise across platforms. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Swift.org announced a Networking workgroup, signalling focused community effort to stabilize and consolidate networking primitives in Swift. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A SwiftUI game jam entry shows continued grassroots energy for rapid prototyping and small apps in SwiftUI — useful reminders about iteration speed over polishing APIs. [Source: dev.to]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Observation
+
+@Observable class FeedStore {
+    var items: [FeedItem] = [
+        .init(id: UUID(), title: &quot;Welcome&quot;, subtitle: &quot;Scalable Dynamic Type&quot;),
+        .init(id: UUID(), title: &quot;SwiftUI Tip&quot;, subtitle: &quot;Read sizeCategory at leaf&quot;)
+    ]
+}
+
+struct FeedItem: Identifiable, Equatable {
+    let id: UUID
+    var title: String
+    var subtitle: String
+}
+
+struct FeedListView: View {
+    @State private var store = FeedStore()
+    var body: some View {
+        List(store.items) { item in
+            FeedRow(item: item)
+        }
+        .listStyle(.plain)
+    }
+}
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it encodes the judgment to localize observation and keep model mutations from invalidating large view hierarchies — read Dynamic Type at the leaf where text renders and avoid shared mutable scale objects.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you’re wrestling with list performance and Dynamic Type, try snapshotting representative DynamicTypeSize states and add signposts around expensive layout work while you iterate. Hit reply with how you instrumented view invalidation — I’ll share notable approaches next issue and link the best threads on LinkedIn so the community can compare notes.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
