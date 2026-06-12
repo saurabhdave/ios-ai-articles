@@ -398,6 +398,10 @@
     <p class="hero-type"><span id="typed"></span><span class="cursor" id="cursor"></span></p>
     <div class="pills" id="pills">
       <a class="pill pill-solid" href="{{ featured.url | relative_url }}">Read the latest article</a>
+      {%- if wwdc_posts.size > 0 -%}
+      {%- assign latest_wwdc_year = wwdc_posts.first.date | date: "%Y" -%}
+      <a class="pill pill-solid" href="{{ '/wwdc/' | relative_url }}">WWDC {{ latest_wwdc_year }} coverage &rarr;</a>
+      {%- endif -%}
       <a class="pill pill-solid" href="#articles">Browse all {{ main_posts | size }} articles</a>
       <a class="pill pill-solid" href="{{ '/newsletter/' | relative_url }}">Read the newsletter</a>
       <a class="pill pill-solid" href="https://github.com/saurabhdave" target="_blank" rel="noopener">Follow on GitHub</a>
