@@ -1,0 +1,23 @@
+{%- comment -%}
+  Splits site.posts into two arrays:
+    wwdc_posts — title contains "WWDC" (any case) or URL matches a slug
+                 fragment listed in _data/wwdc_extra.yml
+    main_posts — everything else
+  Used by the home layout (main list) and wwdc.html (conference hub) so the
+  classification can never drift between the two pages.
+{%- endcomment -%}
+{%- assign wwdc_posts = "" | split: "" -%}
+{%- assign main_posts = "" | split: "" -%}
+{%- for __post in site.posts -%}
+  {%- assign __title = __post.title | downcase -%}
+  {%- assign __is_wwdc = false -%}
+  {%- if __title contains "wwdc" -%}{%- assign __is_wwdc = true -%}{%- endif -%}
+  {%- for __extra in site.data.wwdc_extra -%}
+    {%- if __post.url contains __extra.slug -%}{%- assign __is_wwdc = true -%}{%- endif -%}
+  {%- endfor -%}
+  {%- if __is_wwdc -%}
+    {%- assign wwdc_posts = wwdc_posts | push: __post -%}
+  {%- else -%}
+    {%- assign main_posts = main_posts | push: __post -%}
+  {%- endif -%}
+{%- endfor -%}

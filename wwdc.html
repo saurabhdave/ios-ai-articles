@@ -10,22 +10,12 @@ permalink: /wwdc/
   Self-maintaining: an article appears here automatically when its title
   contains "WWDC". Articles that cover WWDC announcements without the word
   in the title (e.g. an OS-feature deep dive) can be added manually in
-  _data/wwdc_extra.yml — no pipeline or build changes needed.
+  _data/wwdc_extra.yml — no pipeline or build changes needed. The same
+  include drives the home layout, which excludes these posts from the main
+  article list.
 {% endcomment %}
 
-{% assign wwdc_posts = "" | split: "" %}
-{% for post in site.posts %}
-  {% assign t = post.title | downcase %}
-  {% assign is_wwdc = false %}
-  {% if t contains "wwdc" %}{% assign is_wwdc = true %}{% endif %}
-  {% for extra in site.data.wwdc_extra %}
-    {% if post.url contains extra.slug %}{% assign is_wwdc = true %}{% endif %}
-  {% endfor %}
-  {% assign post_year = post.date | date: "%Y" | plus: 0 %}
-  {% if is_wwdc and post_year >= 2026 %}
-    {% assign wwdc_posts = wwdc_posts | push: post %}
-  {% endif %}
-{% endfor %}
+{% include wwdc-split.html %}
 
 <div class="wrap">
   <div class="page-head">
