@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #43</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #43</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #43</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Toolchain upgrades are not a boutique upgrade—they&#x27;re an operational risk that shows up in CI, signing, and shipped binaries. If your team treats an Xcode bump like a chore instead of a release event, you&#x27;ll feel it as flaky PRs, surprise release work, and delayed merges.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Xcode 27 Tooling Updates From WWDC 2026</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Toolchain changes create immediate operational friction for teams with CI and distributed caches. The hard part isn&#x27;t the compiler warning; it&#x27;s validating artifacts, signatures, and binary slices across environments. Plan upgrade work as an engineering milestone, not a casual dependency update.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">macOS 27 Golden Gate removes menu-item icons — a small UI change that signals continued UI refinement across Apple platforms and may affect designers' expectations. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The historical look at Apple's power supplies underscores that platform progress often follows component innovation, not single-vendor magic — a useful reminder when judging sweeping platform claims. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift project announced a Networking Workgroup — early signals suggest community-led efforts are being prioritized to fill gaps outside the standard library. [Source: Swift.org Blog]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A developer's App Store rejection story highlights that review and metadata issues remain the non-code bottleneck for shipping apps. [Source: dev.to]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A post about switching from CloudKit to HealthKit shows teams still make pragmatic, domain-driven infrastructure choices rather than defaulting to platform services. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Foundation
+import Observation
+
+@Observable @MainActor class BuildModel {
+    var status: String = &quot;Idle&quot;
+    var toolchainVersion: String = &quot;&quot;
+}
+
+actor BuildArtifactManager {
+    func currentToolchainVersion() async -&gt; String {
+        // Query installed toolchain (placeholder for xcrun --version)
+        return &quot;Xcode27-Toolchain-1.0.0&quot;
+    }
+
+    func ciRecordedToolchainVersion() async -&gt; String? {
+        // Read CI cache metadata / registry tag (placeholder)
+        return &quot;Xcode26-Toolchain-0.9.0&quot;
+    }
+
+    func regenerateArtifacts() async throws {
+        // Regenerate XCFramework slices and update private registry artifacts.
+        // Implemented as idempotent, hermetic build invocation in real projects.
+        try await Task.sleep(nanoseconds: 300_000_000) // simulate work
+    }
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because modeling toolchain and artifact state as observable, actor-backed services makes upgrade checks and hermetic rebuilds testable and automatable in CI.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://daringfireball.net/2026/06/macos_27_golden_gate_removes_the_dumb_icons_from_menu_items" style="color:#e05c00;text-decoration:none">Sweet Jeebus, macOS 27 Golden Gate Removes the Dumb Icons from Menu Items</a></strong> — Small UX tweaks like this propagate expectations for macOS apps; pay attention to design regressions during SDK bumps.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/sakaax/i-shipped-my-first-ios-app-got-rejected-twice-and-built-a-tool-so-it-never-happens-again-ja6" style="color:#e05c00;text-decoration:none">I shipped my first iOS app, got rejected twice, and built a tool so it never happens again</a></strong> — App Store friction is often non-technical; automating metadata checks can save a release.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.righto.com/2012/02/apple-didnt-revolutionize-power.html" style="color:#e05c00;text-decoration:none">Apple didn&amp;#x27;t revolutionize power supplies; new transistors did (2012)</a></strong> — A history piece that frames how incremental hardware innovation enables platform leaps, useful context when evaluating platform claims.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your CI and local builds diverge after an Xcode bump, treat it as a release incident: rebuild artifacts, validate slices and signatures, and add explicit toolchain markers to cache keys. Hit reply with which migration step caused the most pain for your team—cache invalidation, XCFramework regeneration, or noisy diagnostics—and share the concrete tactic that worked; I’ll feature useful replies next issue.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
