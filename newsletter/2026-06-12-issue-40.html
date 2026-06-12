@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #40</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #40</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #40</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">WWDC made it clear: Apple continues to push higher-level frameworks and tighter integrations, and that will expose timing, cancellation, and operational gaps in shipped apps. Teams quietly refactor to SwiftUI, SwiftData, and async/await — but the hard work is not compiling; it’s preventing new classes of runtime failure across device, thermal, and network conditions.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>What the WWDC 2026 Keynote Means for iOS Teams</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Framework upgrades shift responsibility from build-time to run-time, and that shift reveals where your tests and observability are thin. Expect migrations to surface leaked Tasks, duplicated background work, and partial-write edge cases that only show on real devices under load. Treat these migrations as an operational rollout, not a one-way compile task, or you&#x27;ll pay for it in retention and crashes.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Sweet Jeebus, macOS 27 Golden Gate Removes the Dumb Icons from Menu Items — a small example of interface cleanup that signals continued polish across platforms; teams should watch consistency changes that may affect cross-platform UI parity. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Article revisiting Apple and power supplies emphasizes that hardware and component-level shifts matter over long timelines — performance and thermal behavior remain first-order concerns for mobile apps. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Swift.org announces the Networking Workgroup — community-driven networking primitives are getting formal attention, which could reduce bespoke network stacks over time. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A first-time shipper's App Store rejections remind teams that review and privacy metadata are operational risks, not just QA checkboxes. [Source: dev.to]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A developer's post on replacing CloudKit with HealthKit highlights that platform choices can change product architecture and operational surface area dramatically. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+import Observation
+import OSLog
+
+@MainActor @Observable class DataSyncManager {
+    var isSyncing = false
+    var lastErrorMessage: String?
+    private var syncTask: Task&lt;Void, Error&gt;?
+    private let logger = Logger(subsystem: &quot;com.example.app&quot;, category: &quot;sync&quot;)
+
+    func startSync() {
+        syncTask?.cancel()
+        isSyncing = true
+        lastErrorMessage = nil
+
+        syncTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await self.performSync()
+                logger.log(&quot;Sync succeeded&quot;)
+            } catch is CancellationError {
+                logger.log(&quot;Sync cancelled&quot;)
+            } catch {
+                lastErrorMessage = &quot;\(error)&quot;
+                logger.error(&quot;Sync failed: \(error.localizedDescription)&quot;)
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it encodes an engineering stance: cancel previous work, keep state observable, and treat async boundaries as first-class operational surfaces to log and recover from.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://daringfireball.net/2026/06/macos_27_golden_gate_removes_the_dumb_icons_from_menu_items" style="color:#e05c00;text-decoration:none">Sweet Jeebus, macOS 27 Golden Gate Removes the Dumb Icons from Menu Items</a></strong> — A tiny UI tweak that signals ongoing platform polish; small changes can cascade into UX expectations.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.righto.com/2012/02/apple-didnt-revolutionize-power.html" style="color:#e05c00;text-decoration:none">Apple didn&amp;#x27;t revolutionize power supplies; new transistors did (2012)</a></strong> — Historical hardware context that matters for anyone debugging thermal and power regressions on devices.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/sakaax/i-shipped-my-first-ios-app-got-rejected-twice-and-built-a-tool-so-it-never-happens-again-ja6" style="color:#e05c00;text-decoration:none">I shipped my first iOS app, got rejected twice, and built a tool so it never happens again</a></strong> — A reminder that non-code operational work (privacy labels, review flows) can block releases just as effectively as bugs.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you&#x27;re planning or mid-migration, add runtime guards, stage releases, and instrument async boundaries now — staged MetricKit and signposter traces will repay the effort. Hit reply with how you correlate os_log, MetricKit, and user telemetry during rollouts; I’ll share patterns in a follow-up. Forward this to the engineer who owns your next migration plan.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
