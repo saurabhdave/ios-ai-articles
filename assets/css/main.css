@@ -420,3 +420,8 @@ aside.toc { display: none; }
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* Quiet "marked item" dot for the WWDC nav entry (home layout carries its
+   own copy of this rule in its inline styles). */
+.nav-wwdc::before { content: ""; display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; background: currentColor; margin-right: 8px; vertical-align: 2px; }

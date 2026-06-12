@@ -195,6 +195,30 @@
   .pill-solid:hover { background: #000; color: #fff; }
   .pill-outline { background: transparent; color: var(--fg); border: 1px solid var(--fg); gap: 8px; }
   .pill-outline:hover { background: var(--fg); color: var(--paper); }
+  /* WWDC accent: the one dark pill in the row — inverse of pill-solid,
+     reusing its hover palette so it stays inside the mono system. */
+  .pill-wwdc { background: #16130d; color: #f3efe6; border: 1px solid rgba(22, 19, 13, 0.2); }
+  [data-theme="dark"] .pill-wwdc { border-color: rgba(255, 255, 255, 0.85); }
+  .pill-wwdc:hover { background: #fff; color: #000; border-color: rgba(0, 0, 0, 0.1); }
+  /* Liquid-glass secondaries: frosted blur only works over the hero video,
+     so the treatment stays scoped to this pill row. Theme-aware tint; the
+     solid-ish rgba fallback keeps contrast without backdrop-filter. */
+  .pill-glass { gap: 8px; color: var(--fg);
+    background: rgba(22, 19, 13, 0.07); border: 1px solid rgba(22, 19, 13, 0.28);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%); }
+  .pill-glass:hover { background: rgba(22, 19, 13, 0.14); border-color: rgba(22, 19, 13, 0.45); }
+  [data-theme="dark"] .pill-glass { background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.30); }
+  [data-theme="dark"] .pill-glass:hover { background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.5); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .pill-glass { background: rgba(236, 233, 226, 0.72); }
+    [data-theme="dark"] .pill-glass { background: rgba(40, 40, 40, 0.55); }
+  }
+  /* Quiet "marked item" dot for the WWDC nav entry. */
+  .nav-wwdc::before { content: ""; display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; background: currentColor; margin-right: 8px; vertical-align: 2px; }
   .pill-outline u { text-underline-offset: 1px; }
   .pill-copied { font-size: 11px; opacity: .7; }
 
@@ -362,7 +386,7 @@
   </a>
   <nav class="nav-links">
     <a href="#articles">Articles</a>
-    <a href="{{ '/wwdc/' | relative_url }}">WWDC</a>
+    <a class="nav-wwdc" href="{{ '/wwdc/' | relative_url }}">WWDC</a>
     <a href="{{ '/posts/' | relative_url }}">Posts</a>
     <a href="#newsletter">Newsletter</a>
     <a class="subscribe" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
@@ -380,7 +404,7 @@
 
 <div class="mobile-overlay" id="mobileOverlay">
   <a href="#articles">Articles</a>
-  <a href="{{ '/wwdc/' | relative_url }}">WWDC</a>
+  <a class="nav-wwdc" href="{{ '/wwdc/' | relative_url }}">WWDC</a>
   <a href="{{ '/posts/' | relative_url }}">Posts</a>
   <a href="#newsletter">Newsletter</a>
   <a class="subscribe" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
@@ -400,12 +424,10 @@
       <a class="pill pill-solid" href="{{ featured.url | relative_url }}">Read the latest article</a>
       {%- if wwdc_posts.size > 0 -%}
       {%- assign latest_wwdc_year = wwdc_posts.first.date | date: "%Y" -%}
-      <a class="pill pill-solid" href="{{ '/wwdc/' | relative_url }}">WWDC {{ latest_wwdc_year }} coverage &rarr;</a>
+      <a class="pill pill-wwdc" href="{{ '/wwdc/' | relative_url }}">WWDC {{ latest_wwdc_year }} coverage &rarr;</a>
       {%- endif -%}
-      <a class="pill pill-solid" href="#articles">Browse all {{ main_posts | size }} articles</a>
-      <a class="pill pill-solid" href="{{ '/newsletter/' | relative_url }}">Read the newsletter</a>
-      <a class="pill pill-solid" href="https://github.com/saurabhdave" target="_blank" rel="noopener">Follow on GitHub</a>
-      <a class="pill pill-outline" data-subscribe href="{{ '/feed.xml' | relative_url }}">
+      <a class="pill pill-glass" href="{{ '/newsletter/' | relative_url }}">Read the newsletter</a>
+      <a class="pill pill-glass" data-subscribe href="{{ '/feed.xml' | relative_url }}">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <circle cx="6.18" cy="17.82" r="2.18"/>
           <path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/>
