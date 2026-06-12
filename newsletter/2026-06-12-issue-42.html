@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #42</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #42</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #42</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Swift Concurrency is no longer optional in new codebases — teams are converting large, callback-heavy subsystems and finding the hard parts show up under production load. Cancellation, actor isolation, and scheduling semantics move from library-level decisions into architecture decisions you must observe and test.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Swift Concurrency Updates Announced at WWDC 2026</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Apple&#x27;s updates clarify semantics but also expose migration pitfalls: detached tasks won&#x27;t inherit cancellation or priority, and mixing callback models with structured concurrency can create timing-dependent crashes and orphaned work. Teams that rush a wholesale conversion without instrumentation are the ones likely to hit subtle failures in the wild. Read the piece to get pragmatic choices, migration tactics, and observability steps you can apply now.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Sweet Jeebus, macOS 27 Golden Gate removes menu‑item icons — another small UI cleanup that nudges platform consistency and reduces legacy UI cruft in desktop ports. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A deep dive on power-supply history reminds engineers that platform progress often comes from incremental hardware and materials improvements rather than single dramatic acts — useful context when evaluating low-level performance claims. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift.org Blog announces a Networking Workgroup — early coordination that should help standardize async networking libraries and reduce ad-hoc adapters across projects. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">// ❌ Before — legacy callback-heavy networking with manual cancellation and callbacks.
+// Handled via completion handlers, manual state flags, and ad-hoc cancellation tokens.
+
+import Foundation
+import Observation
+import SwiftUI
+
+// ✅ After — structured concurrency with clear cancellation, isolation, and scheduling
+actor NetworkClient {
+    func fetchData(from url: URL) async throws -&gt; Data {
+        // URLSession async/await variant enforces structured cancellation
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return data
+    }
+}
+
+@Observable
+class FeedModel {
+    var items: [String] = []
+    var isLoading = false
+}
+
+@MainActor
+class FeedController {
+    private let client = NetworkClient()
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern matters because it moves ownership of cancellation and isolation into types and actors you can reason about, making rollouts and failure modes far more observable than ad‑hoc callbacks.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">More community links next issue.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you&#x27;re piloting a concurrency migration, add OSS‑free observability now: signpost spans with OSSignposter, use Instruments Time Profiler to correlate work, and prefer TaskGroup over Task.detached where you need predictable cancellation and priority. Hit reply with the signal that made you rollback last — I’ll share patterns I’ve seen work in rollouts and rollbacks.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
