@@ -21,3 +21,14 @@
 .sub-readers-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .sub-readers a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .sub-readers a:hover { color: var(--accent); }
+
+/* Liquid-glass modal: frosted panel + deeper backdrop blur where supported;
+   the solid var(--paper) card above remains the fallback. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sub-overlay { -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%); }
+  .sub-card { background: rgba(236, 233, 226, 0.82);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%); }
+  [data-theme="dark"] .sub-card { background: rgba(21, 19, 14, 0.82); }
+}

@@ -156,6 +156,14 @@
     opacity: 0; pointer-events: none; transition: opacity .3s ease;
   }
   .mobile-overlay.open { opacity: 1; pointer-events: auto; }
+  /* Liquid-glass menu sheet where backdrop-filter is supported; the near-
+     opaque var(--overlay-bg) above stays as the fallback. */
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .mobile-overlay { background: rgba(236, 233, 226, 0.72);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
+      backdrop-filter: blur(22px) saturate(150%); }
+    [data-theme="dark"] .mobile-overlay { background: rgba(21, 19, 14, 0.72); }
+  }
   .mobile-overlay a { font-family: var(--font-heading); font-size: 34px; color: var(--ink); text-decoration: none; }
   .mobile-overlay a.subscribe { text-decoration: underline; text-underline-offset: 2px; }
 
