@@ -1,0 +1,75 @@
+---
+layout: default
+title: WWDC
+permalink: /wwdc/
+---
+
+{% comment %}
+  WWDC coverage hub, grouped by conference year (2026 onward).
+
+  Self-maintaining: an article appears here automatically when its title
+  contains "WWDC". Articles that cover WWDC announcements without the word
+  in the title (e.g. an OS-feature deep dive) can be added manually in
+  _data/wwdc_extra.yml — no pipeline or build changes needed.
+{% endcomment %}
+
+{% assign wwdc_posts = "" | split: "" %}
+{% for post in site.posts %}
+  {% assign t = post.title | downcase %}
+  {% assign is_wwdc = false %}
+  {% if t contains "wwdc" %}{% assign is_wwdc = true %}{% endif %}
+  {% for extra in site.data.wwdc_extra %}
+    {% if post.url contains extra.slug %}{% assign is_wwdc = true %}{% endif %}
+  {% endfor %}
+  {% assign post_year = post.date | date: "%Y" | plus: 0 %}
+  {% if is_wwdc and post_year >= 2026 %}
+    {% assign wwdc_posts = wwdc_posts | push: post %}
+  {% endif %}
+{% endfor %}
+
+<div class="wrap">
+  <div class="page-head">
+    <div class="page-kicker">Conference Coverage</div>
+    <h1 class="page-title">WWDC</h1>
+    <p class="page-desc">What Apple's announcements mean for production teams &mdash; keynote takeaways, platform updates, and adoption guidance, year by year.</p>
+  </div>
+
+  {% if wwdc_posts.size > 0 %}
+    {% assign year_groups = wwdc_posts | group_by_exp: "p", "p.date | date: '%Y'" | sort: "name" | reverse %}
+    {% for group in year_groups %}
+    <div class="section-head" id="wwdc-{{ group.name }}">
+      <div class="left">
+        <h2>WWDC {{ group.name }}</h2>
+        <span class="count">{{ group.items | size }}</span>
+      </div>
+    </div>
+
+    <div class="ed-list">
+      {% assign year_posts = group.items | sort: "date" | reverse %}
+      {% for item in year_posts %}
+        {% assign words = item.content | number_of_words %}
+        {% assign read_time = words | divided_by: 180 %}{% if read_time < 1 %}{% assign read_time = 1 %}{% endif %}
+        <a href="{{ item.url | relative_url }}" class="ed-row">
+          <div class="ed-grid">
+            <div class="ed-date">{{ item.date | date: "%b %-d, %Y" }}</div>
+            <div class="ed-main">
+              <h3 class="ed-title">{{ item.title }}</h3>
+              <p class="ed-excerpt">{{ item.content | strip_html | truncate: 170 }}</p>
+              <div class="ed-meta">Article &middot; {{ read_time }} min</div>
+            </div>
+            <div class="ed-aside">
+              <span class="tag">WWDC {{ group.name }}</span>
+              <span class="ed-arrow">&rarr;</span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="empty-state">
+    <h2>No WWDC coverage yet</h2>
+    <p>Coverage publishes during each year's conference week &mdash; check back in June.</p>
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,4 @@
+# Articles that belong on the /wwdc/ page but don't say "WWDC" in the title.
+# Each entry is a slug fragment matched against the post URL. Articles whose
+# title contains "WWDC" are included automatically — only list exceptions here.
+- slug: macos-27-menu-redesign-impact-for-mac-app-teams
