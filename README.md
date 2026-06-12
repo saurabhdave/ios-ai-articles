@@ -51,15 +51,15 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-06-12 | [Xcode 27 Tooling Updates From WWDC 2026](articles/2026-06-12-xcode-27-tooling-updates-from-wwdc-2026.md) | [Post](linkedin/2026-06-12-xcode-27-tooling-updates-from-wwdc-2026-linkedin.md) |
 | 2026-06-12 | [What the WWDC 2026 Keynote Means for iOS Teams](articles/2026-06-12-what-the-wwdc-2026-keynote-means-for-ios-teams.md) | [Post](linkedin/2026-06-12-what-the-wwdc-2026-keynote-means-for-ios-teams-linkedin.md) |
 | 2026-06-12 | [Swift Concurrency Updates Announced at WWDC 2026](articles/2026-06-12-swift-concurrency-updates-announced-at-wwdc-2026.md) | [Post](linkedin/2026-06-12-swift-concurrency-updates-announced-at-wwdc-2026-linkedin.md) |
+| 2026-06-12 | [macOS 27 Menu Redesign Impact for Mac App Teams](articles/2026-06-12-macos-27-menu-redesign-impact-for-mac-app-teams.md) | [Post](linkedin/2026-06-12-macos-27-menu-redesign-impact-for-mac-app-teams-linkedin.md) |
 | 2026-06-11 | [Scalable Dynamic Type in SwiftUI](articles/2026-06-11-scalable-dynamic-type-in-swiftui.md) | [Post](linkedin/2026-06-11-scalable-dynamic-type-in-swiftui-linkedin.md) |
 | 2026-06-09 | [Getting Your iOS App Ready for iOS 27 Betas](articles/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas.md) | [Post](linkedin/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas-linkedin.md) |
 | 2026-06-08 | [Structured Concurrency Patterns for iOS Networking](articles/2026-06-08-structured-concurrency-patterns-for-ios-networking.md) | [Post](linkedin/2026-06-08-structured-concurrency-patterns-for-ios-networking-linkedin.md) |
 | 2026-06-04 | [Modular iOS Architecture Using Swift Packages](articles/2026-06-04-modular-ios-architecture-using-swift-packages.md) | [Post](linkedin/2026-06-04-modular-ios-architecture-using-swift-packages-linkedin.md) |
 | 2026-06-01 | [On-device Marathon Coach Patterns for watchOS Apps](articles/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps.md) | [Post](linkedin/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps-linkedin.md) |
 | 2026-05-28 | [VoiceOver for Custom SwiftUI Controls on macOS](articles/2026-05-28-voiceover-for-custom-swiftui-controls-on-macos.md) | [Post](linkedin/2026-05-28-voiceover-for-custom-swiftui-controls-on-macos-linkedin.md) |
-| 2026-05-25 | [WidgetKit App Intents Patterns for macOS Widgets](articles/2026-05-25-widgetkit-app-intents-patterns-for-macos-widgets.md) | [Post](linkedin/2026-05-25-widgetkit-app-intents-patterns-for-macos-widgets-linkedin.md) |
 
-> Showing 10 of 29 articles — [19 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 30 articles — [20 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
