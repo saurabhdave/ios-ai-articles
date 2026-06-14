@@ -61,7 +61,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-06-04 | [Modular iOS Architecture Using Swift Packages](articles/2026-06-04-modular-ios-architecture-using-swift-packages.md) | [Post](linkedin/2026-06-04-modular-ios-architecture-using-swift-packages-linkedin.md) |
 | 2026-06-01 | [On-device Marathon Coach Patterns for watchOS Apps](articles/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps.md) | [Post](linkedin/2026-06-01-on-device-marathon-coach-patterns-for-watchos-apps-linkedin.md) |
 
-> Showing 10 of 31 articles — [21 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 30 articles — [20 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
