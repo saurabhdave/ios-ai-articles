@@ -25,6 +25,9 @@ concurrency:
 jobs:
   typecheck:
     runs-on: macos-latest
+    permissions:
+      contents: read
+      issues: write   # Option C: file a notification issue on compile failure
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,9 +54,27 @@ jobs:
           GATE_DIFF_AFTER: ${{ github.sha }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            python scripts/swift_typecheck.py articles/
+            python scripts/swift_typecheck.py articles/ --report-file typecheck_report.md
           else
-            python scripts/swift_typecheck.py --changed
+            python scripts/swift_typecheck.py --changed --report-file typecheck_report.md
+          fi
+
+      # Option C backstop: anything that slips the writer's in-pipeline guard
+      # (e.g. a hand-edited article) fails this job red AND files/updates a
+      # GitHub issue so it's actionable, not just a red check.
+      - name: File type-check failure issue
+        if: failure() && hashFiles('typecheck_report.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prefix="Swift type-check failures"
+          existing=$(gh issue list --state open --search "in:title $prefix" \
+            --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file typecheck_report.md
+          else
+            gh issue create --title "$prefix ($(date -u +%Y-%m-%d))" \
+              --body-file typecheck_report.md
           fi
 
       # Optional stricter pass (actor isolation / Swift 6 mode). Non-blocking:

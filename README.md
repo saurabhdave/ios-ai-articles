@@ -114,7 +114,7 @@ It is **stub-tolerant**: illustrative snippets reference undefined helper symbol
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
 | `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate (incl. the `swift_lint.py` regex guard), refreshes README, and commits any follow-up removals/docs updates |
-| `swift-typecheck.yml` | Push to `articles/**`; manual dispatch | Compiles every Swift code block against the real SDK on macOS (`swift_typecheck.py`). Consumes macOS Actions minutes (~10× ubuntu); remove the `push` trigger to make it manual-only |
+| `swift-typecheck.yml` | Push to `articles/**`; manual dispatch | Compiles the changed articles' Swift blocks against the real SDK on macOS (`swift_typecheck.py --changed`; manual dispatch checks all). Writes a job summary and, on failure, files/updates a **"Swift type-check failures"** GitHub issue — a backstop for anything that slips the writer's in-pipeline strip guard. Consumes macOS Actions minutes (~10× ubuntu); remove the `push` trigger to make it manual-only |
 | `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages; ignores README-only bot commits |
 
 ## Source

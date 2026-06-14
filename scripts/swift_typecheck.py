@@ -406,6 +406,9 @@ def main() -> int:
     ap.add_argument("--changed", action="store_true",
                     help="Only check articles changed in the push diff (GATE_DIFF_BEFORE/AFTER) "
                          "or the last commit; falls back to all when no diff is resolvable.")
+    ap.add_argument("--report-file", default="",
+                    help="On failure, append a markdown failure report to this path "
+                         "(used by CI to file a notification issue).")
     args = ap.parse_args()
 
     if args.swift6:
@@ -481,27 +484,36 @@ def main() -> int:
         f"{skipped} illustrative skipped."
     )
     print(f"\n{summary}")
-    _write_github_summary(summary, fail_details)
+    report = _build_report(summary, fail_details)
+    # GitHub Actions job summary (always) + an optional report file the workflow
+    # uses to file a notification issue on failure (Option C backstop).
+    gh_summary = os.getenv("GITHUB_STEP_SUMMARY")
+    if gh_summary:
+        _append_file(gh_summary, report)
+    if args.report_file and failing:
+        _append_file(args.report_file, report)
     return 1 if failing else 0
 
 
-def _write_github_summary(summary: str, fail_details: list[tuple[str, list[str]]]) -> None:
-    """Append a markdown report to the GitHub Actions job summary, if running in CI."""
-    path = os.getenv("GITHUB_STEP_SUMMARY")
-    if not path:
-        return
+def _build_report(summary: str, fail_details: list[tuple[str, list[str]]]) -> str:
     lines = ["## Swift type-check", "", summary, ""]
     if fail_details:
         lines.append("### Failures")
         for label, errs in fail_details:
             lines.append(f"- **{label}**")
             for e in errs:
-                lines.append(f"  - `{e}`")
+                # Drop the throwaway temp-file path; keep `line:col: error: …`.
+                clean = re.sub(r"^.*?\.swift:", "", e)
+                lines.append(f"  - `{clean}`")
     else:
         lines.append("✅ No compile failures.")
+    return "\n".join(lines) + "\n"
+
+
+def _append_file(path: str, content: str) -> None:
     try:
         with open(path, "a", encoding="utf-8") as fh:
-            fh.write("\n".join(lines) + "\n")
+            fh.write(content)
     except OSError:
         pass
 
