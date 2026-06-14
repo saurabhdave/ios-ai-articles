@@ -26,9 +26,11 @@ articles/     Full long-form articles — source of truth, pushed by the writer 
 linkedin/     LinkedIn-optimized posts (~1,700 chars) for each article
 codegen/      Swift code generation metadata (compilation results, diagnostics)
 newsletter/   Weekly iOS Dev Weekly newsletter — Markdown + email-safe HTML per issue
-scripts/      editorial_gate.py — quality gate (see below)
-              update_readme.py  — auto-updates this table
-              prep_jekyll.py    — bridges articles/ to Jekyll _posts/
+scripts/      editorial_gate.py  — quality gate (see below)
+              swift_lint.py      — regex guard for never-valid Swift APIs (ubuntu)
+              swift_typecheck.py — compiles every Swift block via swiftc (macOS)
+              update_readme.py   — auto-updates this table
+              prep_jekyll.py     — bridges articles/ to Jekyll _posts/
 ```
 
 All content files share a date-prefixed naming convention:
@@ -82,9 +84,12 @@ Pushes with new or changed published artifacts trigger an automated editorial re
 |---|------|--------|
 | 1 | Article must have a validated Swift code snippet (`codegen path ≠ "omitted"`) | Remove article + companions |
 | 2 | No banned deprecated APIs (`@Published`, `@ObservableObject`, `os_signpost(`) in Swift code blocks | Remove article + companions |
+| 2b | No never-valid Swift API patterns in code blocks — high-precision regex guard (`scripts/swift_lint.py`) | Remove article + companions |
 | 3 | Article H1 must be present and not obviously malformed/truncated | Remove article + companions |
 | 4 | No duplicate topic — Jaccard similarity > 0.5 against other article titles | Remove the weaker changed duplicate |
 | 5 | Newsletter Big Story title must match an existing article H1 | Remove orphaned newsletter |
+
+Check 2b (`scripts/swift_lint.py`) encodes the specific hallucination/API-misuse classes that have shipped before — wrong `OSSignposter` overloads (`endInterval(id:)`, `OSSignposter(logger: OSLog(…))`, `.emit(`), `@MainActor actor`, invented AppIntents `ValidationResult`, RealityKit `Entity.destroy()`, `Task.Handle`, `import OSSignpost`, SwiftUI `Color.windowBackgroundColor`, `systemLayoutSizeFitting(traitCollection:)`, … — as deterministic, zero-dependency regexes (comments and string literals are ignored). `error`-severity findings remove the article; `warning`-severity findings (deprecated `@_implementationOnly`, MetricKit on watchOS, …) are printed only. It runs on ubuntu, so it needs no Xcode.
 
 The gate scopes strict checks to changed artifacts, while still comparing new article titles against the full archive for duplicates. Follow-up fixes are committed automatically by the editorial workflow. The same gate logic also exists upstream in the writer pipeline, so most issues are caught before they reach this repo.
 
@@ -97,13 +102,20 @@ After the hard rules, the gate runs an OpenAI-powered review of Swift code block
 | `OPENAI_API_KEY` | _(none)_ | Repository secret. If absent the check is silently skipped. |
 | `CODE_REVIEW_ENABLED` | `true` | Set to `false` to disable the check without removing the secret. |
 
+### Swift compile gate (`scripts/swift_typecheck.py`)
+
+The highest-fidelity check actually compiles **every** ```swift block (not just the one canonical example) with `swiftc -typecheck` against the real iOS / macOS / watchOS SDK. It needs Xcode, so it runs on macOS via the `swift-typecheck.yml` workflow (and locally: `python scripts/swift_typecheck.py articles/`).
+
+It is **stub-tolerant**: illustrative snippets reference undefined helper symbols on purpose, so "cannot find … in scope" diagnostics (and their cascades) are ignored, and an SDK-appropriate import preamble is injected so import-less fragments resolve. What remains — wrong argument labels, nonexistent members/overloads/modules, failed conformances — fails the gate. Mode-sensitive actor-isolation diagnostics are reported as non-blocking warnings unless `--strict-concurrency` is passed; `--swift6` selects Swift 6 language mode. Pseudocode blocks are skipped.
+
 ## Automation
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate, refreshes README, and commits any follow-up removals/docs updates |
+| `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate (incl. the `swift_lint.py` regex guard), refreshes README, and commits any follow-up removals/docs updates |
+| `swift-typecheck.yml` | Push to `articles/**`; manual dispatch | Compiles every Swift code block against the real SDK on macOS (`swift_typecheck.py`). Consumes macOS Actions minutes (~10× ubuntu); remove the `push` trigger to make it manual-only |
 | `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages; ignores README-only bot commits |
 
 ## Source
 
-Articles are generated by [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer). Swift code samples are validated against Swift 6.2.4 via `swiftc`; the `codegen/` JSON files record diagnostics and repair attempts for each run.
+Articles are generated by [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer). Swift code samples are validated against Swift 6.2.4 via `swiftc`; the `codegen/` JSON files record diagnostics and repair attempts for each run. On the repo side, the Editorial Gate's regex guard (`swift_lint.py`) and the macOS compile gate (`swift_typecheck.py`) re-validate **every** code block — not just the one canonical example — so inline section snippets are covered too.

@@ -37,6 +37,13 @@ import re
 import subprocess
 import sys
 
+# Same-directory module: high-precision regex guard for Swift code blocks.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from swift_lint import lint_article as _swift_lint_article
+except ImportError:  # pragma: no cover - guard if the module is missing
+    _swift_lint_article = None
+
 # ---------------------------------------------------------------------------
 # Paths (relative to repo root, one level above this script)
 # ---------------------------------------------------------------------------
@@ -370,6 +377,51 @@ def check_banned_apis(
 
 
 # ---------------------------------------------------------------------------
+# Check 2b — Hallucinated / misused Swift APIs (deterministic regex guard)
+# ---------------------------------------------------------------------------
+
+def check_swift_api_misuse(
+    slugs: list[str],
+    blocked: dict[str, list[str]],
+    removed: list[str],
+    dry_run: bool,
+) -> None:
+    """Block articles whose Swift blocks contain never-valid API patterns
+    (wrong OSSignposter overloads, `@MainActor actor`, invented AppIntents
+    `ValidationResult`, `Task.Handle`, RealityKit `Entity.destroy()`, …).
+
+    ERROR-severity findings remove the article; WARNING findings are advisory and
+    only printed. This is the ubuntu-CI counterpart to scripts/swift_typecheck.py
+    (which needs Xcode and runs on macOS).
+    """
+    if _swift_lint_article is None:
+        print("[SWIFT-LINT] swift_lint module unavailable — skipping API-misuse check")
+        return
+
+    for slug in slugs:
+        path = article_path(slug)
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as fh:
+                content = fh.read()
+        except OSError:
+            continue
+
+        findings = _swift_lint_article(content, slug)
+        errors = [f for f in findings if f.severity == "error"]
+        warnings = [f for f in findings if f.severity == "warning"]
+
+        for w in warnings:
+            print(f"[SWIFT-LINT] {slug}: warning [{w.rule_id}] {w.message}")
+
+        if errors:
+            reasons = "; ".join(f"{e.rule_id}: {e.message}" for e in errors)
+            blocked.setdefault(slug, []).append(f"swift API misuse — {reasons}")
+            remove_article_set(slug, removed, dry_run)
+
+
+# ---------------------------------------------------------------------------
 # Check 3 — Malformed/truncated article titles
 # ---------------------------------------------------------------------------
 
@@ -643,6 +695,7 @@ def main() -> int:
     # Run checks in dependency order
     check_no_validated_code(review_slugs, blocked, removed, dry_run)
     check_banned_apis(review_slugs, blocked, removed, dry_run)
+    check_swift_api_misuse(review_slugs, blocked, removed, dry_run)
     check_title_sanity(review_slugs, blocked, removed, dry_run)
     check_duplicate_titles(review_slugs, all_slugs, blocked, removed, dry_run)
     check_orphaned_newsletters(newsletter_bases, blocked_newsletters, removed, dry_run)

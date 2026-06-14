@@ -16,6 +16,10 @@ _linkedin/
 # Ephemeral gate outputs — not committed
 outputs/
 
+# Python bytecode from gate/lint scripts
+__pycache__/
+*.pyc
+
 # Content repo must not persist upstream pipeline state.
 newsletter/.issue_number
 

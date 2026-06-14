@@ -1,0 +1,49 @@
+name: Swift Code Typecheck
+
+# Compiles every ```swift block in articles/ against the real SDK (iOS / macOS /
+# watchOS) using scripts/swift_typecheck.py. This is the high-fidelity counterpart
+# to the deterministic regex guard in the Editorial Gate (which runs on ubuntu,
+# where swiftc is unavailable).
+#
+# Runs on macOS (Xcode is required), so it consumes macOS Actions minutes (~10x
+# ubuntu). It triggers on article changes and can be run on demand. If cost is a
+# concern, remove the `push` trigger and rely on the manual run + the ubuntu
+# regex guard, or run `python scripts/swift_typecheck.py` locally before pushing.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "articles/**"
+      - "scripts/swift_typecheck.py"
+
+concurrency:
+  group: swift-typecheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Report toolchain
+        run: |
+          xcodebuild -version
+          echo "iOS SDK:     $(xcrun --sdk iphonesimulator --show-sdk-path)"
+          echo "macOS SDK:   $(xcrun --sdk macosx --show-sdk-path)"
+          echo "watchOS SDK: $(xcrun --sdk watchsimulator --show-sdk-path)"
+
+      - name: Typecheck Swift code blocks
+        run: python scripts/swift_typecheck.py articles/
+
+      # Optional stricter pass (actor isolation / Swift 6 mode). Non-blocking:
+      # surfaces mode-sensitive concurrency findings without failing the job.
+      - name: Strict concurrency report (advisory)
+        if: always()
+        run: python scripts/swift_typecheck.py --swift6 --strict-concurrency articles/ || true
