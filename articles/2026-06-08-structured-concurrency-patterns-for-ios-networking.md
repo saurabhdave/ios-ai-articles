@@ -30,6 +30,14 @@ Example adapter demonstrating cancellation propagation:
 ```swift
 import Foundation
 
+// Holds the in-flight URLSessionTask so the cancellation handler can reach it.
+final class CancellableTaskBox: @unchecked Sendable {
+  private let lock = NSLock()
+  private var task: URLSessionDataTask?
+  func setTask(_ t: URLSessionDataTask) { lock.withLock { task = t } }
+  func cancel() { lock.withLock { task?.cancel() } }
+}
+
 actor NetworkClient {
   let session: URLSession
 
@@ -38,27 +46,28 @@ actor NetworkClient {
   }
 
   func fetchData(from url: URL) async throws -> (Data, URLResponse) {
-    try await withCheckedThrowingContinuation { continuation in
-      let task = session.dataTask(with: url) { data, response, error in
-        if let error = error {
-          continuation.resume(throwing: error)
-          return
+    let box = CancellableTaskBox()
+    // withTaskCancellationHandler wires this Task's cancellation to the
+    // URLSessionTask; a bare `Task { if Task.isCancelled ... }` checks the new
+    // child task's flag (always false) and never fires.
+    return try await withTaskCancellationHandler {
+      try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(Data, URLResponse), Error>) in
+        let task = session.dataTask(with: url) { data, response, error in
+          if let error = error {
+            continuation.resume(throwing: error)
+            return
+          }
+          guard let data = data, let response = response else {
+            continuation.resume(throwing: URLError(.badServerResponse))
+            return
+          }
+          continuation.resume(returning: (data, response))
         }
-        guard let data = data, let response = response else {
-          continuation.resume(throwing: URLError(.badServerResponse))
-          return
-        }
-        continuation.resume(returning: (data, response))
+        box.setTask(task)
+        task.resume()
       }
-
-      // Cooperatively cancel the URLSessionTask if the surrounding Task is cancelled.
-      Task {
-        if Task.isCancelled {
-          task.cancel()
-        }
-      }
-
-      task.resume()
+    } onCancel: {
+      box.cancel()
     }
   }
 }

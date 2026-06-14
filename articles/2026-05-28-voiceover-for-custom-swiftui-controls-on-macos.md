@@ -33,7 +33,9 @@ import AppKit
 final class AccessibleBoxView: NSView {
   private var _label: String?
 
-  override var isAccessibilityElement: Bool { true }
+  // On AppKit these are methods on the NSAccessibility protocol, not stored
+  // properties — override the method form.
+  override func isAccessibilityElement() -> Bool { true }
 
   override func accessibilityRole() -> NSAccessibility.Role? {
     return .button
@@ -152,7 +154,7 @@ struct AccessibleCanvas: View {
                     Text("\(item.value)")
                 }
                 .padding(8)
-                .background(RoundedRectangle(cornerRadius: 6).fill(Color.windowBackgroundColor.opacity(0.1)))
+                .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .windowBackgroundColor).opacity(0.1)))
                 // Explicit semantics for each interactive piece:
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(item.title)
@@ -164,16 +166,12 @@ struct AccessibleCanvas: View {
                     item.value = (item.value + 1) % 10
                     // Notify assistive technologies of a layout/state change.
                     if let win = NSApp.keyWindow {
-                        NSAccessibility.post(element: win, notification: .valueChanged)
+                        NSAccessibility.post(element: win, notification: .layoutChanged)
                     }
                 }
             }
         }
         .padding()
-        .onAppear {
-            // Ensure VoiceOver sees the canvas role explicitly.
-            NSAccessibility.attributeNames(for: NSApp)
-        }
     }
 }
 ```

@@ -53,11 +53,12 @@ class ViewModel {
 Preferred pattern:
 ```swift
 task = Task {
+ // operation runs first; onCancel is the cleanup closure (note the order).
  await withTaskCancellationHandler {
+ try? Task.checkCancellation()
+ try? await performNetworkWork()
+ } onCancel: {
  // cleanup: close sockets, release resources
- } operation: {
- try Task.checkCancellation()
- try await performNetworkWork()
  }
 }
 ```
@@ -158,6 +159,14 @@ final class LegacyClient {
     private class DummyToken: CancellableToken { func cancel() {} }
 }
 
+// Holds the legacy token so the cancellation handler can cancel it.
+final class TokenBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var token: CancellableToken?
+    func setToken(_ t: CancellableToken) { lock.withLock { token = t } }
+    func cancel() { lock.withLock { token?.cancel() } }
+}
+
 @Observable final class ResourceLoader {
     var data: Data? = nil
     var error: String? = nil
@@ -171,14 +180,17 @@ final class LegacyClient {
             error = nil
         } catch {
             data = nil
-            error = "\(error)"
+            // Disambiguate the `error` property from the caught `error` binding.
+            self.error = "\(error)"
         }
     }
 
     private func adaptLegacyLoad(url: URL) async throws -> Data {
-        try await withTaskCancellationHandler {
-            // on cancel: nothing here — cancellation handled by continuation's onCancel below
-        } operation: {
+        let box = TokenBox()
+        // operation first, onCancel second. onCancel cancels the underlying token
+        // when this Task is cancelled — a spawned `Task { if Task.isCancelled ... }`
+        // would only ever see its own (uncancelled) flag.
+        return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data, Error>) in
                 let token = client.loadResource(url: url) { result in
                     switch result {
@@ -186,19 +198,16 @@ final class LegacyClient {
                     case .failure(let e): continuation.resume(throwing: e)
                     }
                 }
-                Task { @MainActor in
-                    // observe Task cancellation and cancel underlying token to avoid leaks
-                    await Task.yield()
-                    if Task.isCancelled { token.cancel() }
-                }
+                box.setToken(token)
             }
+        } onCancel: {
+            box.cancel()
         }
     }
 }
 
 struct LoaderView: View {
     @State private var loader = ResourceLoader()
-    @Bindable private var _loader = ResourceLoader() // @Bindable only in view (illustrative)
     var body: some View { Text("Demo") }
 }
 ```

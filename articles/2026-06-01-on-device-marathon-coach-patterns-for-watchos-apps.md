@@ -64,11 +64,11 @@ Stage schema changes behind feature flags and validate rollback and interrupted 
 
 ## 4. Sensor-to-Output Validation And Reliability
 ### Test The End-To-End Path With Synthetic Inputs
-Anti-patterns include ad-hoc logs, unreproducible test runs, and relying solely on manual QA for pacing regressions. Preferred is automated `XCTest` suites that inject jittered `HKQuantitySample` and `CoreMotion` inputs, mark async boundaries with `OSSignposter`, and collect energy regressions with `MetricKit`.
+Anti-patterns include ad-hoc logs, unreproducible test runs, and relying solely on manual QA for pacing regressions. Preferred is automated `XCTest` suites that inject jittered `HKQuantitySample` and `CoreMotion` inputs, mark async boundaries with `OSSignposter`, and characterize energy with Instruments' Energy Log on-device. Note that `MetricKit` is not available on watchOS, so field energy aggregation has to come from your own sampled `os_log` records (optionally forwarded to a paired iOS app, which can use `MetricKit`).
 
-Choose unit-level `XCTest` async expectations for invariant testing; choose integration profiling with Instruments for periodic spikes and energy characteristics. Add `OSSignposter` marks at high-level boundaries (ingestion → fusion → pacing output) rather than per-sample to keep traces interpretable. Correlate `OSSignposter` marks with `MetricKit` and any collected logs during staged releases to make post-release diagnostics actionable.
+Choose unit-level `XCTest` async expectations for invariant testing; choose integration profiling with Instruments for periodic spikes and energy characteristics. Add `OSSignposter` marks at high-level boundaries (ingestion → fusion → pacing output) rather than per-sample to keep traces interpretable. Correlate `OSSignposter` marks with your sampled `os_log` records during staged releases to make post-release diagnostics actionable.
 
-Run Instruments `Time Profiler` and `Allocations` on representative multi-hour simulated runs and collect `MetricKit` energy payloads during staged rollouts to detect regressions. Add structured `os_log` messages for session start/stop and migration failures so postmortems point to meaningful traces.
+Run Instruments `Time Profiler`, `Allocations`, and the Energy Log on representative multi-hour simulated runs to detect regressions before release. Add structured `os_log` messages for session start/stop and migration failures so postmortems point to meaningful traces.
 
 > Make the watch the source of truth for in-run continuity and build recovery paths that assume the process can be killed at any time.
 
@@ -79,24 +79,24 @@ Sync dependence introduces failure modes during events—phone or cloud dependen
 
 ## Validation & Observability
 ### Signals You Need In Production
-Instrument three primary signal classes: lifecycle events (`HKWorkoutSession` start/stop and `HKLiveWorkoutBuilder` events), ingestion/fusion boundaries marked with `OSSignposter`, and system-level energy reports from `MetricKit`. Emit structured `os_log` messages for session starts, stops, migration failures, and checkpoint errors to make postmortems actionable.
+Instrument three primary signal classes: lifecycle events (`HKWorkoutSession` start/stop and `HKLiveWorkoutBuilder` events), ingestion/fusion boundaries marked with `OSSignposter`, and energy characterization captured with Instruments' Energy Log on-device (watchOS does not provide `MetricKit`). Emit structured `os_log` messages for session starts, stops, migration failures, and checkpoint errors to make postmortems actionable.
 
-Combine unit-level `XCTest` expectations with staged release telemetry thresholds for battery regressions and increased session crash rates. Correlate signpost marks with `MetricKit` payloads and sampling-rate changes to identify regressions introduced by algorithm updates. Use Instruments on representative devices to surface periodic spikes and memory growth over long simulated runs.
+Combine unit-level `XCTest` expectations with staged release telemetry thresholds for battery regressions and increased session crash rates. Correlate signpost marks with your sampled energy logs and sampling-rate changes to identify regressions introduced by algorithm updates. Use Instruments on representative devices to surface periodic spikes and memory growth over long simulated runs.
 
 - Use `OSSignposter` at coarse boundaries to keep traces readable.
-- Capture `MetricKit` energy diagnostics during staged rollouts.
+- Capture energy characteristics with Instruments' Energy Log on-device before and during staged rollouts (`MetricKit` is unavailable on watchOS).
 - Record `os_log` structured messages for session lifecycle and migration events.
 
 ## Practical Checklist
 - [ ] Implement `HKWorkoutSession` lifecycle management with idempotent start/stop and crash-recovery tests.
 - [ ] Build a sensor-fusion pipeline combining `CoreMotion`, `CMPedometer`, and `HealthKit` samples with energy-aware sampling policies.
-- [ ] Add `OSSignposter` points around pacing decisions and measure energy with `MetricKit` during staged runs.
+- [ ] Add `OSSignposter` points around pacing decisions and measure energy with Instruments' Energy Log on-device during staged runs.
 - [ ] Create `XCTest` suites that inject jittered sensor samples and assert pacing invariants.
 - [ ] Persist checkpoints in `CoreData` with additive migrations and feature-flagged rollouts.
 - [ ] Gate rollouts with telemetry thresholds (battery regressions, session crash rate, guidance error reports).
 
 ## Closing Takeaway
-Make the watch the authoritative source for live coaching when you need in-run continuity: use `HKWorkoutSession` for lifecycle, fuse `CoreMotion` and `HealthKit` with energy-aware sampling, persist checkpoints locally, and instrument the pacing path with `OSSignposter` and `MetricKit`. Validate behavior with `XCTest` and Instruments, and phase rollouts behind telemetry gates so you can iterate with reduced risk.
+Make the watch the authoritative source for live coaching when you need in-run continuity: use `HKWorkoutSession` for lifecycle, fuse `CoreMotion` and `HealthKit` with energy-aware sampling, persist checkpoints locally, and instrument the pacing path with `OSSignposter` and structured `os_log`. Validate behavior with `XCTest` and Instruments (including the Energy Log), and phase rollouts behind telemetry gates so you can iterate with reduced risk.
 
 ## Swift/SwiftUI Code Example
 
@@ -113,20 +113,23 @@ import HealthKit
     var lastCheckpoint: Date?
 
     // Start a system-managed workout so the watch is the source of truth
-    func startWorkout() async throws {
+    func startWorkout() throws {
         let config = HKWorkoutConfiguration()
         config.activityType = .running
         config.locationType = .outdoor
-        let session = try HKWorkoutSession(configuration: config)
+        // Use the current initializer; init(configuration:) is deprecated.
+        let session = try HKWorkoutSession(healthStore: healthStore, configuration: config)
         workoutSession = session
-        try await session.startActivity(with: Date())
+        // startActivity(with:) is synchronous and non-throwing.
+        session.startActivity(with: Date())
         isActive = true
         lastCheckpoint = Date()
     }
 
-    func endWorkout() async {
+    func endWorkout() {
         guard let session = workoutSession else { return }
-        await session.end()
+        // end() is synchronous and non-throwing.
+        session.end()
         workoutSession = nil
         isActive = false
     }
@@ -144,13 +147,13 @@ struct RunCoachView: View {
             Text(coach.isActive ? "Running — target pace \(Int(coach.targetPace))s/km" : "Ready")
             HStack {
                 Button("Start") {
-                    Task { try? await coach.startWorkout() }
+                    try? coach.startWorkout()
                 }
                 Button("Checkpoint") {
                     coach.createCheckpoint()
                 }
                 Button("End") {
-                    Task { await coach.endWorkout() }
+                    coach.endWorkout()
                 }
             }
         }

@@ -102,9 +102,10 @@ struct NetworkAPI: APIService {
     let logger: Logger
     let signposter: OSSignposter?
     func fetchTodos() async throws -> [String] {
-        let _ = signposter?.beginInterval("fetchTodos")
+        let interval = signposter?.beginInterval("fetchTodos")
         logger.log("Starting fetchTodos")
-        defer { signposter?.endInterval("fetchTodos") }
+        // endInterval needs the state returned by beginInterval.
+        defer { if let interval { signposter?.endInterval("fetchTodos", interval) } }
         let (data, _) = try await session.data(from: URL(string: "https://example.com/todos")!)
         // parse minimalistic
         return (try? JSONDecoder().decode([String].self, from: data)) ?? []
@@ -116,7 +117,7 @@ struct DIContainer {
     let enableMetrics: Bool
     init(enableMetrics: Bool = false) {
         let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "app", category: "network")
-        let signposter = enableMetrics ? OSSignposter(logger: .default) : nil
+        let signposter = enableMetrics ? OSSignposter(subsystem: "com.example.app", category: "network") : nil
         self.api = NetworkAPI(session: URLSession(configuration: .default), logger: logger, signposter: signposter)
         self.enableMetrics = enableMetrics
     }

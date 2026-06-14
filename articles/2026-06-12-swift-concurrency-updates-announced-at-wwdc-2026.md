@@ -146,11 +146,12 @@ class FeedController {
 
         currentTask = Task { [weak self] in
             defer { Task { @MainActor in self?.model.isLoading = false } }
-            // Use task group for parallel fetches while inheriting cancellation & priority
-            await withTaskGroup(of: (Int, Data).self) { group in
+            // Task group for parallel fetches. The child tasks throw, so this is a
+            // throwing group (a plain withTaskGroup rejects throwing addTask bodies).
+            try await withThrowingTaskGroup(of: (Int, Data).self) { group in
                 for (i, url) in urls.enumerated() { group.addTask { (i, try await self?.client.fetchData(from: url) ?? Data()) } }
                 var results: [(Int, Data)] = []
-                for await res in group { results.append(res) }
+                for try await res in group { results.append(res) }
                 // Process results on main actor
                 await MainActor.run { [weak self] in
                     guard let self else { return }

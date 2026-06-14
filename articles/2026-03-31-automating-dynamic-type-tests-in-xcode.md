@@ -29,9 +29,13 @@ import UIKit
 
 final class DynamicTypeUnitTests: XCTestCase {
  func testLabelExpandsForAccessibilityXXXL() {
+ let traits = UITraitCollection(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)
+
  let label = UILabel()
  label.numberOfLines = 0
- label.font = .preferredFont(forTextStyle: .body)
+ // Resolve the scaled font for the target category deterministically — there is
+ // no traitCollection parameter on systemLayoutSizeFitting.
+ label.font = .preferredFont(forTextStyle: .body, compatibleWith: traits)
  label.text = "This is a long test string to check wrapping and intrinsic size."
 
  let container = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 1000))
@@ -43,12 +47,10 @@ final class DynamicTypeUnitTests: XCTestCase {
  label.topAnchor.constraint(equalTo: container.topAnchor, constant: 16)
  ])
 
- let traits = UITraitCollection(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge)
  let measuredSize = container.systemLayoutSizeFitting(
  UIView.layoutFittingCompressedSize,
  withHorizontalFittingPriority: .required,
- verticalFittingPriority: .fittingSizeLevel,
- traitCollection: traits
+ verticalFittingPriority: .fittingSizeLevel
  )
  XCTAssert(measuredSize.height > 200, "Expected label to grow under XXXL; got \(measuredSize.height)")
  }
@@ -112,11 +114,11 @@ import UIKit
 final class DynamicTypeSnapshotTests: XCTestCase {
     // Render a SwiftUI view under a specific content size category deterministically.
     func render<V: View>(_ view: V, contentSize: UIContentSizeCategory, scale: CGFloat = 3.0) -> UIImage {
-        let hosting = UIHostingController(rootView: view.environment(\.sizeCategory, ContentSizeCategory(contentSize)))
+        let hosting = UIHostingController(rootView: view.environment(\.sizeCategory, ContentSizeCategory(contentSize) ?? .large))
         hosting.view.frame = CGRect(origin: .zero, size: CGSize(width: 375, height: 800))
-        // Force the trait collection to use the requested accessibility size.
-        let traits = UITraitCollection(preferredContentSizeCategory: contentSize)
-        hosting.setOverrideTraitCollection(traits, forChild: hosting)
+        // Drive the UIKit trait via traitOverrides (iOS 17+). setOverrideTraitCollection
+        // is for child controllers, so a controller cannot override its own traits.
+        hosting.traitOverrides.preferredContentSizeCategory = contentSize
         hosting.view.setNeedsLayout()
         hosting.view.layoutIfNeeded()
         let renderer = UIGraphicsImageRenderer(size: hosting.view.bounds.size, format: UIGraphicsImageRendererFormat(for: UITraitCollection(userInterfaceIdiom: .phone)))

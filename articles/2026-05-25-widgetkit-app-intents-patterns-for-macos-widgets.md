@@ -96,6 +96,20 @@ struct FeatureFlags {
     }
 }
 
+// AppIntents has no `validate()`/`ValidationResult` hook — surface validation
+// failures by throwing an error that conforms to localized-message conversion.
+enum SafeSearchError: Error, CustomLocalizedStringResourceConvertible {
+    case malformedQuery
+    case queryTooLong
+
+    var localizedStringResource: LocalizedStringResource {
+        switch self {
+        case .malformedQuery: return "Malformed query"
+        case .queryTooLong: return "Query too long"
+        }
+    }
+}
+
 // Durable, typed intent surface — validate early and fail-fast on malformed payloads.
 struct SafeSearchIntent: AppIntent {
     static var title: LocalizedStringResource = "Safe Search"
@@ -105,25 +119,23 @@ struct SafeSearchIntent: AppIntent {
     var query: String
 
     // Lightweight defensive validation that guards cross-process decoding ambiguities.
-    func validate() -> ValidationResult {
+    private func validatedQuery() throws -> String {
         // Reject embedded NULs or control characters that may be introduced by mis-serialization.
         if query.contains("\0") || query.rangeOfCharacter(from: .controlCharacters) != nil {
             logger.warning("Intent validation failed: control characters in query")
-            return .invalid("Malformed query")
+            throw SafeSearchError.malformedQuery
         }
         // Enforce a sane length to avoid runaway timeline churn for huge payloads.
         if query.count > 512 {
             logger.warning("Intent validation failed: query too long")
-            return .invalid("Query too long")
+            throw SafeSearchError.queryTooLong
         }
-        return .valid
+        return query
     }
 
     // Execute under a staged-rollout guard to avoid cold-start or churn during rollout.
-    func perform() async -> some IntentResult & ReturnsValue<String> {
-        guard validate().isValid else {
-            return .result(value: "invalid")
-        }
+    func perform() async throws -> some IntentResult & ReturnsValue<String> {
+        let sanitizedInput = try validatedQuery()
 
         // Rollout guard: if disabled, do a lightweight no-op acknowledging the intent.
         if !FeatureFlags.stagedRolloutEnabled {
@@ -131,10 +143,11 @@ struct SafeSearchIntent: AppIntent {
             return .result(value: "acknowledged")
         }
 
-        // Normal intent execution: update app state and request widget timelines to refresh.
+        // Normal intent execution: update app state and reload only this widget kind.
         do {
-            try await processQueryAndPersist(query)
-            WidgetCenter.shared.reloadAllTimelines() // trigger widget refresh reliably
+            try await processQueryAndPersist(sanitizedInput)
+            // Reload only the affected widget kind rather than every timeline.
+            WidgetCenter.shared.reloadTimelines(ofKind: "SafeSearchWidget")
             logger.log("Intent performed successfully, timelines reloaded")
             return .result(value: "ok")
         } catch {

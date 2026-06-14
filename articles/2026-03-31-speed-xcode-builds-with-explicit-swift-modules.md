@@ -49,23 +49,28 @@ import OSLog
 @MainActor
 final class BuildSignposter {
     private let signposter = OSSignposter(subsystem: "com.company.ci", category: "module-build")
+    private var interval: OSSignpostIntervalState?
 
-    func markPrebuildStart(id: OSSignposter.SignpostID) {
-        signposter.emit(.begin, id: id, name: "PrebuildModule")
+    // OSSignposter has no `emit`; mark boundaries with beginInterval/endInterval
+    // and keep the returned state to close the interval.
+    func markPrebuildStart() {
+        interval = signposter.beginInterval("PrebuildModule")
     }
 
-    func markPrebuildEnd(id: OSSignposter.SignpostID, info: String) {
-        signposter.emit(.end, id: id, name: "PrebuildModule", "info", "\(info)")
+    func markPrebuildEnd(info: String) {
+        guard let interval else { return }
+        signposter.endInterval("PrebuildModule", interval, "info: \(info, privacy: .public)")
+        self.interval = nil
     }
 }
 
-// Usage in a synchronous helper:
-let signposter = BuildSignposter()
-let id = OSSignposter.SignpostID(log: .default)
-Task {
-    await signposter.markPrebuildStart(id: id)
+// Usage from a main-actor context:
+@MainActor
+func runPrebuild() {
+    let buildSignposter = BuildSignposter()
+    buildSignposter.markPrebuildStart()
     // run prebuild step...
-    await signposter.markPrebuildEnd(id: id, info: "success")
+    buildSignposter.markPrebuildEnd(info: "success")
 }
 ```
 

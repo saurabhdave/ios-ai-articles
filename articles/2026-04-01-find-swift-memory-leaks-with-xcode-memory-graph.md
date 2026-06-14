@@ -63,7 +63,7 @@ final class FeedViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(_animated)
+        super.viewWillDisappear(animated)
         cancellables.forEach { $0.cancel() }
         cancellables.removeAll()
     }
@@ -115,7 +115,9 @@ import Observation
 
 @MainActor
 @Observable class NotificationsViewModel {
-    private var token: NSObjectProtocol?
+    // deinit is nonisolated and cannot touch main-actor state, so the token is
+    // opted out of isolation to allow observer removal during deallocation.
+    nonisolated(unsafe) private var token: NSObjectProtocol?
     var message: String = "Idle"
 
     init() {

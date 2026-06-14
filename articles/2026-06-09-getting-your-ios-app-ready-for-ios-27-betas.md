@@ -31,7 +31,7 @@ API/tool mentioned: `#available`, `Bundle`, `UIDevice.systemVersion`.
 Example pattern (conceptual):
 
 ```swift
-@MainActor
+// An actor is already isolated; `@MainActor actor` is not a valid combination.
 actor ImageLoader {
     func loadHighResolutionImage(from url: URL) async throws -> Data {
         if #available(iOS 27, *) {
@@ -120,11 +120,13 @@ import Observation
 import Foundation
 
 actor TaskSupervisor {
-    private var tasks: [Task.Handle<Void, Never>] = []
+    // Task.detached returns a Task directly; the old `Task.Handle` / `.handle`
+    // beta spellings no longer exist.
+    private var tasks: [Task<Void, Never>] = []
     func track<T>(_ operation: @Sendable @escaping () async -> T) {
         let handle = Task.detached {
             _ = await operation()
-        }.handle
+        }
         tasks.append(handle)
     }
     func cancelAll() {

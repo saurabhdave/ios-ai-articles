@@ -8,19 +8,21 @@ System-driven suggestion and routing can dramatically increase how often your ap
 
 Treat `AppIntent` integration as a product migration: reduce ambiguity with typed parameters, instrument parsing and execution signals, and gate rollout so you can observe and adjust without a large-scale incident. Maintain `INIntent` fallbacks during the transition to avoid breaking existing shortcuts for users on older OS versions.
 
+App Intents is also the surface Apple Intelligence and Siri use to discover and run your actions. For assistant-driven behaviors specifically, App Intents layers on assistant schemas — the `@AssistantIntent(schema:)` macro and the `AssistantSchema` domains — that map your intents onto categories the system understands. The typing, telemetry, and rollout discipline in this article is the prerequisite for adopting those schemas safely; this piece focuses on getting that foundation right rather than on any single schema.
+
 > Replace ambiguous free-form slots with typed parameters early; your telemetry will thank you.
 
 ## 2. App Intent Export Surface And Fallbacks
 
 ### Export Surface And When To Use Catch-All Versus Dedicated Types
-`AppIntent` types influence how the system indexes and suggests actions, and the `@Parameter` shapes coercion. Choose a single catch-all `AppIntent` when you control upstream prompts and need polymorphism; choose small, dedicated `AppIntent` types when you need predictable parsing and lower operational risk. Choose `String` with validation when you truly need arbitrary user prose; choose typed parameters such as `UUID`, `Date`, `URL`, or enums when your domain has structured identifiers or finite choices.
+`AppIntent` types influence how the system indexes and suggests actions, and the `@Parameter` shapes coercion. Choose a single catch-all `AppIntent` when you control upstream prompts and need polymorphism; choose small, dedicated `AppIntent` types when you need predictable parsing and lower operational risk. Choose `String` with validation when you truly need arbitrary user prose; choose typed parameters such as `Int`, `Date`, `URL`, or enums when your domain has structured identifiers or finite choices. (`@Parameter` does not support `UUID` directly — wrap it in an `AppEntity` if you need one.)
 
 Map each `INIntent` to a corresponding `AppIntent` with explicit metadata and localized titles to control discoverability. Keep legacy `INIntent` handlers available during the transition and use a server-side feature flag to route a control cohort to legacy behavior without shipping a client rollback.
 
 ## 3. Parameter Design And Prompt Strategy
 
 ### Typed Parameters, Validation, And Prompt Titles
-Prefer `UUID`, `Date`, `URL`, and enums over free-form `String` where the domain allows. Annotate parameters with `@Parameter` and localized titles to keep system prompts predictable and reduce follow-up disambiguation. Validate coercion paths during CI and add guard clauses to fail fast when inputs cannot be coerced.
+Prefer `Int`, `Date`, `URL`, and enums over free-form `String` where the domain allows. Annotate parameters with `@Parameter` and localized titles to keep system prompts predictable and reduce follow-up disambiguation. Validate coercion paths during CI and add guard clauses to fail fast when inputs cannot be coerced.
 
 Example minimal intent:
 ```swift
@@ -28,7 +30,9 @@ import AppIntents
 
 struct SendReportIntent: AppIntent {
   static var title: LocalizedStringResource = "Send Report"
-  @Parameter(title: "Report ID") var reportID: UUID
+  // @Parameter supports Int/String/Bool/Double/Date/URL/AppEnum/AppEntity — not
+  // UUID. Use Int (or wrap the UUID in an AppEntity) for a typed identifier.
+  @Parameter(title: "Report ID") var reportID: Int
   func perform() async throws -> some IntentResult { .result() }
 }
 ```
@@ -92,17 +96,29 @@ import AppIntents
 import Observation
 import os
 
-enum SearchScope: String, Codable, Sendable {
+// An enum used as an @Parameter must conform to AppEnum, not just Codable/Sendable.
+enum SearchScope: String, AppEnum {
     case all, messages, files
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation { "Search Scope" }
+    static var caseDisplayRepresentations: [SearchScope: DisplayRepresentation] {
+        [.all: "All", .messages: "Messages", .files: "Files"]
+    }
+
     static func parse(_ raw: String) -> SearchScope? {
         let normalized = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return Self(rawValue: normalized) ?? (normalized.contains("msg") ? .messages : nil)
     }
 }
 
-@MainActor @Observable final class IntentTelemetry {
-    var parseFailures = 0
-    var executions = 0
+// An actor counter is reachable from the nonisolated intent context and from a
+// static initializer; mutate isolated state through methods, since you cannot do
+// `await x.prop += 1` across the actor boundary.
+actor IntentTelemetry {
+    private(set) var parseFailures = 0
+    private(set) var executions = 0
+    func recordExecution() { executions += 1 }
+    func recordParseFailure() { parseFailures += 1 }
 }
 
 struct SearchIntent: AppIntent {
@@ -114,14 +130,14 @@ struct SearchIntent: AppIntent {
     static let telemetry = IntentTelemetry()
 
     func perform() async throws -> some IntentResult {
-        await Self.telemetry.executions += 1
+        await Self.telemetry.recordExecution()
         guard rolloutGateEnabled() else {
             logger.log("Intent blocked by rollout gate")
             return .result()
         }
         let finalScope = scope ?? parseFallbackFromContext()
         guard let scope = finalScope else {
-            await Self.telemetry.parseFailures += 1
+            await Self.telemetry.recordParseFailure()
             logger.warning("Failed to parse scope")
             return .result()
         }

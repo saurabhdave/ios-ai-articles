@@ -26,13 +26,19 @@ import os
 
 actor LatencyTracker {
     private let log = OSLog(subsystem: "com.example.app", category: "latency")
-    private let signposter = OSSignposter(logger: OSLog(subsystem: "com.example.app", category: "signpost"))
+    // OSSignposter(logger:) takes a Logger; pass subsystem/category directly here.
+    private let signposter = OSSignposter(subsystem: "com.example.app", category: "signpost")
 
-    func beginRender(id: String) -> OSSignposter.SignpostID {
-        let idObj = signposter.makeSignpostID()
-        signposter.beginInterval("render", id: idObj, "id: %{public}s", id)
+    // beginInterval returns the OSSignpostIntervalState that endInterval requires.
+    func beginRender(id: String) -> OSSignpostIntervalState {
+        let signpostID = signposter.makeSignpostID()
+        let state = signposter.beginInterval("render", id: signpostID, "id: \(id, privacy: .public)")
         os_log("Begin render %{public}s", log: log, type: .debug, id)
-        return idObj
+        return state
+    }
+
+    func endRender(_ state: OSSignpostIntervalState) {
+        signposter.endInterval("render", state)
     }
 }
 ```
@@ -111,7 +117,7 @@ import OSLog
             await Task.yield() // keep cooperative with the scheduler
         }
         busy = false
-        signposter.endInterval(signpostState)
+        signposter.endInterval("RenderFrame", signpostState)
         logger.log("RenderFrame end")
     }
 }

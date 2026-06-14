@@ -36,14 +36,16 @@ Maintain a build-time asset pipeline step that converts textures into GPU-friend
 
 ## 3. Concurrency And Async Asset Loading
 ### Preload With Structured Concurrency And A Bounded Loader
-Anti-pattern → Preferred: launching unbounded ModelEntity.load(contentsOf:) calls from the UI can saturate memory and I/O. Implement a bounded loader that limits concurrent loads and supports cancellation and eviction.
+Anti-pattern → Preferred: launching unbounded `ModelEntity(contentsOf:)` loads from the UI can saturate memory and I/O. Implement a bounded loader that limits concurrent loads and supports cancellation and eviction.
 
 ```swift
 import RealityKit
 import Foundation
 
+// ModelEntity is MainActor-isolated, so the loader is a MainActor class, not an
+// `actor` (and `@MainActor actor` is not a valid combination).
 @MainActor
-actor BoundedModelLoader {
+final class BoundedModelLoader {
     private var cache: [URL: ModelEntity] = [:]
     private var inFlight: Set<URL> = []
     private let concurrencyLimit: Int
@@ -59,17 +61,17 @@ actor BoundedModelLoader {
         }
         inFlight.insert(url)
         defer { inFlight.remove(url) }
-        do {
-            let entity = try await ModelEntity.load(contentsOf: url)
-            cache[url] = entity
-            return entity
-        } catch {
-            throw error
-        }
+        // The async initializer is the supported loading API; the older
+        // load(contentsOf:)/loadAsync(contentsOf:) forms are deprecated.
+        let entity = try await ModelEntity(contentsOf: url)
+        cache[url] = entity
+        return entity
     }
 
     func evict(_ url: URL) {
-        cache[url]?.destroy()
+        // Remove from the scene graph so RealityKit can release backing resources,
+        // then drop the cached reference.
+        cache[url]?.removeFromParent()
         cache.removeValue(forKey: url)
     }
 }
@@ -79,17 +81,18 @@ Tune the concurrency limit according to device memory and I/O characteristics. E
 
 ## 4. Memory Management And Resource Lifecycle
 ### Explicitly Release GPU Resources
-Anti-pattern → Preferred: relying purely on ARC can leave GPU-backed textures and ModelEntity resources alive longer than intended. Call Entity.destroy() (or destroy() on replaced resources) and evict caches deterministically when appropriate.
+Anti-pattern → Preferred: relying purely on ARC can leave GPU-backed textures and ModelEntity resources alive longer than intended. RealityKit's `Entity` has no `destroy()` method; instead, remove entities from the scene graph with `removeFromParent()` and drop your cached references deterministically so RealityKit can release the backing resources.
 
 ```swift
-// Deterministic destroy before eviction
+// Remove from the scene graph, then drop the cached reference so the
+// resources can be released.
 if let model = cache[url] {
-    model.destroy()
+    model.removeFromParent()
     cache.removeValue(forKey: url)
 }
 ```
 
-When sessions are long or multiple heavy scenes can appear in a single app session, evict large assets deterministically. Allow ARC to handle short-lived objects, but evict large GPU-backed assets when they are no longer needed.
+When sessions are long or multiple heavy scenes can appear in a single app session, evict large assets deterministically. Allow ARC to handle short-lived objects, but release large GPU-backed assets when they are no longer needed.
 
 Include longer-running tests that exercise loading and eviction paths and observe resident GPU and memory usage to ensure resources are released as expected.
 
@@ -121,10 +124,10 @@ Include signpost data in CI artifact bundles and use telemetry signals to gate r
 ## Practical Checklist
 - [ ] Inventory heavy assets and convert to GPU-friendly formats (base color, metallicRoughness, compressed textures).
 - [ ] Add OSSignposter events around scene updates, asset loads, and physics steps.
-- [ ] Implement an async prefetch pipeline using a bounded loader actor with cancellation for ModelEntity.load(contentsOf:).
+- [ ] Implement an async prefetch pipeline using a bounded, MainActor-isolated loader with cancellation around `ModelEntity(contentsOf:)`.
 - [ ] Replace deep transform hierarchies with flat entity groups where transforms update frequently.
 - [ ] Add XCTest performance assertions and integrate MetricKit collection into rollout gating.
-- [ ] Implement deterministic resource eviction (call Entity.destroy() or cache eviction) and run longer-session tests on devices that represent your target fleet.
+- [ ] Implement deterministic resource eviction (`removeFromParent()` plus cache eviction) and run longer-session tests on devices that represent your target fleet.
 
 ## Closing Takeaway
 Small, deliberate changes to scene structure, asset loading, and resource eviction improve stability when using RealityKit on platforms with constrained thermal and power budgets. Use a bounded loader, bake and compress static textures, flatten hot transform paths, and instrument with OSSignposter and Instruments. Gate rollouts with on-device tests and telemetry so runtime regressions surface before they affect many users.
@@ -135,7 +138,10 @@ Small, deliberate changes to scene structure, asset loading, and resource evicti
 import SwiftUI
 import RealityKit
 
-actor AssetLoader {
+// ModelEntity loading is MainActor-isolated, so the bounded loader runs on the
+// main actor; the async initializer is the supported entry point.
+@MainActor
+final class AssetLoader {
     let maxConcurrent: Int
     private var activeLoads = 0
     init(maxConcurrent: Int = 3) { self.maxConcurrent = maxConcurrent }
@@ -143,16 +149,15 @@ actor AssetLoader {
         // Backpressure: bound concurrent loads to avoid spikes
         while activeLoads >= maxConcurrent { await Task.yield() }
         activeLoads += 1
-        defer { Task { await self.decrement() } }
-        return try await ModelEntity.loadAsync(contentsOf: url)
+        defer { activeLoads = max(0, activeLoads - 1) }
+        return try await ModelEntity(contentsOf: url)
     }
-    private func decrement() { activeLoads = max(0, activeLoads - 1) }
 }
 
 struct BoundedLoadView: View {
     @State private var entities: [ModelEntity] = []
     let urls: [URL]
-    let loader = AssetLoader(maxConcurrent: 2) // tuned for device budget
+    @State private var loader = AssetLoader(maxConcurrent: 2) // tuned for device budget
 
     var body: some View {
         VStack {
@@ -163,6 +168,7 @@ struct BoundedLoadView: View {
         }
     }
 
+    @MainActor
     func loadAll() async {
         var loaded: [ModelEntity] = []
         for url in urls {
@@ -176,8 +182,7 @@ struct BoundedLoadView: View {
                 continue
             }
         }
-        // once done, publish on main thread
-        await MainActor.run { entities = loaded }
+        entities = loaded
     }
 }
 ```

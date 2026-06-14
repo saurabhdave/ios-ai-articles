@@ -25,12 +25,13 @@ Gate diagnostic verbosity behind runtime flags and sampling so telemetry volume 
 
 ```swift
 import OSLog
-import OSSignpost
+import os
 
-let signposter = OSSignposter(logger: .init(subsystem: "com.example.app", category: "perf"))
+let signposter = OSSignposter(logger: Logger(subsystem: "com.example.app", category: "perf"))
 let id = signposter.makeSignpostID()
-signposter.beginInterval("network.request", id: id)
-signposter.endInterval("network.request", id: id)
+// beginInterval returns the state endInterval requires (there is no endInterval(id:)).
+let state = signposter.beginInterval("network.request", id: id)
+signposter.endInterval("network.request", state)
 ```
 
 ## 3. Validation, Testing, And Observability

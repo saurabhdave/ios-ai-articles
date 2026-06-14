@@ -26,13 +26,16 @@ final class NetworkSignposter {
 
     func makeID() -> OSSignpostID { signposter.makeSignpostID() }
 
-    func beginRequest(id: OSSignpostID, endpoint: String) {
-        signposter.beginInterval("Network.Fetch", id: id, "\(endpoint, privacy: .public)")
+    // beginInterval returns an interval state that endInterval requires; hand it
+    // back to the caller so the matching end can pass it through.
+    func beginRequest(id: OSSignpostID, endpoint: String) -> OSSignpostIntervalState {
+        let state = signposter.beginInterval("Network.Fetch", id: id, "endpoint: \(endpoint, privacy: .public)")
         os_log("begin Network.Fetch for %{public}s", log: log, type: .info, endpoint)
+        return state
     }
 
-    func endRequest(id: OSSignpostID, status: Int) {
-        signposter.endInterval("Network.Fetch", id: id)
+    func endRequest(_ state: OSSignpostIntervalState, status: Int) {
+        signposter.endInterval("Network.Fetch", state)
         os_log("end Network.Fetch status=%{public}d", log: log, type: .info, status)
     }
 }
@@ -92,7 +95,6 @@ import SwiftUI
 import OSLog
 
 private let networkSignposter = OSSignposter(subsystem: "com.example.app", category: "network")
-private let signpostName = "HTTP Request"
 
 struct InstrumentedNetworkView: View {
     @State private var lastDuration: TimeInterval?
@@ -111,24 +113,25 @@ struct InstrumentedNetworkView: View {
     func fetchDemo() async {
         guard let url = URL(string: "https://api.example.com/resource") else { return }
         let id = networkSignposter.makeSignpostID()
-        // Begin interval with a stable name and bounded metadata (host only)
-        networkSignposter.beginInterval(signpostName, signpostID: id, "host: %{public}s", url.host ?? "unknown")
+        // Stable StaticString name + bounded metadata (host only). beginInterval
+        // returns the state that endInterval requires.
+        let state = networkSignposter.beginInterval("HTTP Request", id: id, "host: \(url.host ?? "unknown", privacy: .public)")
         let start = Date()
         defer {
             let duration = Date().timeIntervalSince(start)
             lastDuration = duration
-            // End interval with a small, bounded payload (status or error)
-            networkSignposter.endInterval(signpostName, signpostID: id, "duration: %.3f", duration)
+            // End interval with a small, bounded payload (duration).
+            networkSignposter.endInterval("HTTP Request", state, "duration: \(duration)")
         }
 
         do {
             let (data, resp) = try await URLSession.shared.data(from: url)
             _ = data // use data in real code
             if let http = resp as? HTTPURLResponse {
-                networkSignposter.event("\(signpostName) response", "status: %d", http.statusCode)
+                networkSignposter.emitEvent("HTTP Response", id: id, "status: \(http.statusCode)")
             }
         } catch {
-            networkSignposter.event("\(signpostName) error", "err: %{public}s", String(describing: error))
+            networkSignposter.emitEvent("HTTP Error", id: id, "err: \(String(describing: error), privacy: .public)")
         }
     }
 }

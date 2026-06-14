@@ -77,7 +77,13 @@ actor TelemetryManager {
     enum Consent { case granted, revoked }
     private var consent: Consent = .granted
     private var pendingBatchURL: URL?
-    private var uploadTask: Task<Void, Never>?
+    // The upload body throws (cancellation, file reads), so the task is failable.
+    private var uploadTask: Task<Void, Error>?
+    // Stable signing key. In production, load this from the Keychain (optionally
+    // Secure Enclave-backed) so batch HMACs stay verifiable across launches —
+    // do not mint a fresh random key per upload.
+    private let signingKey: SymmetricKey
+    init(signingKey: SymmetricKey) { self.signingKey = signingKey }
     func setConsent(_ new: Consent) async {
         consent = new
         if new == .revoked {
@@ -102,14 +108,14 @@ actor TelemetryManager {
             // small delay to allow batching; cancellation respected here
             try await Task.sleep(nanoseconds: 500_000_000)
             try Task.checkCancellation()
-            guard self.consent == .granted, let url = self.pendingBatchURL else { return }
+            guard await self.consent == .granted, let url = await self.pendingBatchURL else { return }
             let data = try Data(contentsOf: url)
             var req = URLRequest(url: URL(string: "https://telemetry.example/api/upload")!)
             req.httpMethod = "POST"
             req.httpBody = data
-            // include a stable per-batch HMAC to avoid key drift joins
-            let key = SymmetricKey(size: .bits256)
-            let tag = HMAC<SHA256>.authenticationCode(for: data, using: key)
+            // HMAC computed with the stable signing key so the server can verify
+            // batches and joins are not broken by key drift.
+            let tag = HMAC<SHA256>.authenticationCode(for: data, using: self.signingKey)
             req.addValue(Data(tag).base64EncodedString(), forHTTPHeaderField: "X-Batch-HMAC")
             do {
                 let (_, resp) = try await URLSession.shared.data(for: req)

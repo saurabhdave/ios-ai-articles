@@ -87,13 +87,15 @@ import Observation
 import os
 
 @MainActor @Observable final class ShortcutInvocationLog {
+    // A main-actor singleton avoids initializing a main-actor type from the
+    // nonisolated top-level context.
+    static let shared = ShortcutInvocationLog()
     var entries: [String] = []
     func record(_ entry: String) {
         entries.append("\(Date()): \(entry)")
     }
 }
 
-let SharedShortcutLogger = ShortcutInvocationLog()
 let signposter = OSSignposter()
 let logger = Logger(subsystem: "com.example.shortcuts", category: "AppIntent")
 
@@ -109,16 +111,17 @@ struct SubmitReportIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         let signpostID = signposter.makeSignpostID()
-        signposter.beginInterval("SubmitReport", id: signpostID)
+        // beginInterval returns the state that endInterval requires.
+        let interval = signposter.beginInterval("SubmitReport", id: signpostID)
         logger.log("Shortcut invoked: SubmitReport (date: \(date), summary: \(summary))")
 
         await MainActor.run {
-            SharedShortcutLogger.record("Invoked SubmitReport — date:\(date), summary:\(summary)")
+            ShortcutInvocationLog.shared.record("Invoked SubmitReport — date:\(date), summary:\(summary)")
         }
 
         try await Task.sleep(nanoseconds: 50_000_000) // 50ms
 
-        signposter.endInterval("SubmitReport", id: signpostID)
+        signposter.endInterval("SubmitReport", interval)
         return .result()
     }
 }

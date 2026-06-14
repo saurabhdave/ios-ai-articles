@@ -23,11 +23,14 @@ Validate ownership changes behind feature flags and test cancellation and deallo
 // ❌ Before: expensive work in body causes per-frame cost
 import SwiftUI
 
+struct Model: Decodable { let title: String }
+
 struct HeavyView: View {
  var dataURL: URL
 
  var body: some View {
- let decoded = try? JSONDecoder().decode(Model.self, from: try? Data(contentsOf: dataURL))
+ let data = (try? Data(contentsOf: dataURL)) ?? Data()
+ let decoded = try? JSONDecoder().decode(Model.self, from: data)
  return Text(decoded?.title ?? "…")
  }
 }
@@ -58,8 +61,9 @@ final class ImageCache {
  private var cache: [URL: CGImage] = [:]
  func decodedImage(for url: URL) async -> CGImage? {
  if let img = cache[url] { return img }
- let (data, _) = try? await URLSession.shared.data(from: url)
- guard let ui = data.flatMap({ UIImage(data: $0) })?.cgImage else { return nil }
+ // try? on a throwing tuple yields an Optional tuple — unwrap it before use.
+ guard let (data, _) = try? await URLSession.shared.data(from: url) else { return nil }
+ guard let ui = UIImage(data: data)?.cgImage else { return nil }
  cache[url] = ui
  return ui
  }
@@ -114,15 +118,17 @@ import OSLog
     var image: Image? = nil
     private static let signposter = OSSignposter(subsystem: "com.example.app", category: "render")
     func load(from url: URL) async {
-        let state = ImageLoader.signposter.beginInterval("image-load", id: .exclusive)
+        // Each interval keeps its own state; there is no `parent:` argument and
+        // endInterval takes the state positionally, not as `state:`.
+        let loadState = ImageLoader.signposter.beginInterval("image-load")
         // Fetch off-main to avoid blocking body/layout
         let data = await fetchData(url: url)
-        ImageLoader.signposter.beginInterval("decode", parent: state)
+        let decodeState = ImageLoader.signposter.beginInterval("decode")
         // Decode on a background thread, then assign on main
         let uiImage = await Task.detached { UIImage(data: data) }.value
-        ImageLoader.signposter.endInterval("decode", state: state)
+        ImageLoader.signposter.endInterval("decode", decodeState)
         if let ui = uiImage { image = Image(uiImage: ui) }
-        ImageLoader.signposter.endInterval("image-load", state: state)
+        ImageLoader.signposter.endInterval("image-load", loadState)
     }
     private func fetchData(url: URL) async -> Data {
         (try? await URLSession.shared.data(from: url).0) ?? Data()

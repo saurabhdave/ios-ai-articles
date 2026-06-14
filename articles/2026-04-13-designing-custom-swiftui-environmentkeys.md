@@ -92,6 +92,16 @@ Choose a shim when you must preserve compatibility across a staged rollout; choo
 
 Migration shim example:
 ```swift
+import SwiftUI
+
+// Legacy and replacement value types the shim maps between.
+struct OldConfig { var mode: String }
+struct NewConfig {
+  var mode: String
+  init(mode: String) { self.mode = mode }
+  init(from old: OldConfig) { self.mode = old.mode }
+}
+
 private struct OldConfigKey: EnvironmentKey {
   static let defaultValue: OldConfig? = nil
 }
@@ -150,20 +160,17 @@ import Observation
 // A small, shared protocol to tag environment values to avoid accidental collisions.
 protocol AppEnvironmentValue { static var debugName: String { get } }
 
-// Concrete environment value — intentionally non-optional to force explicit injection.
+// Concrete environment value — a small, immutable struct.
 struct FeedScrollPolicy: AppEnvironmentValue {
     static let debugName = "com.example.feed.scrollPolicy"
     let preservesScrollOffset: Bool
 }
 
-// EnvironmentKey with no silent conservative default — using fatalError to fail fast in dev.
+// Conservative, immutable default — no fatalError and no shared mutable state, so a
+// missing injection degrades gracefully instead of trapping in production. Catch
+// missing injections with the CI smoke tests described above rather than a crash.
 private struct FeedScrollPolicyKey: EnvironmentKey {
-    static var defaultValue: FeedScrollPolicy {
-        fatalError("""
-        FeedScrollPolicy not injected. \
-        Provide one with .injectFeedScrollPolicy(...) at an appropriate ancestor.
-        """)
-    }
+    static let defaultValue = FeedScrollPolicy(preservesScrollOffset: false)
 }
 
 extension EnvironmentValues {

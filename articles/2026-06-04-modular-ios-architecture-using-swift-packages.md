@@ -9,7 +9,7 @@ Exposed ABI surface causes problems when refactors change symbols or when mixed-
 
 ## 1. Module Boundaries And Public API Design
 ### Define a Narrow Public Surface
-Choose `internal` visibility by default when you are iterating quickly on behavior; choose a small, reviewed public facade when multiple apps or teams depend on a stable contract. Use `@_implementationOnly` for implementation dependencies you do not want in the ABI and require an API-stability review before making a type or function `public`.
+Choose `internal` visibility by default when you are iterating quickly on behavior; choose a small, reviewed public facade when multiple apps or teams depend on a stable contract. Use an `internal import` (the Swift 6 access-level import that supersedes the deprecated `@_implementationOnly`) for implementation dependencies you do not want in the ABI, and require an API-stability review before making a type or function `public`.
 
 Add CI checks that validate intended changes to the public surface and validate public contract changes with package-scoped `XCTest` suites. Stage rollouts behind runtime feature flags so clients can opt in from a small cohort first. Treat every public change as a compatibility decision and include automated checks in CI that exercise the public surface.
 
@@ -17,7 +17,7 @@ Example facade that hides private helpers and keeps a dependency out of the ABI:
 
 ```swift
 import Foundation
-@_implementationOnly import CryptoKit
+internal import CryptoKit
 
 public struct AuthToken: Sendable, Codable {
     public let token: String
@@ -29,8 +29,11 @@ public struct AuthToken: Sendable, Codable {
     }
 
     public func signedRepresentation() -> String? {
-        // Implementation uses CryptoKit, but CryptoKit is @_implementationOnly
-        return try? JSONEncoder().encode(self).base64EncodedString()
+        // Implementation uses CryptoKit, but the `internal import` keeps CryptoKit
+        // out of this module's public ABI.
+        guard let data = try? JSONEncoder().encode(self) else { return nil }
+        let digest = SHA256.hash(data: data)
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 }
 ```
@@ -63,7 +66,8 @@ func testAsyncSequenceCompletes() async throws {
         }
     }
 
-    wait(for: [expectation], timeout: 5.0)
+    // In an async test, await fulfillment; wait(for:timeout:) is marked noasync.
+    await fulfillment(of: [expectation], timeout: 5.0)
 }
 ```
 

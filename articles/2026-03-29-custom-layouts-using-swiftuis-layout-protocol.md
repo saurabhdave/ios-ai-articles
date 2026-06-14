@@ -20,7 +20,10 @@ Example compact `Layout` pattern demonstrating a minimal `Cache` and measurement
 ```swift
 struct TwoColLayout: Layout {
  typealias Cache = [CGSize]
- func sizeThatFits(_ proposal: ProposedViewSize, subviews: Subviews, cache: inout Cache) -> CGSize {
+ // A non-Void Cache requires makeCache(subviews:); the protocol method is
+ // labeled sizeThatFits(proposal:...), not sizeThatFits(_:...).
+ func makeCache(subviews: Subviews) -> Cache { [] }
+ func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Cache) -> CGSize {
  cache = subviews.map { $0.sizeThatFits(.init(width: proposal.width.map { $0/2 }, height: nil)) }
  return CGSize(width: proposal.width ?? 800, height: cache.map { $0.height }.max() ?? 0)
  }
