@@ -101,6 +101,7 @@ After the hard rules, the gate runs an OpenAI-powered review of Swift code block
 |----------------------|---------|-------------|
 | `OPENAI_API_KEY` | _(none)_ | Repository secret. If absent the check is silently skipped. |
 | `CODE_REVIEW_ENABLED` | `true` | Set to `false` to disable the check without removing the secret. |
+| `CODE_REVIEW_MODEL` | `gpt-5` | OpenAI model for the review. GPT-5/o-series automatically run without the `temperature` override. At this repo's volume the cost is a few cents/month for any model. |
 
 ### Swift compile gate (`scripts/swift_typecheck.py`)
 

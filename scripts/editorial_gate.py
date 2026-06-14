@@ -92,6 +92,20 @@ BIG_STORY_SECTION = "### This Week's Big Story"
 OUTPUTS_DIR = os.path.join(REPO_ROOT, "outputs")
 CODE_REVIEW_LOG = os.path.join(OUTPUTS_DIR, "code_review_log.json")
 
+# Model for the advisory code-logic review. Configurable so the model can be
+# upgraded without a code change (and without hardcoding a name that may not exist
+# on a given account). A stronger model catches more of the data-race / wrong-
+# @Bindable / misleading-pattern issues that swiftc and the regex guard cannot.
+# At this repo's volume the OpenAI cost is a few cents/month for any of these, so
+# the default favors review quality; override with the CODE_REVIEW_MODEL env var.
+CODE_REVIEW_MODEL = os.getenv("CODE_REVIEW_MODEL", "gpt-5")
+
+
+def _is_reasoning_model(name: str) -> bool:
+    """GPT-5 / o-series reject temperature != 1; detect them so we omit it."""
+    n = name.lower()
+    return n.startswith(("o1", "o3", "o4", "gpt-5"))
+
 CODE_REVIEW_SYSTEM_PROMPT = """\
 You are a Swift 6 code reviewer. Review the following Swift code block from a technical article.
 
@@ -601,15 +615,19 @@ def review_code_logic(slugs: list[str], openai_client) -> None:
 
         for block in blocks:
             try:
-                response = openai_client.chat.completions.create(
-                    model="gpt-4o-mini",
+                create_kwargs = dict(
+                    model=CODE_REVIEW_MODEL,
                     messages=[
                         {"role": "system", "content": CODE_REVIEW_SYSTEM_PROMPT},
                         {"role": "user", "content": block},
                     ],
                     response_format={"type": "json_object"},
-                    temperature=0,
                 )
+                # Reasoning models (gpt-5*, o-series) only accept the default
+                # temperature; classic chat models benefit from deterministic 0.
+                if not _is_reasoning_model(CODE_REVIEW_MODEL):
+                    create_kwargs["temperature"] = 0
+                response = openai_client.chat.completions.create(**create_kwargs)
                 raw = response.choices[0].message.content.strip()
                 result = json.loads(raw)
             except Exception as exc:
