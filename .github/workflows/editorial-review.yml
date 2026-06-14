@@ -59,6 +59,9 @@ jobs:
           git add -A
           git diff --cached --quiet || (
             git commit -m "editorial: sync content repo"
+            # Rebase onto any concurrent pushes (e.g. a writer-pipeline publish)
+            # so the gate's removal commit doesn't fail on a non-fast-forward.
+            git pull --rebase --autostash origin main || true
             git push
           )
 

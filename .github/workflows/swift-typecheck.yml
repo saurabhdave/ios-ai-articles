@@ -27,6 +27,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so --changed can diff the push range.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -39,8 +42,19 @@ jobs:
           echo "macOS SDK:   $(xcrun --sdk macosx --show-sdk-path)"
           echo "watchOS SDK: $(xcrun --sdk watchsimulator --show-sdk-path)"
 
+      # On push, only check the articles in the diff (fast + cheaper on macOS).
+      # Manual dispatch checks everything (full audit). Results also go to the
+      # GitHub job summary via $GITHUB_STEP_SUMMARY.
       - name: Typecheck Swift code blocks
-        run: python scripts/swift_typecheck.py articles/
+        env:
+          GATE_DIFF_BEFORE: ${{ github.event.before }}
+          GATE_DIFF_AFTER: ${{ github.sha }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python scripts/swift_typecheck.py articles/
+          else
+            python scripts/swift_typecheck.py --changed
+          fi
 
       # Optional stricter pass (actor isolation / Swift 6 mode). Non-blocking:
       # surfaces mode-sensitive concurrency findings without failing the job.

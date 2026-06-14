@@ -336,6 +336,38 @@ def typecheck_block(block: str, target: SDKTarget) -> tuple[list[str], list[str]
     return hard, concurrency, dropped
 
 
+def _git_changed_md(base: str, head: str) -> list[str] | None:
+    """Changed articles/ .md files in base..head, or None if a diff is unavailable."""
+    if not head or not base or re.fullmatch(r"0+", base):
+        return None
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", REPO_ROOT, "diff", "--name-only", f"{base}..{head}"],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return None
+    files = [
+        os.path.join(REPO_ROOT, p) for p in out.splitlines()
+        if p.startswith("articles/") and p.endswith(".md")
+    ]
+    return [f for f in files if os.path.exists(f)]
+
+
+def changed_files() -> list[str] | None:
+    """Resolve changed articles from the push diff (GATE_DIFF_*) or the last commit.
+
+    Returns a list (possibly empty when nothing changed) or None when no diff
+    could be resolved (caller should fall back to checking everything).
+    """
+    base = os.getenv("GATE_DIFF_BEFORE", "").strip()
+    head = os.getenv("GATE_DIFF_AFTER", "").strip() or "HEAD"
+    result = _git_changed_md(base, head)
+    if result is None:
+        result = _git_changed_md("HEAD~1", "HEAD")
+    return result
+
+
 def collect_files(args_files: list[str]) -> list[str]:
     if args_files:
         out: list[str] = []
@@ -371,6 +403,9 @@ def main() -> int:
                     help="Also fail on actor-isolation / global-mutable-state diagnostics "
                          "(off by default since they are mode-sensitive, not the hallucination "
                          "class this gate targets).")
+    ap.add_argument("--changed", action="store_true",
+                    help="Only check articles changed in the push diff (GATE_DIFF_BEFORE/AFTER) "
+                         "or the last commit; falls back to all when no diff is resolvable.")
     args = ap.parse_args()
 
     if args.swift6:
@@ -380,7 +415,18 @@ def main() -> int:
         print("swift_typecheck: xcrun/swiftc not available (needs macOS + Xcode); skipping.")
         return 2
 
-    files = collect_files(args.files)
+    if args.changed and not args.files:
+        changed = changed_files()
+        if changed is None:
+            print("swift_typecheck: --changed could not resolve a diff; checking all.")
+            files = collect_files([])
+        elif not changed:
+            print("swift_typecheck: no changed articles to check.")
+            return 0
+        else:
+            files = changed
+    else:
+        files = collect_files(args.files)
     if not files:
         print("swift_typecheck: no markdown files found.")
         return 2
@@ -389,6 +435,7 @@ def main() -> int:
     skipped = 0
     failing = 0
     concurrency_only = 0
+    fail_details: list[tuple[str, list[str]]] = []  # (label, hard error lines)
 
     for path in files:
         with open(path, encoding="utf-8") as fh:
@@ -409,6 +456,8 @@ def main() -> int:
             fail_here = bool(hard) or (args.strict_concurrency and bool(conc))
             if fail_here:
                 failing += 1
+                shown = hard + ([f"[concurrency] {c}" for c in conc] if args.strict_concurrency else [])
+                fail_details.append((label, shown))
                 print(f"FAIL  {label}")
                 for line in hard:
                     print(f"        {line}")
@@ -426,10 +475,35 @@ def main() -> int:
                 print(f"PASS  {label}"
                       + (f"  ({len(dropped)} stub diags ignored)" if dropped else ""))
 
-    print(f"\nChecked {total_blocks} block(s) across {len(files)} file(s): "
-          f"{failing} failure(s), {concurrency_only} with concurrency warnings, "
-          f"{skipped} illustrative skipped.")
+    summary = (
+        f"Checked {total_blocks} block(s) across {len(files)} file(s): "
+        f"{failing} failure(s), {concurrency_only} with concurrency warnings, "
+        f"{skipped} illustrative skipped."
+    )
+    print(f"\n{summary}")
+    _write_github_summary(summary, fail_details)
     return 1 if failing else 0
+
+
+def _write_github_summary(summary: str, fail_details: list[tuple[str, list[str]]]) -> None:
+    """Append a markdown report to the GitHub Actions job summary, if running in CI."""
+    path = os.getenv("GITHUB_STEP_SUMMARY")
+    if not path:
+        return
+    lines = ["## Swift type-check", "", summary, ""]
+    if fail_details:
+        lines.append("### Failures")
+        for label, errs in fail_details:
+            lines.append(f"- **{label}**")
+            for e in errs:
+                lines.append(f"  - `{e}`")
+    else:
+        lines.append("✅ No compile failures.")
+    try:
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
+    except OSError:
+        pass
 
 
 if __name__ == "__main__":
