@@ -50,6 +50,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-06-18 | [Update Sign in with Apple Domains Without Breaking Login](articles/2026-06-18-update-sign-in-with-apple-domains-without-breaking-login.md) | [Post](linkedin/2026-06-18-update-sign-in-with-apple-domains-without-breaking-login-linkedin.md) |
 | 2026-06-15 | [NavigationStack Patterns for visionOS](articles/2026-06-15-navigationstack-patterns-for-visionos.md) | [Post](linkedin/2026-06-15-navigationstack-patterns-for-visionos-linkedin.md) |
 | 2026-06-12 | [Xcode 27 Tooling Updates From WWDC 2026](articles/2026-06-12-xcode-27-tooling-updates-from-wwdc-2026.md) | [Post](linkedin/2026-06-12-xcode-27-tooling-updates-from-wwdc-2026-linkedin.md) |
 | 2026-06-12 | [What the WWDC 2026 Keynote Means for iOS Teams](articles/2026-06-12-what-the-wwdc-2026-keynote-means-for-ios-teams.md) | [Post](linkedin/2026-06-12-what-the-wwdc-2026-keynote-means-for-ios-teams-linkedin.md) |
@@ -59,9 +60,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-06-11 | [Scalable Dynamic Type in SwiftUI](articles/2026-06-11-scalable-dynamic-type-in-swiftui.md) | [Post](linkedin/2026-06-11-scalable-dynamic-type-in-swiftui-linkedin.md) |
 | 2026-06-09 | [Getting Your iOS App Ready for iOS 27 Betas](articles/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas.md) | [Post](linkedin/2026-06-09-getting-your-ios-app-ready-for-ios-27-betas-linkedin.md) |
 | 2026-06-08 | [Structured Concurrency Patterns for iOS Networking](articles/2026-06-08-structured-concurrency-patterns-for-ios-networking.md) | [Post](linkedin/2026-06-08-structured-concurrency-patterns-for-ios-networking-linkedin.md) |
-| 2026-06-04 | [Modular iOS Architecture Using Swift Packages](articles/2026-06-04-modular-ios-architecture-using-swift-packages.md) | [Post](linkedin/2026-06-04-modular-ios-architecture-using-swift-packages-linkedin.md) |
 
-> Showing 10 of 31 articles — [21 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 32 articles — [22 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
