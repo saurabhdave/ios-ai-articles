@@ -1,0 +1,9 @@
+{
+  "topic": "Update Sign in with Apple Domains Without Breaking Login",
+  "generated_at_utc": "2026-06-18T12:59:28.159604+00:00",
+  "path": "direct",
+  "repair_attempts": 0,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[compile]"
+}

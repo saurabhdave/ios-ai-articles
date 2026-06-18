@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #46</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #46</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #46</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Auth is quiet until it isn’t: more teams are changing domains, adding CDNs, or rebranding, and Sign in with Apple is the tripwire. The bugs aren’t Swift; they’re mismatched redirect URLs, AASA mistakes, and identity mapping that breaks returning users. Let’s fix what actually burns you in production.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Update Sign in with Apple Domains Without Breaking Login</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Domain changes for Sign in with Apple look like DNS chores until they lock real users out. Miss a trailing slash on a redirect, swap a Service ID, or publish a bad AASA file and your logs fill with “canceled” errors while returning customers cannot get back in. The fix isn’t clever Swift; it’s a cautious migration plan that preserves identity and keeps both domains alive long enough to prove th...</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Swift at Apple: Migrating the TrueType hinting interpreter to Swift signals continued confidence in Swift for performance-critical subsystems, not just app code. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">“Hide My Email is about to be useless” is making the rounds; treat this as a nudge to re-check assumptions around email domains and login flows rather than panic. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Tim Cook suggests price pressure from memory chips; if device ASPs rise, expect a longer tail of older OS versions in your user base—plan your minimum iOS support accordingly. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Another “what juniors must learn” post is circulating; strip the hype and focus on fundamentals that shipped and stuck (concurrency, SwiftUI interop, testing). [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+import AuthenticationServices
+import Observation
+
+@MainActor
+@Observable
+final class AppleSignInCoordinator: NSObject, ASWebAuthenticationPresentationContextProviding {
+    private let serviceID = &quot;com.example.web&quot; // Service ID (web)
+    private let primaryDomain = URL(string: &quot;https://auth.new.example.com&quot;)!
+    private let legacyDomains: Set&lt;String&gt; = [&quot;auth.old.example.com&quot;, &quot;auth.new.example.com&quot;]
+    private let callbackScheme = &quot;myapp&quot; // keep custom-scheme working during UL cutover
+    private var state = UUID().uuidString
+    private var webSession: ASWebAuthenticationSession?
+
+    func beginWebSignIn() {
+        state = UUID().uuidString
+        var c = URLComponents(url: primaryDomain.appending(path: &quot;/oauth/apple/start/&quot;), resolvingAgainstBaseURL: false)!
+        c.queryItems = [
+            .init(name: &quot;client_id&quot;, value: serviceID),
+            .init(name: &quot;state&quot;, value: state),
+            .init(name: &quot;redirect_uri&quot;, value: &quot;https://auth.new.example.com/auth/callback/&quot;) // server will also allow old host
+        ]
+        let url = c.url!
+        let s = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackScheme) { [weak self] url, error in
+            guard let self, let url else { return }
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This coordinator bakes in the real-world judgment call: keep the Service ID stable, run dual domains, and preserve a custom-scheme callback so you can canary universal link changes without stranding existing accounts.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.theverge.com/tech/942854/apple-vehicle-motion-cues-review-really-work" style="color:#e05c00;text-decoration:none">Apple&amp;#x27;s weird anti-nausea dots cured my car sickness</a></strong> — If motion cues work at scale, re-evaluate motion-heavy UI in CarPlay and transit contexts.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://arseniyshestakov.com/2026/06/16/apple-is-about-to-make-hide-my-email-useless/" style="color:#e05c00;text-decoration:none">Apple is about to make Hide My Email useless</a></strong> — Treat it as a prompt to harden email routing rules and avoid domain-specific whitelists.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.bbc.com/news/articles/c3wyxvqdx1zo" style="color:#e05c00;text-decoration:none">Apple boss Tim Cook says prices to rise due to memory chip costs</a></strong> — Higher device costs could extend older hardware lifetimes; keep perf budgets honest on mid-tier devices.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you’re touching auth domains this quarter, read the full piece and ship a migration, not a gamble. I’d love to hear how you’re gating the redirect flip—feature flag, staged DNS, or both—hit reply or join the LinkedIn thread and share your playbook. Forward this to the teammate who owns your AASA and redirect config before your next deploy window.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
