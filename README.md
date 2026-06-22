@@ -16,8 +16,19 @@ RSS feed available at **[saurabhdave.github.io/ios-ai-articles/feed.xml](https:/
 
 ```bash
 bundle install
+# Optional: populate the portfolio cards locally (CI does this automatically)
+GH_TOKEN=$(gh auth token) python scripts/fetch_github_profile.py
 bundle exec jekyll serve
 ```
+
+### Portfolio
+
+Alongside the articles, the site has an **[About](https://saurabhdave.github.io/ios-ai-articles/about/)** page (bio, experience, skills, education, certifications, contact) and a **[Projects](https://saurabhdave.github.io/ios-ai-articles/projects/)** page (open-source Swift packages, apps, and tooling). These use a hybrid data model:
+
+- **Auto-synced** — `scripts/fetch_github_profile.py` pulls the GitHub profile and **pinned repos** (GraphQL) into `_data/github_profile.json` at build time. The file is gitignored and regenerated on each deploy (and weekly via `jekyll.yml`'s `schedule`).
+- **Curated overlay** — `_data/profile.yml` holds the prose the API can't provide: headline, summary, skills, experience, education, certifications, contact links, and per-project editorial overrides. Edit this file to change the About/Projects copy.
+
+The pages degrade gracefully if the synced file is missing, so a failed fetch never blocks a deploy.
 
 ## Structure
 
@@ -26,11 +37,12 @@ articles/     Full long-form articles — source of truth, pushed by the writer 
 linkedin/     LinkedIn-optimized posts (~1,700 chars) for each article
 codegen/      Swift code generation metadata (compilation results, diagnostics)
 newsletter/   Weekly iOS Dev Weekly newsletter — Markdown + email-safe HTML per issue
-scripts/      editorial_gate.py  — quality gate (see below)
-              swift_lint.py      — regex guard for never-valid Swift APIs (ubuntu)
-              swift_typecheck.py — compiles every Swift block via swiftc (macOS)
-              update_readme.py   — auto-updates this table
-              prep_jekyll.py     — bridges articles/ to Jekyll _posts/
+scripts/      editorial_gate.py        — quality gate (see below)
+              swift_lint.py            — regex guard for never-valid Swift APIs (ubuntu)
+              swift_typecheck.py       — compiles every Swift block via swiftc (macOS)
+              update_readme.py         — auto-updates this table
+              prep_jekyll.py           — bridges articles/ to Jekyll _posts/
+              fetch_github_profile.py  — syncs GitHub profile + pinned repos for the portfolio pages
 ```
 
 All content files share a date-prefixed naming convention:
@@ -115,7 +127,7 @@ It is **stub-tolerant**: illustrative snippets reference undefined helper symbol
 |----------|---------|--------------|
 | `editorial-review.yml` | Push to `articles/**`, `newsletter/**`, `codegen/**`, `linkedin/**` | Runs editorial gate (incl. the `swift_lint.py` regex guard), refreshes README, and commits any follow-up removals/docs updates |
 | `swift-typecheck.yml` | Push to `articles/**`; manual dispatch | Compiles the changed articles' Swift blocks against the real SDK on macOS (`swift_typecheck.py --changed`; manual dispatch checks all). Writes a job summary and, on failure, files/updates a **"Swift type-check failures"** GitHub issue — a backstop for anything that slips the writer's in-pipeline strip guard. Consumes macOS Actions minutes (~10× ubuntu); remove the `push` trigger to make it manual-only |
-| `jekyll.yml` | Push to `main` | Runs `prep_jekyll.py` → Jekyll build → deploys to GitHub Pages; ignores README-only bot commits |
+| `jekyll.yml` | Push to `main`; weekly cron (Mon 06:00 UTC); manual dispatch | Runs `prep_jekyll.py` → `fetch_github_profile.py` (portfolio data) → Jekyll build → deploys to GitHub Pages; ignores README-only bot commits |
 
 ## Source
 
