@@ -13,6 +13,9 @@ _posts/
 _newsletters/
 _linkedin/
 
+# Auto-synced by fetch_github_profile.py — regenerated at build time
+_data/github_profile.json
+
 # Ephemeral gate outputs — not committed
 outputs/
 

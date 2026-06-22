@@ -1,0 +1,61 @@
+---
+layout: default
+title: Projects
+permalink: /projects/
+description: "Open-source Swift packages, AI apps, and developer tooling built by Saurabh Dave."
+---
+{%- assign gh = site.data.github_profile -%}
+{%- assign p = site.data.profile -%}
+
+<section class="wrap portfolio">
+  <header class="page-head">
+    <span class="page-kicker">Projects</span>
+    <h1 class="page-title">Things I've built</h1>
+    <p class="page-desc">A mix of open-source Swift packages, shipped iOS apps, and the tooling I build along the way — pulled live from GitHub.</p>
+  </header>
+
+  {%- if gh.pinned and gh.pinned.size > 0 -%}
+  <div class="project-grid reveal">
+    {%- if p.project_order and p.project_order.size > 0 -%}
+      {%- comment -%} curated order first {%- endcomment -%}
+      {%- for name in p.project_order -%}
+        {%- for repo in gh.pinned -%}
+          {%- if repo.name == name -%}{% include project-card.html repo=repo overrides=p.project_overrides %}{%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+      {%- comment -%} then any pinned repos not in the curated order {%- endcomment -%}
+      {%- for repo in gh.pinned -%}
+        {%- unless p.project_order contains repo.name -%}{% include project-card.html repo=repo overrides=p.project_overrides %}{%- endunless -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for repo in gh.pinned -%}{% include project-card.html repo=repo overrides=p.project_overrides %}{%- endfor -%}
+    {%- endif -%}
+  </div>
+  {%- else -%}
+  <p class="page-desc">Project data is synced at build time. View everything on
+    <a class="u-link" href="https://github.com/saurabhdave" target="_blank" rel="noopener">GitHub</a>.</p>
+  {%- endif -%}
+
+  {%- if p.building and p.building.size > 0 -%}
+  <section class="building reveal">
+    <div class="section-head"><div class="left"><h2>Currently building</h2></div></div>
+    <div class="project-grid">
+      {%- for item in p.building -%}
+      <article class="project-card">
+        <div class="project-card-top">
+          <h3 class="project-name">{{ item.name }}</h3>
+        </div>
+        {%- if item.blurb -%}<p class="project-blurb">{{ item.blurb }}</p>{%- endif -%}
+        {%- if item.language -%}
+        <div class="project-foot"><span class="lang">{{ item.language }}</span></div>
+        {%- endif -%}
+      </article>
+      {%- endfor -%}
+    </div>
+  </section>
+  {%- endif -%}
+
+  <p class="projects-more">
+    <a class="u-link" href="{{ gh.html_url | default: 'https://github.com/saurabhdave' }}" target="_blank" rel="noopener">More on GitHub &rarr;</a>
+  </p>
+</section>

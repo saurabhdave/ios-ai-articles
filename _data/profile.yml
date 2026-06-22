@@ -1,0 +1,119 @@
+# ---------------------------------------------------------------------------
+# Curated portfolio overlay (hand-edited, committed).
+#
+# Structured facts (profile fields, pinned repos, stars, languages) are synced
+# automatically into _data/github_profile.json by scripts/fetch_github_profile.py.
+# THIS file carries the narrative the GitHub API can't give: headline, summary,
+# skills taxonomy, contact, and per-project editorial overrides.
+# Read in templates as site.data.profile.*
+# ---------------------------------------------------------------------------
+
+name: Saurabh Dave
+headline: "Senior iOS engineer — 11+ years in Swift & SwiftUI, now building where iOS meets AI"
+tagline: "Ship clean Swift. Embrace AI. Keep learning."
+
+# Current role (employer/city intentionally not published).
+current_role: "Senior iOS Engineer"
+
+summary: |
+  I build iOS apps that hold up in production. Over 11+ years I've shipped
+  software for payments, banking, telecom, and wearables — apps where a dropped
+  frame or a flaky network call is a real problem, not a cosmetic one. My work
+  tends to live in the architecture and the details: modular SwiftUI and UIKit
+  codebases, clean networking and concurrency, and tests that actually catch
+  regressions. On recent teams that's added up to calmer releases — roughly
+  25% faster, 30% fewer UI defects, and 35% more test coverage.
+
+  Lately I spend most of my time where iOS meets AI: on-device intelligence with
+  Core ML, and small Swift packages that make OpenAI and Anthropic streaming
+  painless to adopt. This site is part of that work — deep Swift and SwiftUI
+  writing for senior engineers, twice a week.
+
+# Skills are grouped; each group renders as a labelled row of chips.
+skills:
+  - group: Languages & UI
+    items: [Swift, Objective-C, SwiftUI, UIKit, Combine, RxSwift, Core Data, WidgetKit]
+  - group: Architecture & Concurrency
+    items: [MVVM, Coordinator, Modular Architecture, Dependency Injection, Async/Await, GCD]
+  - group: AI / ML
+    items: [Core ML, ARKit, Vision, OpenAI, Anthropic]
+  - group: Testing & Delivery
+    items: [XCTest, XCUITest, "CI/CD (Jenkins, Fastlane)", Instruments, Accessibility, Agile/Scrum]
+
+# Professional experience (concise — one impact line per role; full detail on the résumé).
+experience:
+  - company: "Infosys"
+    title: "Technology Lead / Senior iOS Developer"
+    dates: "Feb 2023 – Present"
+    impact: "Leading the team's move to SwiftUI — about 30% fewer UI defects and 25% snappier screens — while lifting automated test coverage roughly 35% with XCTest/XCUITest."
+  - company: "Mobiquity Softech"
+    title: "Senior iOS Developer"
+    dates: "Sep 2021 – Nov 2022"
+    impact: "Shipped secure mobile banking for Bank of the Philippine Islands, hardening the app until crashes fell around 20%."
+  - company: "AT&T Global Business Services"
+    title: "Senior Application Developer"
+    dates: "2018 – 2021"
+    impact: "Built enterprise mobile apps and stood up the CI/CD pipelines that made their releases predictable."
+  - company: "Hug Innovations (Titan Company)"
+    title: "Senior iOS Developer"
+    dates: "2017 – 2018"
+    impact: "Built BLE-connected wearable apps — real-time device sync designed to stay reliable when the connection isn't."
+  - company: "ATMECS Technologies"
+    title: "Software Engineer"
+    dates: "2014 – 2017"
+    impact: "Where I started: building and shipping 100+ iOS apps across a wide range of client projects."
+
+# Education & certifications (confirmed by Saurabh).
+education:
+  - school: "C-DAC (Centre for Development of Advanced Computing)"
+    detail: "P.G. Diploma, Wireless & Mobile Computing (PG-DWiMC) · 2013–2014"
+  - school: "Visvesvaraya Technological University"
+    detail: "B.E., Electronics & Communications Engineering · 2008–2012"
+# Curated subset of the LinkedIn certs — strongest / most relevant first.
+# Omitted as too entry-level for a senior profile: Introduction to Generative AI
+# (Google), Google Analytics for Beginners, Azure Data Fundamentals, Scrum
+# Fundamentals (SFC). Add any back here if you want them shown.
+certifications:
+  - name: "Claude Code in Action"
+    issuer: "Anthropic · 2026"
+  - name: "McKinsey.org Forward Program"
+    issuer: "McKinsey & Company · 2025"
+  - name: "AWS Certified Solutions Architect – Associate"
+    issuer: "Amazon Web Services · 2021"
+  - name: "Microsoft Certified: Azure Developer Associate"
+    issuer: "Microsoft · 2021"
+  - name: "Microsoft Certified: Azure AI Fundamentals"
+    issuer: "Microsoft · 2021"
+  - name: "Backbase Mobile Developer"
+    issuer: "Backbase · 2021"
+
+# Contact / hire-me. Edit or remove any line — email is published publicly.
+open_to: "Open to senior iOS roles and selective consulting — especially teams pushing Swift and on-device AI."
+contact:
+  email: "sdsaurabhdave@gmail.com"
+  linkedin: "https://www.linkedin.com/in/sdsaurabhdave"
+  github: "https://github.com/saurabhdave"
+
+# Display order for the synced pinned repos (by repo name). Repos not listed
+# here fall to the end in their GitHub-pinned order.
+project_order: [KrishnaGPT, SDOpenAIClientKit, aiagents, ios-ai-articles]
+
+# Optional per-repo editorial overrides (keyed by repo name) — better prose than the raw GitHub descriptions.
+project_overrides:
+  KrishnaGPT:
+    blurb: "An iOS app that answers life's questions through the lens of the Bhagavad Gita — conversational AI with a calm, considered point of view."
+  SDOpenAIClientKit:
+    blurb: "A lightweight Swift package for the OpenAI Responses API — streaming, multi-turn memory, and retries, with almost no ceremony."
+  aiagents:
+    blurb: "AI-driven skills for Apple-platform engineers — accessibility, performance, and architecture help that meets you inside your codebase."
+  ios-ai-articles:
+    blurb: "This site — Swift & SwiftUI articles for senior iOS engineers, auto-generated from live trend signals and editorially gated, twice a week."
+
+# Featured work that isn't a public pinned repo (rendered in its own section).
+building:
+  - name: "AIChatSupport SDK"
+    blurb: "Drop-in SwiftUI AI chat for any app — zero dependencies, with OpenAI and Anthropic streaming built in."
+    language: "Swift"
+  - name: "AIAnalyticsKit"
+    blurb: "On-device behavioral analytics and AI personalization for iOS and macOS — insight without sending user data off the device."
+    language: "Swift"

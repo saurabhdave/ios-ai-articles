@@ -6,6 +6,8 @@ on:
     paths-ignore:
       - "README.md"
       - "CLAUDE.md"
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC — refresh portfolio GitHub data
   workflow_dispatch:
 
 permissions:
@@ -29,6 +31,11 @@ jobs:
 
       - name: Prepare Jekyll posts from articles/
         run: python scripts/prep_jekyll.py
+
+      - name: Sync GitHub profile + pinned repos (portfolio)
+        run: python scripts/fetch_github_profile.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: ruby/setup-ruby@v1
         with:

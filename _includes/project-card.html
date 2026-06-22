@@ -1,0 +1,40 @@
+{%- comment -%}
+  Renders one project card from a synced pinned repo.
+  Params:
+    include.repo       — a node from site.data.github_profile.pinned
+    include.overrides  — site.data.profile.project_overrides (optional hash)
+{%- endcomment -%}
+{%- assign repo = include.repo -%}
+{%- assign ov = include.overrides[repo.name] -%}
+{%- assign blurb = ov.blurb | default: repo.description -%}
+<article class="project-card">
+  <div class="project-card-top">
+    <h3 class="project-name"><a href="{{ repo.url }}" target="_blank" rel="noopener">{{ repo.name }}</a></h3>
+    {%- if repo.stars and repo.stars > 0 -%}
+    <span class="project-stars" aria-label="{{ repo.stars }} GitHub stars">
+      <svg class="star-ico" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      {{ repo.stars }}
+    </span>
+    {%- endif -%}
+  </div>
+  {%- if blurb -%}<p class="project-blurb">{{ blurb }}</p>{%- endif -%}
+  {%- if repo.topics and repo.topics.size > 0 -%}
+  <div class="chips">
+    {%- for t in repo.topics limit: 4 -%}<span class="chip-static sm">{{ t }}</span>{%- endfor -%}
+  </div>
+  {%- endif -%}
+  <div class="project-foot">
+    {%- if repo.language -%}
+    <span class="lang">
+      {%- if repo.language_color -%}<span class="lang-dot" style="background: {{ repo.language_color }}"></span>{%- endif -%}
+      {{ repo.language }}
+    </span>
+    {%- endif -%}
+    <span class="project-links">
+      <a href="{{ repo.url }}" target="_blank" rel="noopener">Code</a>
+      {%- if repo.homepage and repo.homepage != "" and repo.homepage != repo.url -%}
+      <a href="{{ repo.homepage }}" target="_blank" rel="noopener">Live</a>
+      {%- endif -%}
+    </span>
+  </div>
+</article>
