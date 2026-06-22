@@ -208,3 +208,24 @@
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
 })();
+
+/* ===================================================================
+   Scroll reveal (portfolio sections) — progressive, reduced-motion safe.
+   CSS only hides .reveal when html.js is set AND motion is allowed, so
+   content is never stuck hidden without JS or with reduced-motion.
+   =================================================================== */
+(function () {
+  var els = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (!els.length) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce || !("IntersectionObserver" in window)) {
+    els.forEach(function (el) { el.classList.add("is-visible"); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); }
+    });
+  }, { rootMargin: "0px 0px -10% 0px", threshold: 0.05 });
+  els.forEach(function (el) { io.observe(el); });
+})();

@@ -8,7 +8,7 @@
 
   <!-- Set theme before paint to avoid a flash -->
   <script>
-    (function(){var s=localStorage.getItem('theme');var d=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.setAttribute('data-theme',s||d);})();
+    (function(){var s=localStorage.getItem('theme');var d=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.setAttribute('data-theme',s||d);document.documentElement.classList.add('js');})();
   </script>
 
   {%- assign asset_v = site.github.build_revision | default: site.time | date: '%s' -%}
@@ -23,6 +23,7 @@
   {% feed_meta %}
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="nav" id="nav">
     <a href="{{ '/' | relative_url }}" class="nav-brand">
       <span class="nav-logo">{{ site.title }}</span>
@@ -30,9 +31,8 @@
     </a>
     <nav class="nav-links">
       <a href="{{ '/#articles' | relative_url }}">Articles</a>
-      <a class="nav-wwdc" href="{{ '/wwdc/' | relative_url }}">WWDC</a>
-      <a href="{{ '/posts/' | relative_url }}">Posts</a>
-      <a href="{{ '/newsletter/' | relative_url }}">Newsletter</a>
+      <a href="{{ '/projects/' | relative_url }}"{% if page.url contains '/projects' %} class="active" aria-current="page"{% endif %}>Projects</a>
+      <a href="{{ '/about/' | relative_url }}"{% if page.url contains '/about' %} class="active" aria-current="page"{% endif %}>About</a>
       <a class="subscribe" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
     </nav>
     <div class="nav-right">
@@ -48,20 +48,19 @@
 
   <div class="mobile-overlay" id="mobileOverlay">
     <a href="{{ '/#articles' | relative_url }}">Articles</a>
-    <a class="nav-wwdc" href="{{ '/wwdc/' | relative_url }}">WWDC</a>
-    <a href="{{ '/posts/' | relative_url }}">Posts</a>
-    <a href="{{ '/newsletter/' | relative_url }}">Newsletter</a>
+    <a href="{{ '/projects/' | relative_url }}"{% if page.url contains '/projects' %} class="active"{% endif %}>Projects</a>
+    <a href="{{ '/about/' | relative_url }}"{% if page.url contains '/about' %} class="active"{% endif %}>About</a>
     <a class="subscribe" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe</a>
   </div>
 
-  <main class="main">
+  <main class="main" id="main">
     {{ content }}
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
       <p class="footer-text">Curated by <a href="https://www.linkedin.com/in/sdsaurabhdave" target="_blank" rel="noopener">Saurabh Dave</a> &middot; Swift &middot; SwiftUI &middot; Apple Platform</p>
-      <p class="footer-text">Swift &amp; SwiftUI engineering, twice a week.</p>
+      <p class="footer-text"><a href="{{ '/#articles' | relative_url }}">Articles</a> &middot; <a href="{{ '/wwdc/' | relative_url }}">WWDC</a> &middot; <a href="{{ '/newsletter/' | relative_url }}">Newsletter</a> &middot; <a href="{{ '/posts/' | relative_url }}">Posts</a> &middot; <a href="{{ '/projects/' | relative_url }}">Projects</a> &middot; <a href="{{ '/about/' | relative_url }}">About</a></p>
     </div>
   </footer>
 
