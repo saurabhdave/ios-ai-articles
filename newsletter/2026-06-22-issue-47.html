@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #47</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #47</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #47</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">App Intents are finally showing up in real products, and the glossy demos don’t cover the mess when Shortcuts, Siri, and Spotlight each run your code differently. Teams are quietly discovering that “works in the app” doesn’t mean “works in the host,” especially when defaults, entity queries, and response rendering race each other. This week: getting deterministic about which process you’re actually debugging and why your dialog text drifts.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Debugging App Intents Responses in Xcode</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Shortcuts shows the wrong dialog, your AppEntity icon is blank, and logs insist everything is fine because they’re attached to the wrong process. The fix starts with attaching to the host at launch, instrumenting with signposts, and letting displayRepresentation drive UI text and icons across all surfaces. If your response copy “migrates” between Shortcuts and Siri, this piece breaks down the timing traps and how to make intent runs boringly consistent.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">UHF X11 for visionOS hints at a serious tinkering wave: devs are pushing legacy UI into new form factors to test input models and latency constraints. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Ember, an open-source native iOS Hacker News reader focused on accessibility, shows the bar rising for VoiceOver-first navigation in feed apps. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple detailing the TrueType hinting interpreter migration to Swift underscores Swift’s expanding role in performance-sensitive, system-adjacent code. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Articles praising SwiftData’s declarative model changes suggest teams are actively shedding manual state notifications, with cleaner persistence pipelines as the payoff. [Source: dev.to]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+import AppIntents
+import OSLog
+
+struct MyItem: AppEntity, Identifiable, Hashable, Codable {
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: &quot;Item&quot;)
+    static var defaultQuery = MyItemQuery()
+    let id: UUID
+    let name: String
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: LocalizedStringResource(stringLiteral: name))
+    }
+}
+
+struct MyItemQuery: EntityQuery {
+    static let log = Logger(subsystem: &quot;com.example.intents&quot;, category: &quot;EntityQuery&quot;)
+    static let signposter = OSSignposter(subsystem: &quot;com.example.intents&quot;, category: &quot;EntityQuery&quot;)
+
+    func suggestedEntities() async throws -&gt; [MyItem] {
+        let interval = Self.signposter.beginInterval(&quot;suggestedEntities&quot;)
+        defer { Self.signposter.endInterval(&quot;suggestedEntities&quot;, interval) }
+        Self.log.info(&quot;Host: \(ProcessInfo.processInfo.processName, privacy: .public) suggesting defaults&quot;)
+        return [MyItem(id: UUID(), name: &quot;Fallback&quot;)]
+    }
+
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern bakes determinism into App Intents by making the host explicit in logs and timing with signposts, so you debug the process the user actually experiences—not the one you wish you attached to.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.lispm.net/apps/uhf-x11/" style="color:#e05c00;text-decoration:none">UHF X11: X11 Built for VisionOS and Apple Vision Pro</a></strong> — A clever bridge that stresses input and windowing on visionOS; useful for thinking about latency and pointer semantics before you ship.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/DatanoiseTV/ember-hackernews" style="color:#e05c00;text-decoration:none">Show HN: Ember, a native iOS Hacker News reader I built around accessibility</a></strong> — A solid reference for VoiceOver and dynamic type in a real feed app; worth skimming the navigation and focus handling.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/tyler_hackbart_0929384/goodbye-manual-state-notifications-hello-swiftdata-3lf9" style="color:#e05c00;text-decoration:none">Goodbye, Manual State Notifications. Hello SwiftData</a></strong> — Early field notes that mirror what teams are reporting: fewer hand-rolled observers, simpler mental model.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If App Intents are giving you “works here, not there” vibes, the Big Story walks through a setup that makes host mismatches obvious and response text stable. Read it, try the attach-at-launch flow, then hit reply with what your signposts revealed—or jump into the LinkedIn thread and share your setup. And if this helped, forward to a teammate who’s knee-deep in Shortcuts right now.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
