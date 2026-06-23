@@ -21,3 +21,9 @@
   src: url('../fonts/sourceserif4-400i.woff2') format('woff2');
   font-weight: 400; font-style: italic; font-display: swap;
 }
+/* Space Grotesk (OFL) → sci-fi/techy hero headline (used on the home page only). */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../fonts/space-grotesk.woff2') format('woff2');
+  font-weight: 300 700; font-style: normal; font-display: swap;
+}

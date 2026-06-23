@@ -14,6 +14,7 @@
   {%- assign asset_v = site.github.build_revision | default: site.time | date: '%s' -%}
   <!-- Self-hosted signature faces (no third-party request) -->
   <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/geist.woff2' | relative_url }}" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/space-grotesk.woff2' | relative_url }}" crossorigin>
   <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}?v={{ asset_v }}">
 
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ asset_v }}">

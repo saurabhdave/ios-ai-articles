@@ -9,6 +9,7 @@
 {%- assign asset_v = site.github.build_revision | default: site.time | date: '%s' -%}
 <!-- Signature display type (self-hosted, no third-party request) -->
 <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/geist.woff2' | relative_url }}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/space-grotesk.woff2' | relative_url }}" crossorigin>
 <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}?v={{ asset_v }}" />
 <link rel="stylesheet" href="{{ '/assets/css/subscribe.css' | relative_url }}?v={{ asset_v }}" />
 
@@ -33,6 +34,8 @@
     --muted: #635d4f;          /* AA (>=4.5:1) on both paper and paper-2 surfaces */
     --hair: rgba(22, 19, 13, 0.14);
     --accent: #f05138;          /* swift orange, used sparingly */
+    --data: #2563eb;            /* cool "data" accent — HUD ticks/eyebrows */
+    --scanline: #16130d;
     --row-hover: rgba(22, 19, 13, 0.035);
     --band-bg: #16130d;
     --band-fg: #ece9e2;
@@ -44,7 +47,7 @@
     --hero-overlay: linear-gradient(100deg, rgba(236,233,226,0.94) 0%, rgba(236,233,226,0.66) 26%, rgba(236,233,226,0) 58%);
     --nav-hero-scrim: linear-gradient(to bottom, rgba(236,233,226,0.72), rgba(236,233,226,0));
     --hero-cue-shadow: 0 1px 12px rgba(236,233,226,0.9);
-    --video-filter: contrast(1.02) saturate(1.02);
+    --hero-spot: rgba(255,255,255,0.55);
   }
   [data-theme="dark"] {
     --paper: #15130e;
@@ -53,6 +56,8 @@
     --muted: #9d9582;
     --hair: rgba(236, 231, 219, 0.14);
     --accent: #ff6a4d;
+    --data: #5fd0ff;
+    --scanline: #e9ebee;
     --row-hover: rgba(236, 231, 219, 0.05);
     --band-bg: #211d16;
     --band-fg: #ece7db;
@@ -64,7 +69,7 @@
     --hero-overlay: linear-gradient(100deg, rgba(8,8,10,0.82) 0%, rgba(8,8,10,0.5) 26%, rgba(8,8,10,0) 58%);
     --nav-hero-scrim: linear-gradient(to bottom, rgba(8,8,10,0.6), rgba(8,8,10,0));
     --hero-cue-shadow: 0 1px 14px rgba(0,0,0,0.75);
-    --video-filter: brightness(0.5) contrast(1.04);
+    --hero-spot: rgba(255,255,255,0.14);
   }
 
   * { box-sizing: border-box; }
@@ -94,23 +99,6 @@
 
   .font-head { font-family: var(--font-heading); }
   .font-mono { font-family: var(--font-mono); }
-
-  /* ----- Background video ----- */
-  .bg-video {
-    position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh;
-    z-index: 0; object-fit: cover; object-position: 70% center;
-    background: var(--paper);
-    filter: var(--video-filter, none);
-    transition: filter .3s ease;
-  }
-
-  /* ----- Layered parallax hero (touch) ----- */
-  .hero-parallax { position: fixed; inset: 0; z-index: 0; overflow: hidden; display: none;
-    background: var(--paper); filter: var(--video-filter, none); transition: filter .3s ease; }
-  .hero-parallax.active { display: block; }
-  .hp-layer { position: absolute; inset: -9%;
-    background-repeat: no-repeat; background-size: cover; background-position: 68% center;
-    will-change: transform; }
 
   /* ----- Navbar ----- */
   .nav {
@@ -174,22 +162,34 @@
   /* ----- Hero ----- */
   .hero {
     position: relative; z-index: 1; min-height: 100vh; min-height: 100dvh;
-    display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 0 20px 96px; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 96px 20px; overflow: hidden;
   }
   /* Fade the bottom of the video into the page so the hero hands off cleanly */
   .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 180px;
     background: linear-gradient(to bottom, transparent, var(--paper)); pointer-events: none; z-index: 2; }
-  .hero-veil { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  .hero-veil { position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: var(--hero-overlay); transition: background .3s ease; }
+  /* ----- Interactive Spline 3D hero (theme-aware; replaces the video/parallax background).
+     Container tone follows the theme tokens and the scene composites transparently,
+     so the hero matches light and dark like the rest of the site. ----- */
+  .hero-spline { position: absolute; inset: 0; z-index: 0; overflow: hidden;
+    background: radial-gradient(125% 125% at 72% 28%, var(--paper-2), var(--paper)); transition: background .3s ease; }
+  .hero-spline spline-viewer { width: 100%; height: 100%; display: block; background: transparent; }
+  /* Theme-aware spotlight that follows the cursor over the hero */
+  .hero-spotlight { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: radial-gradient(440px circle at var(--spot-x, 72%) var(--spot-y, 32%), var(--hero-spot), transparent 60%);
+    opacity: 0; transition: opacity .45s ease; }
+  .hero-spotlight.lit { opacity: 1; }
   .hero-content { position: relative; z-index: 10; max-width: 600px; }
   @media (min-width: 768px) { .hero-content { max-width: min(540px, 48%); } }
   .hero-intro { pointer-events: none; user-select: none; margin-bottom: 28px; max-width: 42ch;
     font-size: clamp(14px, 1.6vw, 16px); line-height: 1.55; font-weight: 400; letter-spacing: 0.005em;
     color: var(--fg); opacity: 0.82; text-shadow: var(--hero-cue-shadow); }
-  .hero-type { margin: 0 0 34px; color: var(--fg); font-family: var(--font-heading);
-    font-size: clamp(22px, 2.9vw, 30px); line-height: 1.28; letter-spacing: -0.015em;
-    font-weight: 500; min-height: 60px; text-shadow: var(--hero-cue-shadow); }
+  .hero-type { margin: 0 0 34px; color: var(--fg); font-family: 'Space Grotesk', var(--font-heading);
+    font-size: clamp(23px, 3vw, 32px); line-height: 1.26; letter-spacing: -0.005em;
+    font-weight: 500; min-height: 60px; text-shadow: var(--hero-cue-shadow);
+    overflow-wrap: break-word; word-break: break-word; }
 
   .pills { display: flex; flex-wrap: wrap; gap: 12px; max-width: 480px;
     opacity: 0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease; }
@@ -201,17 +201,12 @@
     transition: background-color .2s ease, color .2s ease, transform .2s ease;
   }
   .pill:hover { transform: translateY(-1px); }
-  .tilt-chip { display: inline-block; margin-top: 14px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--fg); background: transparent; border: 1px solid var(--fg); border-radius: 999px; padding: 7px 14px; cursor: pointer; opacity: .8; transition: opacity .2s ease; }
-  .tilt-chip:hover { opacity: 1; }
   .pill-solid { background: #fff; color: #000; border: 1px solid rgba(0, 0, 0, 0.1); }
   .pill-solid:hover { background: #000; color: #fff; }
   .pill-outline { background: transparent; color: var(--fg); border: 1px solid var(--fg); gap: 8px; }
   .pill-outline:hover { background: var(--fg); color: var(--paper); }
   /* WWDC accent: the one dark pill in the row — inverse of pill-solid,
      reusing its hover palette so it stays inside the mono system. */
-  .pill-wwdc { background: #16130d; color: #f3efe6; border: 1px solid rgba(22, 19, 13, 0.2); }
-  [data-theme="dark"] .pill-wwdc { border-color: rgba(255, 255, 255, 0.85); }
-  .pill-wwdc:hover { background: #fff; color: #000; border-color: rgba(0, 0, 0, 0.1); }
   /* Liquid-glass secondaries: frosted blur only works over the hero video,
      so the treatment stays scoped to this pill row. Theme-aware tint; the
      solid-ish rgba fallback keeps contrast without backdrop-filter. */
@@ -248,8 +243,9 @@
   .featured { padding: 80px 20px 48px; scroll-margin-top: 96px; }
   .featured-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 24px; border-bottom: 1px solid var(--hair); }
   .featured-link { display: block; padding-top: 32px; text-decoration: none; }
-  .featured-topic { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
-  .featured-title { font-family: var(--font-heading); font-size: clamp(32px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.02em; color: var(--ink); max-width: 16ch; margin: 0; }
+  .featured-topic { font-family: var(--font-mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--data); margin-bottom: 16px; }
+  .featured-topic::before { content: "// "; opacity: .65; }
+  .featured-title { font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(32px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.02em; color: var(--ink); max-width: 16ch; margin: 0; }
   .featured-excerpt { margin: 24px 0 0; max-width: 60ch; color: var(--muted); font-size: clamp(17px, 2.2vw, 21px); line-height: 1.5; }
   .featured-foot { margin-top: 28px; display: flex; align-items: center; gap: 16px; }
   .featured-foot .read { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
@@ -259,7 +255,7 @@
   .index { padding: 0 20px 80px; }
   .index-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--hair); }
   .index-head-left { display: flex; align-items: baseline; gap: 12px; }
-  .index-title { font-family: var(--font-heading); font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.01em; white-space: nowrap; color: var(--ink); margin: 0; }
+  .index-title { font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.01em; white-space: nowrap; color: var(--ink); margin: 0; }
   .index-count { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
   .index-search { font-family: var(--font-mono); font-size: 16px; min-height: 44px; padding: 10px 14px; border-radius: 9999px;
     width: 100%; background: var(--paper-2); border: 1px solid var(--hair); color: var(--ink); }
@@ -360,6 +356,60 @@
     .cursor { display: none; }
   }
 
+  /* ----- "Console" sci-fi identity (matches main.css; home is standalone) ----- */
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, var(--scanline) 0 1px, transparent 1px 3px);
+    opacity: .045;
+  }
+  .featured-link { position: relative; }
+  .featured-link::before, .featured-link::after {
+    content: ""; position: absolute; width: 12px; height: 12px; pointer-events: none; opacity: .6;
+  }
+  .featured-link::before { top: 18px; left: -2px; border-top: 1px solid var(--data); border-left: 1px solid var(--data); }
+  .featured-link::after { bottom: -2px; right: -2px; border-bottom: 1px solid var(--data); border-right: 1px solid var(--data); }
+  @media (prefers-reduced-motion: reduce) { body::after { display: none; } }
+
+  /* ----- Trust band ("why trust it") ----- */
+  .trust { position: relative; z-index: 1; padding: 64px 20px; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+  @media (min-width: 640px) { .trust { padding: 80px 32px; } }
+  @media (min-width: 768px) { .trust { padding: 84px 40px; } }
+  .trust .label { color: var(--data); }
+  .trust-title { font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(26px, 4vw, 40px); letter-spacing: -0.02em; line-height: 1.08; margin: 14px 0 0; color: var(--ink); }
+  .trust-lede { margin: 14px 0 0; max-width: 62ch; color: var(--muted); font-size: clamp(16px, 2vw, 18px); line-height: 1.6; }
+  .trust-grid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-top: 34px; }
+  @media (min-width: 760px) { .trust-grid { grid-template-columns: repeat(3, 1fr); gap: 30px; } }
+  .trust-item { border-top: 1px solid var(--hair); padding-top: 16px; }
+  .trust-k { font-family: var(--font-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .trust-item p { margin: 8px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+  .trust-covered { margin: 30px 0 0; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+  .trust-covered b { color: var(--ink); font-weight: 500; }
+
+  /* ----- Author strip ("who's behind it") ----- */
+  .author-strip { position: relative; z-index: 1; padding: 48px 20px; }
+  @media (min-width: 768px) { .author-strip { padding: 56px 40px; } }
+  .author-inner { max-width: 1080px; margin: 0 auto; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .author-ava { width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--hair); flex: none; }
+  .author-text .label { color: var(--data); }
+  .author-line { margin: 8px 0 0; max-width: 72ch; color: var(--ink); font-size: 16px; line-height: 1.6; }
+  .author-line strong { font-weight: 600; }
+  .author-link { display: inline-block; margin-top: 10px; font-family: var(--font-mono); font-size: 13px; }
+
+  /* ----- Hero: byline + proof bar ----- */
+  .hero-byline { margin: 18px 0 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+  .hero-byline strong { color: var(--fg); font-weight: 600; }
+  .hero-byline-sub { color: var(--muted); }
+  .hero-byline a { color: var(--fg); text-decoration: underline; text-underline-offset: 2px; }
+  /* Hero proof bar (scannable credibility under the CTAs) */
+  .hero-proof { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 24px 0 0; padding: 0; }
+  .hero-proof li { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+  .hero-proof b { font-family: 'Space Grotesk', var(--font-heading); font-weight: 600; font-size: 15px; color: var(--fg); margin-right: 3px; }
+
+  /* ----- Newsletter benefits ----- */
+  .nl-benefits { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 10px; }
+  .nl-benefits li { position: relative; padding-left: 22px; font-size: 14.5px; color: var(--muted); line-height: 1.4; }
+  .nl-benefits li::before { content: "\203A"; position: absolute; left: 5px; color: var(--data); font-family: var(--font-mono); }
+
   /* Subscribe modal styles: assets/css/subscribe.css (loaded in head). */
 </style>
 </head>
@@ -376,22 +426,13 @@
 {%- capture topics_raw -%}{%- for post in main_posts -%}{{ site.data.article_topics[post.slug] | default: post.topic | default: "iOS" }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}{%- endcapture -%}
 {%- assign topic_list = topics_raw | split: "," | uniq | sort -%}
 
-<!-- Hero background. Desktop (mouse): scrubbed video. Touch: layered parallax
-     (subject cut out on-device with Vision, background inpainted) driven by tilt + scroll. -->
-<video class="bg-video" id="bgVideo" aria-hidden="true"
-  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4"
-  muted playsinline preload="none"></video>
-<div class="hero-parallax" id="heroParallax" aria-hidden="true"
-     data-bg="{{ '/assets/images/hero-bg.jpg' | relative_url }}"
-     data-fg="{{ '/assets/images/hero-fg.png' | relative_url }}">
-  <div class="hp-layer hp-bg"></div>
-  <div class="hp-layer hp-fg"></div>
-</div>
+<!-- Hero background is now an interactive Spline 3D scene, injected into
+     .hero-spline inside the hero section by the loader script below. -->
 
 <!-- Navbar -->
 <header class="nav" id="nav">
   <a href="#top" class="nav-brand">
-    <span class="nav-logo">{{ site.title | default: "iOS AI Articles" }}</span>
+    <span class="nav-logo">{{ site.title | default: "The iOS Desk" }}</span>
     <span class="nav-star">&#10035;&#65038;</span>
   </a>
   <nav class="nav-links">
@@ -420,29 +461,27 @@
 
 <!-- Hero -->
 <section class="hero" id="top">
-  <h1 class="sr-only">{{ site.title | default: "iOS AI Articles" }} — Swift &amp; SwiftUI engineering for senior iOS developers</h1>
+  <h1 class="sr-only">{{ site.title | default: "The iOS Desk" }} — Swift &amp; SwiftUI engineering for senior iOS developers</h1>
+  <div class="hero-spline" id="heroSpline" aria-hidden="true"
+       data-scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"></div>
   <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-spotlight" id="heroSpotlight" aria-hidden="true"></div>
   <div class="hero-content">
     <div class="hero-intro">
-      Hey there &mdash; welcome to the iOS Dev AI desk.<br />
-      Deep Swift &amp; SwiftUI engineering, published twice a week.
+      New, in-depth articles twice a week &mdash; for senior iOS engineers.
     </div>
     <p class="hero-type"><span id="typed"></span><span class="cursor" id="cursor"></span></p>
     <div class="pills" id="pills">
       <a class="pill pill-solid" href="{{ featured.url | relative_url }}">Read the latest article</a>
-      {%- if wwdc_posts.size > 0 -%}
-      {%- assign latest_wwdc_year = wwdc_posts.first.date | date: "%Y" -%}
-      <a class="pill pill-wwdc" href="{{ '/wwdc/' | relative_url }}">WWDC {{ latest_wwdc_year }} coverage &rarr;</a>
-      {%- endif -%}
-      <a class="pill pill-glass" href="{{ '/newsletter/' | relative_url }}">Read the newsletter</a>
-      <a class="pill pill-glass" data-subscribe href="{{ '/feed.xml' | relative_url }}">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <circle cx="6.18" cy="17.82" r="2.18"/>
-          <path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/>
-        </svg>
-        <span>Subscribe via RSS</span>
-      </a>
+      <a class="pill pill-glass" data-subscribe href="{{ '/feed.xml' | relative_url }}">Subscribe &mdash; free</a>
     </div>
+    <ul class="hero-proof">
+      <li><b>11+</b> yrs experience</li>
+      <li><b>{{ site.posts | size }}</b> articles</li>
+      <li><b>2&times;</b> weekly</li>
+    </ul>
+    <p class="hero-byline">By <strong>Saurabh Dave</strong><br>
+      <span class="hero-byline-sub">Senior iOS engineer &middot; Banking &middot; Payments &middot; Telecom &middot; AI &middot; <a href="{{ '/about/' | relative_url }}">About</a></span></p>
   </div>
   <a href="#articles" class="scroll-cue">
     <span class="label">Scroll to explore</span>
@@ -451,6 +490,21 @@
 </section>
 
 <main class="content" id="main">
+  <!-- Why trust it -->
+  <section class="trust">
+    <div class="wrap">
+      <span class="label">// Why trust it</span>
+      <h2 class="trust-title">AI-drafted. Engineer-validated.</h2>
+      <p class="trust-lede">Most AI dev content ships hallucinated APIs. Here, every Swift sample is compiled against the real SDK before it goes out &mdash; so what you copy actually builds.</p>
+      <div class="trust-grid">
+        <div class="trust-item"><span class="trust-k">SDK-compiled</span><p>Every Swift snippet compiles against the real iOS, macOS &amp; watchOS SDK before it publishes.</p></div>
+        <div class="trust-item"><span class="trust-k">Gate-checked</span><p>Editorial gates strip deprecated and never-valid APIs &mdash; no copy-paste landmines.</p></div>
+        <div class="trust-item"><span class="trust-k">Senior-curated</span><p>Operated by a senior iOS engineer with 11+ years shipping production apps.</p></div>
+      </div>
+      <p class="trust-covered">Covered: <b>Architecture &middot; Concurrency &middot; SwiftUI &middot; Performance &middot; Testing &middot; WWDC &middot; Apple Intelligence</b></p>
+    </div>
+  </section>
+
   <!-- Featured -->
   {% if featured %}
   <section class="featured" id="articles">
@@ -525,6 +579,19 @@
   {% assign sorted_newsletters = site.newsletters | sort: 'date' | reverse %}
   {% if sorted_newsletters.size > 0 %}
   {% assign latest_nl = sorted_newsletters.first %}
+  <!-- Who's behind it -->
+  {%- assign gh = site.data.github_profile -%}
+  <section class="author-strip">
+    <div class="wrap author-inner">
+      {%- if gh.avatar_url -%}<img class="author-ava" src="{{ gh.avatar_url }}" alt="Saurabh Dave" width="64" height="64" loading="lazy">{%- endif -%}
+      <div class="author-text">
+        <span class="label">// Who's behind it</span>
+        <p class="author-line"><strong>Saurabh Dave</strong> &mdash; senior iOS engineer building banking, payments, telecom, and AI-powered applications for 11+ years (AT&amp;T, Infosys, Titan). 100+ iOS apps shipped, plus open-source Swift packages on GitHub.</p>
+        <p class="author-link"><a class="u-link" href="{{ '/about/' | relative_url }}">About the author &rarr;</a> &middot; <a class="u-link" href="{{ '/projects/' | relative_url }}">See projects &rarr;</a></p>
+      </div>
+    </div>
+  </section>
+
   <section class="newsletter" id="newsletter">
     <div class="wrap">
       <div class="newsletter-head">
@@ -535,9 +602,15 @@
         <div>
           <h2 class="newsletter-title">iOS Dev Weekly, in your reader.</h2>
           <p class="newsletter-desc">
-            Every issue distills the week&rsquo;s Swift &amp; SwiftUI engineering into one focused read.
-            Subscribe via any RSS reader &mdash; Reeder, NetNewsWire, Feedly.
+            Free, every week. Each issue distills the week&rsquo;s Swift &amp; SwiftUI engineering into one
+            focused read &mdash; subscribe in any RSS reader (Reeder, NetNewsWire, Feedly).
           </p>
+          <ul class="nl-benefits">
+            <li>2 senior-level iOS deep-dives a week</li>
+            <li>Swift 6, SwiftUI &amp; concurrency patterns</li>
+            <li>AI on iOS &mdash; Apple Intelligence &amp; Foundation Models</li>
+            <li>Production-ready, SDK-compiled code</li>
+          </ul>
         </div>
         <div class="newsletter-actions">
           <a href="{{ latest_nl.url | relative_url }}" class="nl-btn nl-primary">
@@ -558,7 +631,7 @@
       <div class="footer-grid">
         <div>
           <div class="footer-brand">
-            <span class="footer-logo">{{ site.title | default: "iOS AI Articles" }}</span>
+            <span class="footer-logo">{{ site.title | default: "The iOS Desk" }}</span>
             <span class="footer-star">&#10035;&#65038;</span>
           </div>
           <p class="footer-desc">Real-world iOS engineering articles &mdash; generated from live trend signals.</p>
@@ -595,92 +668,56 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- Hero background ----
-     Desktop (mouse): scrub the video by horizontal movement.
-     Touch: layered parallax still (lighter than video) driven by tilt + scroll. */
-  var SENSITIVITY = 0.8;
-  var v = document.getElementById("bgVideo");
-  var heroParallax = document.getElementById("heroParallax");
+  /* ---- Hero background: interactive Spline 3D scene ----
+     WebGL is heavy, so only load it on a real pointer + wide viewport, with
+     motion allowed and no data-saver. Otherwise the dark gradient on
+     .hero-spline stands in (mobile / reduced-motion / slow connections). */
+  var heroSpline = document.getElementById("heroSpline");
   var finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var wideEnough = window.matchMedia && window.matchMedia("(min-width: 768px)").matches;
   var saveData = navigator.connection && navigator.connection.saveData;
-
-  if (finePointer && !reduceMotion && v && !saveData) {
-    /* Desktop with a mouse: scrub the video (first frame shows at rest). */
-    v.preload = "auto"; v.load();
-    var state = { prevX: null, targetTime: 0, seeking: false };
-    var seekNext = function () {
-      if (Math.abs(v.currentTime - state.targetTime) > 0.01) v.currentTime = state.targetTime;
-      else state.seeking = false;
+  if (heroSpline && finePointer && wideEnough && !reduceMotion && !saveData) {
+    var sv = document.createElement("script");
+    sv.type = "module";
+    sv.src = "https://unpkg.com/@splinetool/viewer@1/build/spline-viewer.js";
+    document.head.appendChild(sv);
+    var viewer = document.createElement("spline-viewer");
+    viewer.setAttribute("url", heroSpline.getAttribute("data-scene"));
+    heroSpline.appendChild(viewer);
+    heroSpline.classList.add("active");
+    /* Remove the free-tier "Built with Spline" badge from the viewer's shadow DOM. */
+    var killBadge = function () {
+      var root = viewer.shadowRoot;
+      if (!root) return false;
+      var logo = root.querySelector("#logo");
+      if (logo) { logo.remove(); return true; }
+      return false;
     };
-    v.addEventListener("seeked", seekNext);
-    window.addEventListener("mousemove", function (e) {
-      var duration = v.duration;
-      if (!duration || isNaN(duration)) { state.prevX = e.clientX; return; }
-      if (state.prevX === null) { state.prevX = e.clientX; state.targetTime = v.currentTime || 0; return; }
-      var delta = e.clientX - state.prevX;
-      state.prevX = e.clientX;
-      var t = state.targetTime + (delta / window.innerWidth) * SENSITIVITY * duration;
-      t = Math.max(0, Math.min(duration, t));
-      state.targetTime = t;
-      if (!state.seeking) { state.seeking = true; v.currentTime = t; }
+    viewer.addEventListener("load", killBadge);
+    var bt = 0, bi = setInterval(function () { if (killBadge() || ++bt > 25) clearInterval(bi); }, 150);
+  }
+
+  /* ---- Hero spotlight: theme-aware light that tracks the cursor (desktop, motion on) ---- */
+  var heroSpot = document.getElementById("heroSpotlight");
+  var heroEl = document.getElementById("top");
+  if (heroSpot && heroEl && finePointer && !reduceMotion) {
+    var spotRAF = null, sx = 0, sy = 0;
+    var paintSpot = function () {
+      heroSpot.style.setProperty("--spot-x", sx + "px");
+      heroSpot.style.setProperty("--spot-y", sy + "px");
+      spotRAF = null;
+    };
+    heroEl.addEventListener("mousemove", function (e) {
+      var r = heroEl.getBoundingClientRect();
+      sx = e.clientX - r.left; sy = e.clientY - r.top;
+      heroSpot.classList.add("lit");
+      if (!spotRAF) spotRAF = requestAnimationFrame(paintSpot);
     });
-  } else if (heroParallax) {
-    /* Touch / no-mouse / reduced-motion: layered depth parallax (no video download). */
-    if (v && v.parentNode) v.parentNode.removeChild(v);
-    var bgEl = heroParallax.querySelector(".hp-bg");
-    var fgEl = heroParallax.querySelector(".hp-fg");
-    bgEl.style.backgroundImage = "url('" + heroParallax.getAttribute("data-bg") + "')";
-    fgEl.style.backgroundImage = "url('" + heroParallax.getAttribute("data-fg") + "')";
-    heroParallax.classList.add("active");
-
-    if (!reduceMotion) {
-      var tX = 0, tY = 0, cX = 0, cY = 0, raf = null;   // targets + eased current (-1..1)
-      var render = function () {
-        cX += (tX - cX) * 0.12; cY += (tY - cY) * 0.12;
-        bgEl.style.transform = "translate3d(" + (cX * -10).toFixed(2) + "px," + (cY * -8).toFixed(2) + "px,0) scale(1.04)";
-        fgEl.style.transform = "translate3d(" + (cX * 22).toFixed(2) + "px," + (cY * 18).toFixed(2) + "px,0) scale(1.07)";
-        raf = (Math.abs(tX - cX) > 0.0008 || Math.abs(tY - cY) > 0.0008) ? requestAnimationFrame(render) : null;
-      };
-      var kick = function () { if (!raf) raf = requestAnimationFrame(render); };
-      var clamp = function (n) { return Math.max(-1, Math.min(1, n)); };
-
-      /* Scroll → vertical depth (always available, no permission). */
-      window.addEventListener("scroll", function () {
-        tY = clamp((window.scrollY / Math.max(1, window.innerHeight)) * 1.4 - 0.2);
-        kick();
-      }, { passive: true });
-
-      /* Tilt → horizontal depth only (scroll owns vertical, so they never fight). */
-      var onTilt = function (e) {
-        if (e.gamma == null) return;
-        tX = clamp((e.gamma || 0) / 26);
-        kick();
-      };
-      var DOE = window.DeviceOrientationEvent;
-      if (DOE && typeof DOE.requestPermission === "function") {
-        /* iOS 13+: gyroscope needs explicit consent. Offer a dismissible opt-in
-           chip instead of a surprise permission dialog. Scroll depth works regardless. */
-        var hc = document.querySelector(".hero-content");
-        if (hc) {
-          var chip = document.createElement("button");
-          chip.type = "button";
-          chip.className = "tilt-chip";
-          chip.textContent = "Enable 3D tilt";
-          hc.appendChild(chip);
-          chip.addEventListener("click", function () {
-            DOE.requestPermission().then(function (s) {
-              if (s === "granted") window.addEventListener("deviceorientation", onTilt);
-            }).catch(function () {}).finally(function () { chip.remove(); });
-          });
-        }
-      } else if (DOE) {
-        window.addEventListener("deviceorientation", onTilt);
-      }
-    }
+    heroEl.addEventListener("mouseleave", function () { heroSpot.classList.remove("lit"); });
   }
 
   /* ---- Typewriter ---- */
-  var HEADLINE = "Glad you stopped in. Real trend signals in, real iOS engineering out. So — what are we shipping?";
+  var HEADLINE = "Swift 6, SwiftUI & On-Device AI — Built for Production.";
   var SPEED = 38, START_DELAY = 600;
   var typed = document.getElementById("typed");
   var cursor = document.getElementById("cursor");

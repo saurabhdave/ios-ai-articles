@@ -229,3 +229,39 @@
   }, { rootMargin: "0px 0px -10% 0px", threshold: 0.05 });
   els.forEach(function (el) { io.observe(el); });
 })();
+
+/* ===================================================================
+   Hover "decryption" scramble on [data-decrypt] elements (About skill chips).
+   Desktop-hover only; skipped under reduced-motion. The real text stays as an
+   aria-label so the accessible name never scrambles.
+   =================================================================== */
+(function () {
+  var els = Array.prototype.slice.call(document.querySelectorAll("[data-decrypt]"));
+  if (!els.length) return;
+  var fine = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!fine || reduce) return;
+  var CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()";
+  els.forEach(function (el) {
+    var original = el.textContent;
+    el.setAttribute("aria-label", original);
+    var timer = null;
+    el.addEventListener("mouseenter", function () {
+      if (timer) return;
+      var frame = 0, total = original.length * 3;
+      timer = setInterval(function () {
+        var revealed = Math.floor(frame / 3), out = "";
+        for (var i = 0; i < original.length; i++) {
+          var c = original[i];
+          out += (c === " " || i < revealed) ? c : CHARS[Math.floor(Math.random() * CHARS.length)];
+        }
+        el.textContent = out;
+        if (++frame > total) { clearInterval(timer); timer = null; el.textContent = original; }
+      }, 30);
+    });
+    el.addEventListener("mouseleave", function () {
+      if (timer) { clearInterval(timer); timer = null; }
+      el.textContent = original;
+    });
+  });
+})();
