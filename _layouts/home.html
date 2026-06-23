@@ -176,6 +176,12 @@
   .hero-spline { position: absolute; inset: 0; z-index: 0; overflow: hidden;
     background: radial-gradient(125% 125% at 72% 28%, var(--paper-2), var(--paper)); transition: background .3s ease; }
   .hero-spline spline-viewer { width: 100%; height: 100%; display: block; background: transparent; }
+  /* Mobile: 3D scene fills the upper hero; content sits at the bottom over a scrim */
+  @media (max-width: 767px) {
+    .hero { justify-content: flex-end; padding: 84px 20px 48px; }
+    .hero-veil { background: linear-gradient(to top, rgba(236,233,226,0.97) 0%, rgba(236,233,226,0.72) 32%, rgba(236,233,226,0) 66%); }
+    [data-theme="dark"] .hero-veil { background: linear-gradient(to top, rgba(13,14,17,0.97) 0%, rgba(13,14,17,0.72) 32%, rgba(13,14,17,0) 66%); }
+  }
   /* Theme-aware spotlight that follows the cursor over the hero */
   .hero-spotlight { position: absolute; inset: 0; z-index: 2; pointer-events: none;
     background: radial-gradient(440px circle at var(--spot-x, 72%) var(--spot-y, 32%), var(--hero-spot), transparent 60%);
@@ -240,7 +246,7 @@
   .u-link:hover { color: var(--accent); }
 
   /* Featured */
-  .featured { padding: 80px 20px 48px; scroll-margin-top: 96px; }
+  .featured { padding: 52px 20px 36px; scroll-margin-top: 96px; }
   .featured-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 24px; border-bottom: 1px solid var(--hair); }
   .featured-link { display: block; padding-top: 32px; text-decoration: none; }
   .featured-topic { font-family: var(--font-mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--data); margin-bottom: 16px; }
@@ -252,7 +258,7 @@
   .featured-foot .cta { font-family: var(--font-mono); font-size: 14px; color: var(--ink); }
 
   /* Index */
-  .index { padding: 0 20px 80px; }
+  .index { padding: 0 20px 56px; }
   .index-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--hair); }
   .index-head-left { display: flex; align-items: baseline; gap: 12px; }
   .index-title { font-family: 'Space Grotesk', var(--font-heading); font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.01em; white-space: nowrap; color: var(--ink); margin: 0; }
@@ -282,7 +288,7 @@
   .no-results { font-family: var(--font-mono); font-size: 14px; padding: 48px 0; text-align: center; color: var(--muted); display: none; }
 
   /* Newsletter */
-  .newsletter { padding: 80px 20px; scroll-margin-top: 80px; background: var(--band-bg); color: var(--band-fg); transition: background-color .3s ease, color .3s ease; }
+  .newsletter { padding: 56px 20px; scroll-margin-top: 80px; background: var(--band-bg); color: var(--band-fg); transition: background-color .3s ease, color .3s ease; }
   .newsletter-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 32px; border-bottom: 1px solid var(--band-hair); }
   .newsletter-head span { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--band-muted); }
   .newsletter-grid { display: grid; gap: 40px; padding-top: 40px; align-items: end; }
@@ -371,7 +377,7 @@
   @media (prefers-reduced-motion: reduce) { body::after { display: none; } }
 
   /* ----- Trust band ("why trust it") ----- */
-  .trust { position: relative; z-index: 1; padding: 64px 20px; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+  .trust { position: relative; z-index: 1; padding: 48px 20px; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
   @media (min-width: 640px) { .trust { padding: 80px 32px; } }
   @media (min-width: 768px) { .trust { padding: 84px 40px; } }
   .trust .label { color: var(--data); }
@@ -386,7 +392,7 @@
   .trust-covered b { color: var(--ink); font-weight: 500; }
 
   /* ----- Author strip ("who's behind it") ----- */
-  .author-strip { position: relative; z-index: 1; padding: 48px 20px; }
+  .author-strip { position: relative; z-index: 1; padding: 40px 20px; }
   @media (min-width: 768px) { .author-strip { padding: 56px 40px; } }
   .author-inner { max-width: 1080px; margin: 0 auto; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
   .author-ava { width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--hair); flex: none; }
@@ -674,9 +680,8 @@
      .hero-spline stands in (mobile / reduced-motion / slow connections). */
   var heroSpline = document.getElementById("heroSpline");
   var finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var wideEnough = window.matchMedia && window.matchMedia("(min-width: 768px)").matches;
   var saveData = navigator.connection && navigator.connection.saveData;
-  if (heroSpline && finePointer && wideEnough && !reduceMotion && !saveData) {
+  if (heroSpline && !reduceMotion && !saveData) {
     var sv = document.createElement("script");
     sv.type = "module";
     sv.src = "https://unpkg.com/@splinetool/viewer@1/build/spline-viewer.js";
