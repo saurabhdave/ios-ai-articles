@@ -1,6 +1,6 @@
-# iOS AI Articles
+# The iOS Desk
 
-Automated technical articles for senior iOS engineers, generated 2x/week (Monday & Thursday) by the [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer) pipeline and published at **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**.
+Senior-level technical articles for iOS engineers, generated 2x/week (Monday & Thursday) by the [ios-dev-ai-writer](https://github.com/saurabhdave/ios-dev-ai-writer) pipeline and published at **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**.
 
 Topics focus on senior-level Swift and SwiftUI: architecture decisions, migration strategies, performance, and risk-aware rollout patterns.
 
@@ -8,7 +8,7 @@ Topics focus on senior-level Swift and SwiftUI: architecture decisions, migratio
 
 Live at → **[saurabhdave.github.io/ios-ai-articles](https://saurabhdave.github.io/ios-ai-articles)**
 
-Built with Jekyll (custom "Mainframe" editorial theme — warm-paper palette with full light/dark mode, self-hosted Geist + Source Serif 4 type (both OFL), and a mouse-scrubbed video hero on the homepage) and deployed to GitHub Pages via GitHub Actions on every push.
+Built with Jekyll (custom "Console" theme — full light/dark mode, self-hosted Geist + Space Grotesk + Source Serif 4 type (all OFL), and an interactive Spline 3D hero on the homepage) and deployed to GitHub Pages via GitHub Actions on every push.
 
 RSS feed available at **[saurabhdave.github.io/ios-ai-articles/feed.xml](https://saurabhdave.github.io/ios-ai-articles/feed.xml)** — works in Reeder, NetNewsWire, Feedly, and any RSS reader.
 
