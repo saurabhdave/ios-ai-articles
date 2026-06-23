@@ -38,7 +38,7 @@ description: "Saurabh Dave — senior iOS engineer with 11+ years in Swift and S
     <div class="skill-group">
       <span class="label">{{ grp.group }}</span>
       <div class="chips">
-        {%- for it in grp.items -%}<span class="chip-static">{{ it }}</span>{%- endfor -%}
+        {%- for it in grp.items -%}<span class="chip-static" data-decrypt>{{ it }}</span>{%- endfor -%}
       </div>
     </div>
     {%- endfor -%}
@@ -53,7 +53,7 @@ description: "Saurabh Dave — senior iOS engineer with 11+ years in Swift and S
       <li class="exp-item">
         <div class="exp-head">
           <h3 class="exp-title">{{ job.title }}{%- if job.company -%} <span class="exp-company">· {{ job.company }}</span>{%- endif -%}</h3>
-          {%- if job.dates -%}<span class="exp-dates">{{ job.dates }}</span>{%- endif -%}
+          {%- if job.dates -%}<span class="exp-dates">{{ job.dates }}{% if job.location %} &middot; {{ job.location }}{% endif %}</span>{%- endif -%}
         </div>
         {%- if job.impact -%}<p class="exp-impact">{{ job.impact }}</p>{%- endif -%}
       </li>

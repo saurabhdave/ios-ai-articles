@@ -21,8 +21,8 @@ summary: |
   frame or a flaky network call is a real problem, not a cosmetic one. My work
   tends to live in the architecture and the details: modular SwiftUI and UIKit
   codebases, clean networking and concurrency, and tests that actually catch
-  regressions. On recent teams that's added up to calmer releases — roughly
-  25% faster, 30% fewer UI defects, and 35% more test coverage.
+  regressions. On recent teams that's added up to calmer releases — fewer
+  regressions, faster screens, and suites that pull their weight.
 
   Lately I spend most of my time where iOS meets AI: on-device intelligence with
   Core ML, and small Swift packages that make OpenAI and Anthropic streaming
@@ -45,22 +45,27 @@ experience:
   - company: "Infosys"
     title: "Technology Lead / Senior iOS Developer"
     dates: "Feb 2023 – Present"
+    location: "USA"
     impact: "Leading the team's move to SwiftUI — about 30% fewer UI defects and 25% snappier screens — while lifting automated test coverage roughly 35% with XCTest/XCUITest."
   - company: "Mobiquity Softech"
     title: "Senior iOS Developer"
     dates: "Sep 2021 – Nov 2022"
+    location: "India"
     impact: "Shipped secure mobile banking for Bank of the Philippine Islands, hardening the app until crashes fell around 20%."
   - company: "AT&T Global Business Services"
     title: "Senior Application Developer"
     dates: "2018 – 2021"
+    location: "India"
     impact: "Built enterprise mobile apps and stood up the CI/CD pipelines that made their releases predictable."
   - company: "Hug Innovations (Titan Company)"
     title: "Senior iOS Developer"
     dates: "2017 – 2018"
+    location: "India"
     impact: "Built BLE-connected wearable apps — real-time device sync designed to stay reliable when the connection isn't."
   - company: "ATMECS Technologies"
     title: "Software Engineer"
     dates: "2014 – 2017"
+    location: "India"
     impact: "Where I started: building and shipping 100+ iOS apps across a wide range of client projects."
 
 # Education & certifications (confirmed by Saurabh).
