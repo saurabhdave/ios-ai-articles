@@ -62,6 +62,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-07-02 | [Custom SwiftUI Layouts with the Layout Protocol](articles/2026-07-02-custom-swiftui-layouts-with-the-layout-protocol.md) | [Post](linkedin/2026-07-02-custom-swiftui-layouts-with-the-layout-protocol-linkedin.md) |
 | 2026-06-25 | [OSSignposter Custom Performance Markers for iOS](articles/2026-06-25-ossignposter-custom-performance-markers-for-ios.md) | [Post](linkedin/2026-06-25-ossignposter-custom-performance-markers-for-ios-linkedin.md) |
 | 2026-06-22 | [Debugging App Intents Responses in Xcode](articles/2026-06-22-debugging-app-intents-responses-in-xcode.md) | [Post](linkedin/2026-06-22-debugging-app-intents-responses-in-xcode-linkedin.md) |
 | 2026-06-18 | [Update Sign in with Apple Domains Without Breaking Login](articles/2026-06-18-update-sign-in-with-apple-domains-without-breaking-login.md) | [Post](linkedin/2026-06-18-update-sign-in-with-apple-domains-without-breaking-login-linkedin.md) |
@@ -71,9 +72,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-06-12 | [SwiftUI Changes From WWDC 2026 Worth Adopting Now](articles/2026-06-12-swiftui-changes-from-wwdc-2026-worth-adopting-now.md) | [Post](linkedin/2026-06-12-swiftui-changes-from-wwdc-2026-worth-adopting-now-linkedin.md) |
 | 2026-06-12 | [Swift Concurrency Updates Announced at WWDC 2026](articles/2026-06-12-swift-concurrency-updates-announced-at-wwdc-2026.md) | [Post](linkedin/2026-06-12-swift-concurrency-updates-announced-at-wwdc-2026-linkedin.md) |
 | 2026-06-12 | [macOS 27 Menu Redesign Impact for Mac App Teams](articles/2026-06-12-macos-27-menu-redesign-impact-for-mac-app-teams.md) | [Post](linkedin/2026-06-12-macos-27-menu-redesign-impact-for-mac-app-teams-linkedin.md) |
-| 2026-06-11 | [Scalable Dynamic Type in SwiftUI](articles/2026-06-11-scalable-dynamic-type-in-swiftui.md) | [Post](linkedin/2026-06-11-scalable-dynamic-type-in-swiftui-linkedin.md) |
 
-> Showing 10 of 34 articles — [24 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 35 articles — [25 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
