@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #53</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #53</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #53</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">CI is green but your laptop fans are howling — that’s the day‑to‑day reality of mixed Swift/Objective‑C workspaces right now. The tooling is getting better, but header churn and implicit module builds still waste minutes on nothing changes. This week is about turning that randomness into deterministic reuse.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Speed Up Xcode Builds with Explicit Modules</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Xcode’s “Compiling Swift” spinner often hides wasted work: Clang and swiftc reparsing the same headers over and over. When modules are explicit, you prebuild them once with a stable dependency graph and reuse them across targets and schemes. If you’ve got deep umbrella headers or widely shared C/Obj‑C surfaces, this is the lever that actually moves build times — here’s how to roll it out safely.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What’s new in Swift June 2026 lands with broad ecosystem momentum, and the practical takeaway is to pin your toolchain versions if you care about stable build caches. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Threads before GCD remains a useful refresher: understanding CPU cores and OS threads clarifies why you still hit contention with “clever” queue usage. [Source: Medium]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Folks are still bridging Combine into SwiftUI to manage data flow in legacy surfaces; if you’re mid‑migration to async/await, this pattern buys time without a full rewrite. [Source: dev.to]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">DI maturity shows up in the questions you ask, not the container you pick — the community is pushing for boundary‑first design and test seams over magical resolution. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import Foundation
+@_implementationOnly import CryptoKit
+
+public enum HashAlgorithm {
+    case sha256
+}
+
+public struct ContentHasher {
+    private let algorithm: HashAlgorithm
+    public init(algorithm: HashAlgorithm = .sha256) { self.algorithm = algorithm }
+    
+    // Public surface is Foundation-only, so downstream modules do not depend on CryptoKit.
+    public func digestHex(_ data: Data) -&gt; String {
+        switch algorithm {
+        case .sha256:
+            let digest = SHA256.hash(data: data)
+            return hex(from: digest)
+        }
+    }
+    
+    // Keep helpers private to avoid leaking implementation details into the public ABI.
+    private func hex(from digest: some Sequence&lt;UInt8&gt;) -&gt; String {
+        var s = &quot;&quot;
+        s.reserveCapacity(digest.underestimatedCount * 2)
+        for b in digest {
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This shows disciplined API hygiene: constrain your public surface (Foundation‑only) and hide heavy dependencies with @_implementationOnly, which keeps downstream build graphs lighter and swap‑friendly.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://namratakhanduri.medium.com/from-cpu-core-to-swift-thread-api-understanding-thread-before-gcd-b7f709659535?source=rss------swift-5" style="color:#e05c00;text-decoration:none">From CPU core to swift Thread API: Understanding Thread before GCD</a></strong> — Ground yourself in how threads actually map to cores before you layer on concurrency abstractions.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/rahul_bandal_afe623cbf2e2/bridging-combine-and-swiftui-in-ios-apps-3b5h" style="color:#e05c00;text-decoration:none">Bridging Combine and SwiftUI in iOS Apps</a></strong> — A pragmatic bridge pattern for teams living with Combine while adopting Swift concurrency incrementally.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/@swatimishra2824/dependency-injection-questions-that-define-senior-level-thinking-43b50c72098c?source=rss------ios-5" style="color:#e05c00;text-decoration:none">Dependency Injection Questions That Define Senior-Level Thinking</a></strong> — Use these prompts to pressure‑test boundaries, lifetimes, and seams rather than debating containers.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your builds feel arbitrary, explicit modules are the knob worth turning — read the full piece and start with your leaf frameworks. I’d love to hear what flips the curve for you: hit reply or join the LinkedIn thread to share rollout wins and footguns. And if this helped, forward it to the teammate who lives in “Compiling Swift.”</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
