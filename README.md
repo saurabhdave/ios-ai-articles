@@ -62,6 +62,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-07-16 | [Speed Up Xcode Builds with Explicit Modules](articles/2026-07-16-speed-up-xcode-builds-with-explicit-modules.md) | [Post](linkedin/2026-07-16-speed-up-xcode-builds-with-explicit-modules-linkedin.md) |
 | 2026-07-13 | [Dark Mode Color Contrast Checks for SwiftUI](articles/2026-07-13-dark-mode-color-contrast-checks-for-swiftui.md) | [Post](linkedin/2026-07-13-dark-mode-color-contrast-checks-for-swiftui-linkedin.md) |
 | 2026-07-06 | [MVVM or Observable? Choosing for Production SwiftUI](articles/2026-07-06-mvvm-or-observable-choosing-for-production-swiftui.md) | [Post](linkedin/2026-07-06-mvvm-or-observable-choosing-for-production-swiftui-linkedin.md) |
 | 2026-07-02 | [Custom SwiftUI Layouts with the Layout Protocol](articles/2026-07-02-custom-swiftui-layouts-with-the-layout-protocol.md) | [Post](linkedin/2026-07-02-custom-swiftui-layouts-with-the-layout-protocol-linkedin.md) |
@@ -71,9 +72,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-06-15 | [NavigationStack Patterns for visionOS](articles/2026-06-15-navigationstack-patterns-for-visionos.md) | [Post](linkedin/2026-06-15-navigationstack-patterns-for-visionos-linkedin.md) |
 | 2026-06-12 | [Xcode 27 Tooling Updates From WWDC 2026](articles/2026-06-12-xcode-27-tooling-updates-from-wwdc-2026.md) | [Post](linkedin/2026-06-12-xcode-27-tooling-updates-from-wwdc-2026-linkedin.md) |
 | 2026-06-12 | [What the WWDC 2026 Keynote Means for iOS Teams](articles/2026-06-12-what-the-wwdc-2026-keynote-means-for-ios-teams.md) | [Post](linkedin/2026-06-12-what-the-wwdc-2026-keynote-means-for-ios-teams-linkedin.md) |
-| 2026-06-12 | [SwiftUI Changes From WWDC 2026 Worth Adopting Now](articles/2026-06-12-swiftui-changes-from-wwdc-2026-worth-adopting-now.md) | [Post](linkedin/2026-06-12-swiftui-changes-from-wwdc-2026-worth-adopting-now-linkedin.md) |
 
-> Showing 10 of 37 articles — [27 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 38 articles — [28 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
