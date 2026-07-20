@@ -1,0 +1,9 @@
+{
+  "topic": "Hunting AppKit Retain Cycles with Memory Graph",
+  "generated_at_utc": "2026-07-20T12:25:34.657529+00:00",
+  "path": "direct",
+  "repair_attempts": 0,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[compile]"
+}

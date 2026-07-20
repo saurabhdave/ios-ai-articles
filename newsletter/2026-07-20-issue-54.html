@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #54</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #54</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #54</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">macOS teams are quietly relearning that “window closed” isn’t “objects released.” AppKit happily keeps whole controller trees alive if you give it a single strong edge, and the symptoms only show up under load: scrolling hitching, caches that never empty, and slow leaks that pass smoke tests. This week is about turning Memory Graph snapshots into fixes you can trust in production.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Hunting AppKit Retain Cycles with Memory Graph</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Windows that visually dismiss but stick around are almost always one forgotten observer, timer, or closure away from a leak. Memory Graph shows you the actual owning path; the real craft is wiring predictable teardown so the same bug can’t creep back. If you’ve ever watched an NSTableView get choppy after “closing” a window, this one will pay for itself.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What’s new in Swift: June 2026 Edition — Worth a careful read for toolchain and language evolution that will impact migration plans this quarter. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">UITableView Performance Optimization Techniques — Still relevant in 2026: cell reuse, prefetching, and measuring bottlenecks before “optimizing.” [Source: dev.to]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Are conditional view modifiers a good idea in SwiftUI? — A useful lens on readability versus flexibility when conditionally composing views. [Source: Medium]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">NyaruDB2: an embedded document database for Swift — Early signals suggest a pragmatic alternative when Core Data is too heavy and SQLite too low-level. [Source: dev.to]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import AppKit
+
+final class ListViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+    private let tableView = NSTableView()
+    private var notificationToken: NSObjectProtocol?
+    private weak var refreshTimer: Timer?
+    private var items: [String] = (0..&lt;1_000).map { &quot;Row \($0)&quot; } // large data to make leaks obvious
+
+    override func loadView() {
+        let scroll = NSScrollView()
+        scroll.documentView = tableView
+        tableView.addTableColumn(NSTableColumn(identifier: .init(&quot;main&quot;)))
+        tableView.headerView = nil
+        tableView.delegate = self
+        tableView.dataSource = self
+        self.view = scroll
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        notificationToken = NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern puts the usual leak culprits on display—runloop timers and notification tokens—so you remember to design explicit teardown paths (not just deinit) and keep ownership edges visible when debugging AppKit views under load.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://wireupdates.medium.com/ios-4-23-17f22a383374?source=rss------ios-5" style="color:#e05c00;text-decoration:none">iOS 4.23</a></strong> — Skim for version notes that may affect feature flags or rollout plans.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/rahul_bandal_afe623cbf2e2/uitableview-performance-optimization-techniques-20d4" style="color:#e05c00;text-decoration:none">UITableView Performance Optimization Techniques</a></strong> — A solid checklist to revisit before blaming the network or layout engine.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/macoclock/are-conditional-view-modifiers-a-good-idea-in-swiftui-617cf9a3ba1d?source=rss------swiftui-5" style="color:#e05c00;text-decoration:none">Are conditional view modifiers a good idea in SwiftUI?</a></strong> — Handy framing for when an if/else reads cleaner than a custom ViewModifier.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your AppKit windows “close” but memory doesn’t, the Big Story walks through turning Memory Graph evidence into fixes you can regression-test. Read it, forward to the teammate who owns your table/collection adapters, and then hit reply with what you find in your graphs. I’ll keep the conversation going on LinkedIn—bring your nastiest retain-cycle war stories.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
