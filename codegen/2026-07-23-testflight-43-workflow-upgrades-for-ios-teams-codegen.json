@@ -1,9 +1,0 @@
-{
-  "topic": "TestFlight 4.3 Workflow Upgrades for iOS Teams",
-  "generated_at_utc": "2026-07-23T11:58:47.622429+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[compile] /var/folders/8j/sfr9qqcj73j4p6nhwcfpr0th0000gn/T/tmpo24a68mg/Snippet.swift:39:57: error: extra argument 'state' in call\n/var/folders/8j/sfr9qqcj73j4p6nhwcfpr0th0000gn/T/tmpo24a68mg/Snippet.swift:39:46: error: cannot convert value of type 'OSSignpostID' to expected argument type 'OSSignpostIntervalState'"
-}
