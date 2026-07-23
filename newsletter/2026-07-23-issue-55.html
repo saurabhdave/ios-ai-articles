@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #55</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #55</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #55</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Security headlines are loud, but most teams I talk to are quietly wrestling with build pipelines that still have “just this once” buttons. Between privacy audits, new Swift drops, and a TestFlight that’s grown up, our risk isn’t the tools—it’s the glue we write and the habits we codify. This week is about turning TestFlight from a file drop into a workflow that never surprises you.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>TestFlight 4.3 Workflow Upgrades for iOS Teams</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Manual uploads, fuzzy groups, and unsymbolicated crashes are how otherwise solid teams lose days in pre-release. TestFlight 4.3 closes gaps, but only if you tighten your versioning, entitlements, and symbol handling in CI so the pipes carry the right bits every time. If you’ve ever shipped a hotfix that re-used a build number or watched a crash log turn to noise, you’ll want to see the wiring I recommend.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple defeats liability for not scanning iCloud for CSAM — Expect privacy baselines to keep leaning toward on-device processing and narrow data access; plan your telemetry and moderation features accordingly. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple Private Cloud Compute SOC 3 audit reports — If you pitch server-side ML with Apple’s infra, you now have audit material to hand security teams, which can unblock enterprise adoption. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple Fixes Hide My Email Vulnerability After 404 Media Coverage — Trust but verify: entitlement and email-routing edge cases can and do slip; add negative tests and runtime assertions for identity flows. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What's new in Swift: June 2026 Edition — With Swift evolving quickly post-WWDC, budget time for language upgrades in CI images and lint rules or you’ll pay for it at branch cut. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">// Swift script in CI: validate symbol artifacts before upload.
+import Foundation
+
+struct Symbols {
+    let dsym: URL
+    let bcsymbolMaps: [URL]
+}
+
+func loadSymbols(at exportPath: URL) throws -&gt; Symbols {
+    let fm = FileManager.default
+    let dsym = exportPath.appendingPathComponent(&quot;dSYMs/App.dSYM&quot;)
+    let bcsDir = exportPath.appendingPathComponent(&quot;BCSymbolMaps&quot;)
+    let contents = (try? fm.contentsOfDirectory(at: bcsDir, includingPropertiesForKeys: nil)) ?? []
+    guard fm.fileExists(atPath: dsym.path), !contents.isEmpty else {
+        throw NSError(domain: &quot;ci.symbols&quot;, code: 1, userInfo: [NSLocalizedDescriptionKey: &quot;Missing dSYM or BCSymbolMaps&quot;])
+    }
+    return Symbols(dsym: dsym, bcsymbolMaps: contents)
+}
+
+do {</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">You don’t ship builds—you ship debuggability—so failing the pipeline early on missing dSYMs/BCSymbolMaps is the difference between a one-hour fix and a multi-day postmortem.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://blog.ericgoldman.org/archives/2026/07/apple-defeats-liability-for-not-scanning-icloud-for-csam-but-the-judge-was-not-pleased-amy-v-apple.htm" style="color:#e05c00;text-decoration:none">Apple defeats liability for not scanning iCloud for CSAM</a></strong> — Legal winds still favor on-device privacy; design features assuming minimal server inspection.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://support.apple.com/guide/certifications/apple-private-cloud-compute-soc-3-audit-apc95a31b9d8/web" style="color:#e05c00;text-decoration:none">Apple Private Cloud Compute SoC 3 audit reports</a></strong> — Hand this to your CISO to greenlight experiments that touch Apple’s privacy-preserving compute.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.404media.co/apple-fixes-hide-my-email-vulnerability-after-404-media-coverage/" style="color:#e05c00;text-decoration:none">Apple Fixes Hide My Email Vulnerability After 404 Media Coverage</a></strong> — A reminder to test identity proxies and mail flows like untrusted boundaries, not convenience features.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If TestFlight still depends on a human to remember “the right way,” it’s a risk—let&#x27;s fix that. Read the full piece for a concrete 4.3 wiring checklist, then hit reply or forward to the teammate who owns your CI. I’ll be discussing the trade-offs and gotchas on LinkedIn this week—come add your scars and wins.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
