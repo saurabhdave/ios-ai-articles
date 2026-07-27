@@ -1,9 +1,0 @@
-{
-  "topic": "Designing App Intents for Apple Intelligence on iOS",
-  "generated_at_utc": "2026-07-27T13:02:04.174358+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[compile] /var/folders/8j/sfr9qqcj73j4p6nhwcfpr0th0000gn/T/tmpfnadudq7/Snippet.swift:50:76: error: cannot convert value of type 'Date' to expected argument type 'IntentParameter<Date>'\n/var/folders/8j/sfr9qqcj73j4p6nhwcfpr0th0000gn/T/tmpfnadudq7/Snippet.swift:50:42: error: cannot convert value of type 'Int' to expected argument type 'IntentParameter<Int>'\n/var/folders/8j/sfr9qqcj73j4p6nhwcfpr0th0000gn/T/tmpfnadudq7/Snippet.swift:50:58: error: type 'IntentParameter<BeverageKind>' has no member 'water'"
-}
