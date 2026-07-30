@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #57</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #57</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #57</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">SwiftUI apps are hitting that unglamorous phase where UX polish is blocked by rendering hitches that only appear on-device, in Release, under real scroll pressure. Meanwhile, Apple quietly shuffles programs (hello, Apple Upgrade) and folks on new M5 Pros are discovering bridged networking snags in VMs—both reminders that our tooling and platforms are moving under our feet while we ship. This week is about getting rigorous: traces over theories.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Profiling SwiftUI Rendering Hitches in Instruments</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">SwiftUI hitches are rarely about one slow view; they’re about the main thread missing a frame deadline while recompositions, layout, and drawing accumulate. Guesswork won’t isolate a stall during a fast scroll. You need a trace that shows which views recomputed, why they did, and where the time actually went.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The iPhone Upgrade Program is being replaced by Apple Upgrade — operational change that may affect device testing cycles and team budgeting for hardware refreshes. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">VMs can't boot with Network Mode set to Bridged on Apple M5 Pro machines — early adopters report hiccups, so plan fallbacks for local infra that depends on bridged networking. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Show HN: Qwen Scribe – local transcription and dictation for Apple Silicon — promising on-device prototyping path for voice features without cloud latency or data sharing. [Source: HackerNews]</li>
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What's new in Swift: June 2026 Edition — steady cadence continues; skim for language and tooling notes that can unblock incremental refactors rather than sweeping rewrites. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import OSLog
+
+enum ScrollSignposts {
+    static let signposter = OSSignposter(subsystem: &quot;com.acme.app&quot;, category: &quot;ux.scroll&quot;)
+
+    @discardableResult
+    static func begin() -&gt; OSSignpostIntervalState {
+        signposter.beginInterval(&quot;FeedScroll&quot;)
+    }
+
+    static func end(_ state: OSSignpostIntervalState) {
+        signposter.endInterval(&quot;FeedScroll&quot;, state)
+    }
+}```
+
+Script a repeatable scroll path before you record. Without determinism, it’s easy to chase noise and overfit fixes to outliers.
+
+## 2. Trace SwiftUI Recomposition And State
+### Identify Over-Invalidation
+Broadly scoped state can fan out recompositions. Track events tied to `@State` and observable models. If a high-level read depends on a large model, small changes can ripple widely.</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This signposting pattern pays for itself because it anchors your CA drops, SwiftUI recompositions, and Time Profiler samples to the exact user interaction you care about, making performance work a methodical investigation instead of a fishing expedition.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.apple.com/shop/iphone/iphone-upgrade-program" style="color:#e05c00;text-decoration:none">The iPhone Upgrade Program is being replaced by Apple Upgrade</a></strong> — Worth a heads-up to ops: device procurement and testing fleet rotations may need a tweak.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/utmapp/UTM/issues/7658" style="color:#e05c00;text-decoration:none">VMs can&amp;#x27;t boot with Network Mode set to Bridged on Apple M5 Pro machines</a></strong> — If your local services rely on bridged VMs, hold off on upgrades or plan NAT-based workarounds.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/VladUZH/qwen-scribe" style="color:#e05c00;text-decoration:none">Show HN: Qwen Scribe – local transcription and dictation for Apple Silicon</a></strong> — A practical sandbox for on-device voice UX experiments without cloud dependencies.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If performance is on your plate this sprint, the Big Story lays out a clear, reproducible path to isolate SwiftUI stalls without hand-waving. Read it, try the sequence on a physical device, and then hit reply with your trace war stories—or jump into the conversation on LinkedIn and share where your hitches usually hide. Forward this to the teammate who keeps “optimizing” views without a profile.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
