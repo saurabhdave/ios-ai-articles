@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #58</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #58</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #58</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">SwiftUI is seven years in, and the community is split between “good enough” and “death by footgun,” especially once you leave the happy path. Meanwhile, WidgetKit has grown across iOS, watchOS, macOS, and visionOS, but many teams still treat widgets like a view that refreshes itself instead of a constrained product with budgets and contracts. This week is about getting real: composable, testable widget architecture that doesn’t melt your background budget or fork three codebases.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Composable WidgetKit Architecture for Cross Platform Widgets</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Stale Lock Screen entries, reload storms, and platform forks usually come from implicit data flow and copy-paste renderers that don’t respect WidgetFamily constraints. The antidote is a composable design: one renderer per intent-driven entry model, a strict provider boundary, and platform shims only where density and contrast truly diverge. If your widget still “just updates,” this piece shows how to turn it into a product with explicit contracts that actually ship well.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">SwiftUI After 7 Years — A sober post making the rounds questions SwiftUI’s maturity at scale, which mirrors what many of us feel when we mix data flow, previews, and platform quirks. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Show HN: Kakehashi – Experimental userspace to run macOS binaries on Linux ARM — Interesting for tooling folks: if this matures, expect new CI/emulation workflows and cross-platform experiments. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple engineer says he was fired after refusing to send cust. device IDs to AT&T — Regardless of outcome, expect fresh scrutiny on customer data flows and stronger internal audit trails. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">MkLinux and the pimped-out Apple Workgroup Server 9150 — A fun reminder that Apple platform portability debates have long roots; history repeats with new acronyms. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">What's new in Swift: June 2026 Edition — Keep an eye on language and tooling updates from Swift.org; even small compiler or concurrency tweaks ripple into WidgetKit providers. [Source: Swift.org Blog]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import WidgetKit
+import AppIntents
+
+struct KPI: Sendable, Equatable { let title: String; let value: String }
+struct KPIEntry: TimelineEntry { let date: Date; let kpis: [KPI] }
+
+@MainActor
+struct KPIRenderer: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: KPIEntry
+    var body: some View {
+        switch family {
+        case .accessoryCircular:
+            Gauge(value: 1) { Text(entry.kpis.first?.value ?? &quot;--&quot;) }
+                .gaugeStyle(.accessoryCircular)
+        case .accessoryRectangular:
+            VStack(alignment: .leading) {
+                ForEach(entry.kpis.prefix(2), id: \.title) { kpi in
+                    Text(&quot;\(kpi.title): \(kpi.value)&quot;)
+                }
+            }
+        default:
+            VStack {
+                ForEach(entry.kpis, id: \.title) { kpi in
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern centralizes rendering behind a single View that switches on WidgetFamily, which keeps your entry model stable across platforms and avoids forking layouts into separate targets that inevitably drift and blow your update budget.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://ykvm.com/2026/07/swiftui-a-story-of-mediocrity/" style="color:#e05c00;text-decoration:none">SwiftUI After 7 Years</a></strong> — A candid read that matches what many large apps feel once they push past toy examples; worth a team discussion.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/wie-project/kakehashi" style="color:#e05c00;text-decoration:none">Show HN: Kakehashi – Experimental userspace to run macOS binaries on Linux ARM</a></strong> — Early days, but intriguing for CI and cross-platform tooling experiments.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://runtimewire.com/article/exclusive-apple-engineer-says-he-was-fired-after-refusing-to-send-customer-devic" style="color:#e05c00;text-decoration:none">Apple engineer says he was fired after refusing to send cust. device IDs to AT&amp;amp;T</a></strong> — Whatever the details, review your data access justifications and logging; compliance debt always comes due.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If widgets are still “that thing that flakes on Mondays,” read the big story and steal the contracts. Then hit reply and tell me where your team is stuck, or forward this to the person who babysits your timelines. I’ll be in the comments on LinkedIn continuing the conversation—join in and share what’s worked under real budgets.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
