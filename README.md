@@ -62,6 +62,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-08-06 | [Generate App Intents with Swift 6.3 Macros](articles/2026-08-06-generate-app-intents-with-swift-63-macros.md) | [Post](linkedin/2026-08-06-generate-app-intents-with-swift-63-macros-linkedin.md) |
 | 2026-08-03 | [Composable WidgetKit Architecture for Cross Platform Widgets](articles/2026-08-03-composable-widgetkit-architecture-for-cross-platform-widgets.md) | [Post](linkedin/2026-08-03-composable-widgetkit-architecture-for-cross-platform-widgets-linkedin.md) |
 | 2026-07-20 | [Hunting AppKit Retain Cycles with Memory Graph](articles/2026-07-20-hunting-appkit-retain-cycles-with-memory-graph.md) | [Post](linkedin/2026-07-20-hunting-appkit-retain-cycles-with-memory-graph-linkedin.md) |
 | 2026-07-16 | [Speed Up Xcode Builds with Explicit Modules](articles/2026-07-16-speed-up-xcode-builds-with-explicit-modules.md) | [Post](linkedin/2026-07-16-speed-up-xcode-builds-with-explicit-modules-linkedin.md) |
@@ -71,9 +72,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-06-25 | [OSSignposter Custom Performance Markers for iOS](articles/2026-06-25-ossignposter-custom-performance-markers-for-ios.md) | [Post](linkedin/2026-06-25-ossignposter-custom-performance-markers-for-ios-linkedin.md) |
 | 2026-06-22 | [Debugging App Intents Responses in Xcode](articles/2026-06-22-debugging-app-intents-responses-in-xcode.md) | [Post](linkedin/2026-06-22-debugging-app-intents-responses-in-xcode-linkedin.md) |
 | 2026-06-18 | [Update Sign in with Apple Domains Without Breaking Login](articles/2026-06-18-update-sign-in-with-apple-domains-without-breaking-login.md) | [Post](linkedin/2026-06-18-update-sign-in-with-apple-domains-without-breaking-login-linkedin.md) |
-| 2026-06-15 | [NavigationStack Patterns for visionOS](articles/2026-06-15-navigationstack-patterns-for-visionos.md) | [Post](linkedin/2026-06-15-navigationstack-patterns-for-visionos-linkedin.md) |
 
-> Showing 10 of 40 articles — [30 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 41 articles — [31 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
