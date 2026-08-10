@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #60</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #60</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #60</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Between Xcode 27 beta shaking up workflows and another high‑profile App Store review retraction making the rounds, teams are quietly wrestling with a more basic failure mode: app hangs that never crash and never log. SwiftUI and Observation make it easy to trigger extra work on the main thread without noticing, and Time Profiler is still the fastest truth serum we have. This week is about turning “it feels sluggish” into a fix you can ship.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Diagnosing iOS Hangs with Xcode Time Profiler</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Hangs are the ugliest kind of failure because they hide where the time actually goes, usually somewhere on the main thread you didn’t mean to touch. If you can capture a clean Time Profiler run, expand the main thread to your first app frame, and annotate with signposts, you can usually spot the blocking call in minutes. The trick is reading stacks with intent: keep your mental model of what should be off-main, then let the evidence change your mind.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Retraction of a widely shared “App Store Rejection of the Week” reminds us to read guidelines and edge cases closely before outrage; review can be correct and still surprising. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Klepton shows Android ARM64 VR APKs running on Apple Vision Pro, hinting at a wave of experimental ports and performance benchmarks for 3D/VR pipelines on visionOS. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">The Swift.org July 2026 roundup suggests steady momentum across tooling, concurrency discussions, and package ecosystem improvements—worth scanning for upcoming source-compat impacts. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Xcode 27 (beta 4) appears to be a substantive release with meaningful quality-of-life fixes; teams should budget time to validate build settings, test plans, and new diagnostics. [Source: dev.to]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Foundation
+import Observation
+import OSLog
+
+struct FeedItem: Identifiable, Decodable, Equatable {
+    let id: Int
+    let title: String
+}
+
+@MainActor
+@Observable
+final class FeedModel {
+    var items: [FeedItem] = []
+    private let signposter = OSSignposter(subsystem: &quot;com.example.app&quot;, category: &quot;Feed&quot;)
+    private let logger = Logger(subsystem: &quot;com.example.app&quot;, category: &quot;Feed&quot;)
+
+    func load() async {
+        let name: StaticString = &quot;FeedLoad&quot;
+        let state = signposter.beginInterval(name)
+        defer { signposter.endInterval(name, state) }
+        do {
+            let newItems = try await Self.fetchAndDecodeOffMain()
+            logger.log(&quot;AssignItems.count=\(newItems.count, privacy: .public)&quot;)
+            items = newItems
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This combo—Observation for minimal invalidations, @MainActor for explicit UI hops, and OSSignposter for proof—codifies two hard‑won habits: keep work off the main thread and measure the hot paths you think you fixed.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://daringfireball.net/2026/08/retraction_app_store_rejection_of_the_week" style="color:#e05c00;text-decoration:none">Retraction: The App Store Rejection of the Week That Was a Correct Rejection</a></strong> — A useful reminder that policy nuance matters; verify before you escalate.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/shinyquagsire23/Klepton" style="color:#e05c00;text-decoration:none">Run Android ARM64 VR APKs on Apple Vision Pro</a></strong> — Not production-ready, but an eye‑opener for performance exploration and cross‑platform rendering assumptions.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/arshtechpro/xcode-27-everything-developers-need-to-know-6lh" style="color:#e05c00;text-decoration:none">Xcode 27: Everything Developers Need to Know</a></strong> — A practical overview to plan your beta adoption and CI breakage budget.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If you’re chasing a stall, grab a Time Profiler trace on device, read the main-thread stack until you hit your code, and let the data drive the fix. Read the full piece for a battle-tested flow and signposting tips, then hit reply or forward this to the teammate who “just scrolled and it froze.” I’m also comparing notes in the weekly discussion—tell me what actually blocked your main thread and what finally gave it away.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
