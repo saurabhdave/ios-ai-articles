@@ -1,0 +1,9 @@
+{
+  "topic": "SwiftUI PhaseAnimator Patterns Senior Engineers Rely",
+  "generated_at_utc": "2026-08-13T11:08:59.337082+00:00",
+  "path": "omitted",
+  "repair_attempts": 2,
+  "swift_language_version": "6.2.4",
+  "swift_language_mode": "6",
+  "diagnostics_excerpt": "[compile] /var/folders/df/djsxfhc17x95674wsm_g8s980000gn/T/tmpzrx5my2m/Snippet.swift:35:21: error: extra argument 'content' in call\n/var/folders/df/djsxfhc17x95674wsm_g8s980000gn/T/tmpzrx5my2m/Snippet.swift:17:55: error: contextual closure type '(ToastPhase) -> Content' expects 1 argument, but 2 were used in closure body"
+}
