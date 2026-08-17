@@ -62,6 +62,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-08-17 | [Swift 6 Concurrency Migration for Deprecated iOS APIs](articles/2026-08-17-swift-6-concurrency-migration-for-deprecated-ios-apis.md) | [Post](linkedin/2026-08-17-swift-6-concurrency-migration-for-deprecated-ios-apis-linkedin.md) |
 | 2026-08-10 | [Diagnosing iOS Hangs with Xcode Time Profiler](articles/2026-08-10-diagnosing-ios-hangs-with-xcode-time-profiler.md) | [Post](linkedin/2026-08-10-diagnosing-ios-hangs-with-xcode-time-profiler-linkedin.md) |
 | 2026-08-06 | [Generate App Intents with Swift 6.3 Macros](articles/2026-08-06-generate-app-intents-with-swift-63-macros.md) | [Post](linkedin/2026-08-06-generate-app-intents-with-swift-63-macros-linkedin.md) |
 | 2026-08-03 | [Composable WidgetKit Architecture for Cross Platform Widgets](articles/2026-08-03-composable-widgetkit-architecture-for-cross-platform-widgets.md) | [Post](linkedin/2026-08-03-composable-widgetkit-architecture-for-cross-platform-widgets-linkedin.md) |
@@ -71,9 +72,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-07-06 | [MVVM or Observable? Choosing for Production SwiftUI](articles/2026-07-06-mvvm-or-observable-choosing-for-production-swiftui.md) | [Post](linkedin/2026-07-06-mvvm-or-observable-choosing-for-production-swiftui-linkedin.md) |
 | 2026-07-02 | [Custom SwiftUI Layouts with the Layout Protocol](articles/2026-07-02-custom-swiftui-layouts-with-the-layout-protocol.md) | [Post](linkedin/2026-07-02-custom-swiftui-layouts-with-the-layout-protocol-linkedin.md) |
 | 2026-06-25 | [OSSignposter Custom Performance Markers for iOS](articles/2026-06-25-ossignposter-custom-performance-markers-for-ios.md) | [Post](linkedin/2026-06-25-ossignposter-custom-performance-markers-for-ios-linkedin.md) |
-| 2026-06-22 | [Debugging App Intents Responses in Xcode](articles/2026-06-22-debugging-app-intents-responses-in-xcode.md) | [Post](linkedin/2026-06-22-debugging-app-intents-responses-in-xcode-linkedin.md) |
 
-> Showing 10 of 42 articles — [32 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 43 articles — [33 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
