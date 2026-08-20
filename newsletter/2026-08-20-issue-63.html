@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #63</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #63</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #63</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Between Apple’s regulatory reshuffles and the “AI can do anything” demos, the quiet work that ships macOS apps remains the same: make layouts resilient under real user input. Desktop windows get resized, sidebars collapse, titles localize, and constraint solvers have opinions you didn’t vote for. This week is about making AppKit show its math so we stop guessing.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Debugging macOS AppKit Layout Bugs with Xcode View Debugger</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">When a window looks fine in Interface Builder but implodes on resize, you’re not dealing with pixels—you’re negotiating with Auto Layout’s solver. The View Debugger exposes the actual constraints, priorities, and intrinsic sizes in play, so you can see the conflict instead of cargo-culting “.required” everywhere. If your layout shakes under stress, this walkthrough shows how to tighten the priorities ladder and stabilize the system before users ever touch the resize handle.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple announces changes for apps in the EU — teams appear to be re-evaluating distribution, entitlement, and payment assumptions; expect more operational work than code this quarter. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">A 3D fruit fly on macOS desktop powered by the real FlyWire connectome — a reminder that macOS is still a great platform for scientific visualization and GPU-heavy desktop tooling. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Claude writing a macOS driver for an obscure HP printer — early signals suggest AI-assisted low-level macOS development is moving from toy to tooling, but keep humans in the review loop. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">MicroGPT-C in pure C hits 10M TPS on Apple M5 — tiny inference stacks in C are becoming credible for on-device features without dragging in heavyweight runtimes. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Claude Code teaching macOS to natively print to the HP Laser 1008a — a second datapoint pointing to AI as a bootstrapper for device support and driver shims on Apple platforms. [Source: HackerNews]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import AppKit
+
+final class DebugLayoutViewController: NSViewController {
+    private let avatar = NSImageView()
+    private let titleLabel: NSTextField = {
+        let tf = NSTextField(labelWithString: &quot;A very long title that can wrap or compress under stress&quot;)
+        tf.lineBreakMode = .byTruncatingTail
+        tf.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        tf.setContentCompressionResistancePriority(.defaultLow, for: .horizontal) // allow compression before breaking avatar
+        return tf
+    }()
+
+    override func loadView() {
+        view = NSView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.identifier = NSUserInterfaceItemIdentifier(&quot;RootContentView&quot;)
+
+        avatar.image = NSImage(named: NSImage.userAccountsName)
+        avatar.imageScaling = .scaleProportionallyUpOrDown
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        avatar.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        avatar.setContentCompressionResistancePriority(.required, for: .horizontal)
+        avatar.identifier = NSUserInterfaceItemIdentifier(&quot;AvatarView&quot;)
+
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This snippet encodes a sane priorities ladder—protect the non-negotiable avatar, let the title yield under pressure—which is exactly how you keep AppKit layouts stable as windows resize and content changes at runtime.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.apple.com/newsroom/2026/08/apple-announces-changes-for-apps-in-the-european-union/" style="color:#e05c00;text-decoration:none">Apple announces changes for apps in the European Union</a></strong> — Bookmark for policy details; product roadmaps will need operational updates once the fine print settles.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://github.com/DenisSergeevitch/desktop-fly" style="color:#e05c00;text-decoration:none">A 3D fruit fly on macOS desktop powered by the real FlyWire connectome</a></strong> — Fun, but also a blueprint for shipping serious 3D/Metal/SceneKit data viz on the desktop.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://twitter.com/kuberwastaken/status/2089377982536388964" style="color:#e05c00;text-decoration:none">Claude writing a macOS driver for my obscure HP printer built only for Windows</a></strong> — A provocative case study; treat as inspiration for tooling, not a compliance playbook.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your AppKit window jitters or tears on resize, the debugger-centric workflow in this week’s piece will save hours of guesswork. Read the full article, try the priorities ladder on your worst offender, and tell me what breaks next. Hit reply with your screenshots, or jump into the LinkedIn thread and share how you’re validating layouts under real runtime conditions.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
