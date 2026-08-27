@@ -1,9 +1,0 @@
-{
-  "topic": "Safely Migrating SwiftData Schemas in Production",
-  "generated_at_utc": "2026-08-27T20:21:12.563310+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[compile] /var/folders/df/djsxfhc17x95674wsm_g8s980000gn/T/tmpsppndyb6/Snippet.swift:49:20: error: no exact matches in call to initializer"
-}
