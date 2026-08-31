@@ -62,6 +62,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-08-31 | [Practical SwiftUI Environment Keys for Scalable Apps](articles/2026-08-31-practical-swiftui-environment-keys-for-scalable-apps.md) | [Post](linkedin/2026-08-31-practical-swiftui-environment-keys-for-scalable-apps-linkedin.md) |
 | 2026-08-24 | [Building VoiceOver-Friendly Custom SwiftUI Controls](articles/2026-08-24-building-voiceover-friendly-custom-swiftui-controls.md) | [Post](linkedin/2026-08-24-building-voiceover-friendly-custom-swiftui-controls-linkedin.md) |
 | 2026-08-20 | [Debugging macOS AppKit Layout Bugs with Xcode View Debugger](articles/2026-08-20-debugging-macos-appkit-layout-bugs-with-xcode-view-debugger.md) | [Post](linkedin/2026-08-20-debugging-macos-appkit-layout-bugs-with-xcode-view-debugger-linkedin.md) |
 | 2026-08-17 | [Swift 6 Concurrency Migration for Deprecated iOS APIs](articles/2026-08-17-swift-6-concurrency-migration-for-deprecated-ios-apis.md) | [Post](linkedin/2026-08-17-swift-6-concurrency-migration-for-deprecated-ios-apis-linkedin.md) |
@@ -71,9 +72,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-07-20 | [Hunting AppKit Retain Cycles with Memory Graph](articles/2026-07-20-hunting-appkit-retain-cycles-with-memory-graph.md) | [Post](linkedin/2026-07-20-hunting-appkit-retain-cycles-with-memory-graph-linkedin.md) |
 | 2026-07-16 | [Speed Up Xcode Builds with Explicit Modules](articles/2026-07-16-speed-up-xcode-builds-with-explicit-modules.md) | [Post](linkedin/2026-07-16-speed-up-xcode-builds-with-explicit-modules-linkedin.md) |
 | 2026-07-13 | [Dark Mode Color Contrast Checks for SwiftUI](articles/2026-07-13-dark-mode-color-contrast-checks-for-swiftui.md) | [Post](linkedin/2026-07-13-dark-mode-color-contrast-checks-for-swiftui-linkedin.md) |
-| 2026-07-06 | [MVVM or Observable? Choosing for Production SwiftUI](articles/2026-07-06-mvvm-or-observable-choosing-for-production-swiftui.md) | [Post](linkedin/2026-07-06-mvvm-or-observable-choosing-for-production-swiftui-linkedin.md) |
 
-> Showing 10 of 45 articles — [35 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 46 articles — [36 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
