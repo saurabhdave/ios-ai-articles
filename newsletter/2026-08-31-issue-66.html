@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #66</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #66</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #66</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">SwiftUI apps are getting bigger, and the pain shows up in all the usual places: previews that crash, features that toggle inconsistently across screens, and cells that re-render because a “global” leaked into view state. The fix isn’t another DI container; it’s making policy explicit and local. This week is about putting cross‑cutting decisions where SwiftUI already wants them: the environment.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>Practical SwiftUI Environment Keys for Scalable Apps</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Crashing previews, mis-scoped rollouts, and list churn often share one culprit: dependencies with no boundaries. Treat the SwiftUI environment as a typed, read-only policy layer and you get deterministic previews, safer feature flags, and fewer accidental re-renders. If you’ve ever threaded a logger or a clock through ten initializers, this is the click that buys your weekend back.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Embedded Swift Improvements Coming in Swift 6.4 — Apple is tightening the Embedded Swift subset, which signals real intent for Swift beyond iOS and opens doors for companion devices and on-device ML controllers. [Source: Swift.org Blog]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Dropping BadUSB Keystrokes on macOS — Practical OS-level mitigations remind teams to threat-model peripherals and harden dev laptops, not just prod servers. [Source: dev.to]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Why I Built a Budgeting App That Refuses to Connect to Your Bank — A push toward trust-by-design suggests more apps will trade integrations for explicit user control and simpler privacy postures. [Source: Medium]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">SwiftUI vs Jetpack Compose: Two Declarative Frameworks, Two Platform Philosophies — Useful comparative thinking if you’re sharing architecture across iOS/Android; the philosophical gaps explain why “just mirror it” often burns cycles. [Source: Medium]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+
+enum Feature: Hashable { case newPaywall }
+
+struct FeaturePolicy { let enabled: Set&lt;Feature&gt;; func isEnabled(_ f: Feature) -&gt; Bool { enabled.contains(f) } }
+
+private struct FeaturePolicyKey: EnvironmentKey { static let defaultValue = FeaturePolicy(enabled: []) }
+
+extension EnvironmentValues { var featurePolicy: FeaturePolicy { get { self[FeaturePolicyKey.self] } set { self[FeaturePolicyKey.self] = newValue } } }
+
+struct PaywallView: View {
+    @Environment(\.featurePolicy) private var policy
+    var body: some View {
+        Text(policy.isEnabled(.newPaywall) ? &quot;New Paywall&quot; : &quot;Legacy Paywall&quot;)
+    }
+}
+
+struct CohortGate: View {
+    let cohort: String
+    var body: some View {
+        let policy = FeaturePolicy(enabled: cohort == &quot;A&quot; ? [.newPaywall] : [])
+        return PaywallView().environment(\.featurePolicy, policy)
+    }
+}
+
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern decouples feature decisions from view construction, so you can swap policies at the composition root for cohorts, previews, and tests without leaking state or inflating initializers.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://dev.to/lafine_systemsdesign/dropping-badusb-keystrokes-on-macos-before-they-open-spotlight-3of8" style="color:#e05c00;text-decoration:none">Dropping BadUSB Keystrokes on macOS Before They Open Spotlight</a></strong> — A hands-on reminder to harden macOS workstations against “it’s just a cable” attacks.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/@shreyaskalyanpad25/why-i-built-a-budgeting-app-that-refuses-to-connect-to-your-bank-f1e8f11bcbdd?source=rss------ios-5" style="color:#e05c00;text-decoration:none">Why I Built a Budgeting App That Refuses to Connect to Your Bank</a></strong> — A compelling case for local-first finance UX and fewer brittle integrations.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://medium.com/@sklee206/swifts-tokenised-deposit-ledger-is-not-a-swift-coin-and-that-is-the-point-3e6a8a4fb6d2?source=rss------swift-5" style="color:#e05c00;text-decoration:none">Swift’s Tokenised Deposit Ledger Is Not a Swift Coin — and That Is the Point</a></strong> — Not about the language; useful context for fintech teams navigating bank rails vs. crypto narratives.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your SwiftUI app is feeling “global,” the environment keys article is the smallest change with the biggest stability payoff—go read it and try one policy this week. Then hit reply or join the LinkedIn thread to share how you scope flags, clocks, and loggers without tripping re-renders. Forward this to a teammate who’s been untangling initializer soup.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
