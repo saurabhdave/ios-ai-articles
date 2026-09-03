@@ -1,9 +1,0 @@
-{
-  "topic": "Designing Core Haptics for macOS Apps",
-  "generated_at_utc": "2026-09-03T14:20:10.300486+00:00",
-  "path": "omitted",
-  "repair_attempts": 2,
-  "swift_language_version": "6.2.4",
-  "swift_language_mode": "6",
-  "diagnostics_excerpt": "[compile]  | style=Remove `@Bindable` from model properties (`model`) inside `@Observable`. Plain stored properties belong in the model; `@Bindable` belongs only in the SwiftUI View: `struct MyView: View {{ @Bindable var model: MyModel }}`."
-}
