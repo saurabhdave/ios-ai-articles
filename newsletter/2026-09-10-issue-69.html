@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>iOS Dev Weekly — Issue #69</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0;font-family:Georgia,serif">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f0f0">
+  <tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" border="0"
+           style="background:#ffffff;max-width:600px;width:100%;border-radius:4px">
+      <tr>
+        <td style="background:#1a1a1a;padding:24px 40px;border-radius:4px 4px 0 0">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#aaa;letter-spacing:2px;text-transform:uppercase">Issue #69</p>
+          <h1 style="margin:4px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:26px;color:#ffffff;letter-spacing:-0.5px">iOS Dev Weekly</h1>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 40px">
+<h2 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:22px">iOS Dev Weekly — Issue #69</h2>
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Opening</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">Hardware week again, and with it the usual flood of press. But the quieter reality for teams right now is stabilizing SwiftUI apps that stream live state without blowing up the main actor or starving rendering. If your feed-driven screens stutter under load, this issue is for you.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">This Week&#x27;s Big Story</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong>AsyncSequence Patterns for Real-Time SwiftUI Views</strong></p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">SwiftUI is fine with “fast enough,” but it falls apart with bursty, unordered, or long-lived inputs unless you own buffering, cancellation, and isolation. The core move is to treat each live source as an AsyncSequence boundary you can reason about and test, not as a delegate call spraying mutations across the app. If you’ve ever shipped a screen that only recovers after a full relaunch, this is the mental model that prevents it.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Trend Signals</h3>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">iPhone Duo — A new form factor always reopens layout and gesture assumptions; expect edge cases in scene phases and window sizes to matter again. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">iPhone 18 Pro and iPhone 18 Pro Max — New silicon typically alters energy/perf trade-offs for background tasks; revalidate your refresh cadence and metrics on device. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple Watch Series 12 — The health-sensing story advances, which usually means more cadence-sensitive streams; design HealthKit bridges as AsyncSequences, not timers. [Source: HackerNews]</li>
+</ul>
+<ul style="margin:0 0 16px;padding-left:20px;list-style-type:disc">
+<li style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin-bottom:6px">Apple Watch Ultra 4 — Endurance workloads highlight cancellation discipline; long-running Tasks must checkpoint and yield responsibly to avoid UI back-pressure. [Source: HackerNews]</li>
+</ul>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Swift Snippet of the Week</h3>
+<code style="background:#f4f4f4;border-left:3px solid #e05c00;padding:16px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;white-space:pre;overflow-x:auto;display:block;margin:16px 0;color:#1a1a1a">import SwiftUI
+import Observation
+
+struct TickerEvent: Identifiable, Sendable { let id = UUID(); let value: Int; let time: Date }
+
+actor TickerSource {
+    private var continuation: AsyncStream&lt;TickerEvent&gt;.Continuation?
+    private var pump: Task&lt;Void, Never&gt;?
+    let id = UUID()
+    func stream(buffer: Int = 64) -&gt; AsyncStream&lt;TickerEvent&gt; {
+        AsyncStream(bufferingPolicy: .bufferingOldest(buffer)) { cont in
+            continuation = cont
+            cont.onTermination = { [weak self] _ in Task { await self?.stop() } }
+        }
+    }
+    func startDemo() {
+        pump?.cancel()
+        pump = Task {
+            var n = 0
+            while !Task.isCancelled {
+                for _ in 0..&lt;Int.random(in: 1...6) {
+                    n += 1; continuation?.yield(.init(value: n, time: .now))
+                }
+                try? await Task.sleep(for: .milliseconds(Int.random(in: 60...220)))
+            }
+// … (truncated for newsletter)</code>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">This pattern encodes explicit back-pressure, lifecycle-aware cancellation, and actor isolation at the source—practical guardrails that keep real-time SwiftUI views responsive under bursty load.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Community Picks</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.apple.com/iphone-duo/" style="color:#e05c00;text-decoration:none">iPhone Duo</a></strong> — If you target novel screen states, audit orientation, split-view, and scrolling assumptions now.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.apple.com/newsroom/2026/09/apple-debuts-iphone-18-pro-and-iphone-18-pro-max/" style="color:#e05c00;text-decoration:none">iPhone 18 Pro and iPhone 18 Pro Max</a></strong> — Treat the first on-device perf pass as a requirement; simulator won’t tell you thermal headroom stories.</p>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px"><strong><a href="https://www.apple.com/newsroom/2026/09/introducing-apple-watch-series-12-with-the-all-new-health-sensing-system/" style="color:#e05c00;text-decoration:none">Apple Watch Series 12</a></strong> — Health streams amplify coalescing strategy: debounce off-main, render succinctly.</p>
+<hr style="border:0;border-top:1px solid #e8e8e8;margin:24px 0">
+<h3 style="font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;margin:24px 0 8px;font-size:18px">Until Next Time</h3>
+<p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#333;margin:0 0 16px">If your real-time screens feel fragile, the full piece walks through AsyncSequence boundaries you can test, instrument, and trust. Give it a read, then hit reply with what you’re seeing in production or forward it to the teammate wrestling with Task cancellation right now. I’m also unpacking trade-offs in a LinkedIn thread—jump in and tell me how you’re shaping buffers and back-pressure this cycle.</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8f8f8;padding:20px 40px;border-radius:0 0 4px 4px;border-top:1px solid #e8e8e8">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#888;text-align:center">iOS Dev Weekly &middot; For iOS engineers, by iOS engineers</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
