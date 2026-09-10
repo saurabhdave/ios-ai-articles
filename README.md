@@ -62,6 +62,7 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 <!-- ARTICLES_TABLE_START -->
 | Date | Article | LinkedIn |
 |------|---------|----------|
+| 2026-09-10 | [AsyncSequence Patterns for Real-Time SwiftUI Views](articles/2026-09-10-asyncsequence-patterns-for-real-time-swiftui-views.md) | [Post](linkedin/2026-09-10-asyncsequence-patterns-for-real-time-swiftui-views-linkedin.md) |
 | 2026-09-07 | [Prevent Retain Cycles in Swift Actors](articles/2026-09-07-prevent-retain-cycles-in-swift-actors.md) | [Post](linkedin/2026-09-07-prevent-retain-cycles-in-swift-actors-linkedin.md) |
 | 2026-08-31 | [Practical SwiftUI Environment Keys for Scalable Apps](articles/2026-08-31-practical-swiftui-environment-keys-for-scalable-apps.md) | [Post](linkedin/2026-08-31-practical-swiftui-environment-keys-for-scalable-apps-linkedin.md) |
 | 2026-08-24 | [Building VoiceOver-Friendly Custom SwiftUI Controls](articles/2026-08-24-building-voiceover-friendly-custom-swiftui-controls.md) | [Post](linkedin/2026-08-24-building-voiceover-friendly-custom-swiftui-controls-linkedin.md) |
@@ -71,9 +72,8 @@ Latest 10 — full list at **[saurabhdave.github.io/ios-ai-articles](https://sau
 | 2026-08-06 | [Generate App Intents with Swift 6.3 Macros](articles/2026-08-06-generate-app-intents-with-swift-63-macros.md) | [Post](linkedin/2026-08-06-generate-app-intents-with-swift-63-macros-linkedin.md) |
 | 2026-08-03 | [Composable WidgetKit Architecture for Cross Platform Widgets](articles/2026-08-03-composable-widgetkit-architecture-for-cross-platform-widgets.md) | [Post](linkedin/2026-08-03-composable-widgetkit-architecture-for-cross-platform-widgets-linkedin.md) |
 | 2026-07-20 | [Hunting AppKit Retain Cycles with Memory Graph](articles/2026-07-20-hunting-appkit-retain-cycles-with-memory-graph.md) | [Post](linkedin/2026-07-20-hunting-appkit-retain-cycles-with-memory-graph-linkedin.md) |
-| 2026-07-16 | [Speed Up Xcode Builds with Explicit Modules](articles/2026-07-16-speed-up-xcode-builds-with-explicit-modules.md) | [Post](linkedin/2026-07-16-speed-up-xcode-builds-with-explicit-modules-linkedin.md) |
 
-> Showing 10 of 47 articles — [37 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
+> Showing 10 of 48 articles — [38 more on the blog](https://saurabhdave.github.io/ios-ai-articles)
 <!-- ARTICLES_TABLE_END -->
 
 ## Article Format
